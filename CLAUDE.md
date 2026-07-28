@@ -19,7 +19,7 @@ Treat the master plan as canonical scope and `MEMORY.md` as the current implemen
 ## Current State
 
 - Stage 3 compliance walking skeleton is active.
-- Build Packet 33 is complete.
+- Build Packet 34 is complete.
 - Work assignment, append-only reassignment, immutable workflow versions, pinned checklists, checklist completion evidence, checklist-gated review submission, reviewer return and approval decisions and explicit audited workflow-version migration are implemented.
 - Every work item is pinned to a published firm-owned workflow definition and checklist version.
 - Moving from `in_preparation` to `under_review` requires retained completion evidence for every required item on the pinned checklist.
@@ -37,23 +37,24 @@ Treat the master plan as canonical scope and `MEMORY.md` as the current implemen
 - The audit register can be exported through `ExportAuditRegister`; its browser download resolves only an immutable firm-scoped export record, verifies the private artifact checksum and size, and records retrieval separately.
 - Completed work can be corrected through `ReopenWorkItem`, which creates a linked follow-up and never changes the original. An obligation keeps one primary work item plus any number of follow-ups.
 - The read-only work register groups each preserved primary work item with chronological corrective follow-ups and exposes each record's independent status, risk, workflow version and current owners.
+- The firm dashboard derives separate due-soon, overdue, high-risk and overdue-payment measures from stored firm-scoped records without calculating a compliance score.
 - Two operational notification templates exist, `work_item_high_risk` and `payment_overdue`, both fired only by an explicit recorded change and addressed to the current responsible manager.
 - Regulated-rule generation modules are not implemented.
 - The full current verification baseline is recorded in `MEMORY.md`.
 
 ## Next Safe Packet
 
-Add a firm dashboard summarising due work, high risk and overdue payments from existing records.
+Add retained document evidence with strict validation and an explicit malware-scanning boundary.
 
 Keep it bounded:
 
-- Derive every count from existing firm-scoped records.
-- Keep work, filing, payment, tax and risk state separate.
-- Show actionable due and overdue groups without inventing a compliance score.
-- Add authorization, tenant-isolation, empty-state and responsive interface tests.
-- Update this file and `MEMORY.md`.
+- Store only synthetic test files during development.
+- Validate file size, extension, detected MIME type and allowed document purpose.
+- Keep new uploads quarantined until a scanner adapter returns a clean result; do not pretend a scanner exists when it is not configured.
+- Link retained evidence to one firm-scoped work item and preserve an immutable upload record.
+- Add authorization, tenant-isolation, unsafe-file, quarantine and download tests.
 
-After that packet, the next planned slice is retained document evidence with strict validation and an approved malware-scanning boundary.
+After that packet, stop before import processing unless conflict, reversal and retention policies have been approved.
 
 ## Local Commands
 

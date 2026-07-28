@@ -6,6 +6,7 @@ use App\Http\Controllers\FirmSwitchController;
 use App\Http\Controllers\InvitationAcceptanceController;
 use App\Livewire\Audit\Index as AuditIndex;
 use App\Livewire\Clients\Index as ClientsIndex;
+use App\Livewire\Dashboard\Index as DashboardIndex;
 use App\Livewire\Members\Index as MembersIndex;
 use App\Livewire\Obligations\Index as ObligationsIndex;
 use App\Livewire\Settings\FeatureFlags as SettingsFeatureFlags;
@@ -27,7 +28,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 });
 
 Route::middleware(['auth', 'verified', 'firm.context'])->group(function () {
-    Route::view('dashboard', 'dashboard')->name('dashboard');
+    Route::livewire('dashboard', DashboardIndex::class)->name('dashboard');
     Route::livewire('clients', ClientsIndex::class)->name('clients.index');
     Route::livewire('members', MembersIndex::class)->name('members.index');
     Route::livewire('obligations', ObligationsIndex::class)->name('obligations.index');
