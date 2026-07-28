@@ -19,7 +19,7 @@ Treat the master plan as canonical scope and `MEMORY.md` as the current implemen
 ## Current State
 
 - Stage 3 compliance walking skeleton is active.
-- Build Packet 35 is complete.
+- Build Packet 36 is complete.
 - Work assignment, append-only reassignment, immutable workflow versions, pinned checklists, checklist completion evidence, checklist-gated review submission, reviewer return and approval decisions and explicit audited workflow-version migration are implemented.
 - Every work item is pinned to a published firm-owned workflow definition and checklist version.
 - Moving from `in_preparation` to `under_review` requires retained completion evidence for every required item on the pinned checklist.
@@ -39,23 +39,22 @@ Treat the master plan as canonical scope and `MEMORY.md` as the current implemen
 - The read-only work register groups each preserved primary work item with chronological corrective follow-ups and exposes each record's independent status, risk, workflow version and current owners.
 - The firm dashboard derives separate due-soon, overdue, high-risk and overdue-payment measures from stored firm-scoped records without calculating a compliance score.
 - Document evidence is immutable, firm-scoped, private and fail-closed: unconfigured scanning quarantines, infected payloads are removed, and only checksum-verified clean evidence can be downloaded.
+- Client profiles retain explicit service enrollments with a responsible active firm member, tax registrations and actual non-overlapping tax periods. These records are firm-scoped, permission-gated and audited, and no period or registration is inferred.
 - Two operational notification templates exist, `work_item_high_risk` and `payment_overdue`, both fired only by an explicit recorded change and addressed to the current responsible manager.
 - Regulated-rule generation modules are not implemented.
 - The full current verification baseline is recorded in `MEMORY.md`.
 
 ## Next Safe Packet
 
-Record product-owner decisions for import conflict handling, reversal and retention before import processing begins.
+Add client contacts and explicit audited client and service lifecycle transitions.
 
 Keep it bounded:
 
-- Choose whether an import creates proposals only or may create new records directly.
-- Define duplicate-key and conflicting-value behavior.
-- Define reversal rules after an approved import is applied.
-- Define retention for source files, staging rows, rejected rows and processing evidence.
-- Do not infer these governance decisions in code.
-
-After approval, build the first bounded import staging packet without applying changes to canonical records.
+- Add firm-scoped client contacts without sensitive identity-document scans.
+- Add explicit client status and service-enrollment transition actions with retained reasons and history.
+- Keep tax registrations and periods as separately stored facts.
+- Do not infer status changes from dates or other records.
+- Keep import processing gated until conflict, reversal and retention decisions are approved.
 
 ## Local Commands
 

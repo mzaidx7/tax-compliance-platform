@@ -2,20 +2,20 @@
 
 ## Handoff Metadata
 
-- Last updated: 2026-07-28 02:40 +04:00
-- Updated by: Claude Sonnet 5 (Claude Code)
+- Last updated: 2026-07-28
+- Updated by: Codex GPT-5.6
 - Current parent repository branch: `main`
 - Current parent baseline commit: `1071185`
-- Platform repository status: not yet initialised as a separate repository
-- Parent repository status for this directory: entire `TBT Compliance Platform/` directory is untracked
-- Current phase: Stage 3, compliance walking skeleton
-- Current milestone: Operational notification triggers packet completed
+- Platform repository status: independent repository on `main`, remote `mzaidx7/tax-compliance-platform`
+- Parent repository status for this directory: separate nested repository, outside website delivery
+- Current phase: Stage 4, client and data foundation
+- Current milestone: Client service and tax profile packet completed
 
 ## Current Objective
 
 Create a UAE-focused compliance operations and e-invoicing readiness platform under a TBT subdomain while keeping its application, data, deployment and release lifecycle separate from the public TBT website.
 
-The immediate objective is approval of import conflict, reversal and retention policies before import processing.
+The immediate objective is a bounded client contacts and audited lifecycle-transition packet. Import processing remains gated on product-owner decisions for conflict handling, reversal and retention.
 
 ## Canonical Files
 
@@ -177,7 +177,7 @@ The immediate objective is approval of import conflict, reversal and retention p
 - Laravel Pint check passed.
 - Larastan passed with zero errors.
 - Full workflow feature suite (`tests/Feature/Workflows`, including checklist, transition, reviewer-decision and workflow-version migration tests) passed with no failures.
-- PHPUnit passed 320 tests with 985 assertions.
+- PHPUnit passed 355 tests with 1,089 assertions after Build Packet 36.
 - Database triggers were verified to reject raw query-builder updates and deletes on `work_item_transitions`, which Eloquent model events alone do not cover.
 - Vite production build passed.
 - All 24 migrations and seven synthetic domain seeders passed in an isolated temporary database.
@@ -297,4 +297,4 @@ Start by reading `AGENTS.md` and the master plan. Reconcile this file against Gi
 - Implemented and verified payment records (`PaymentStatus`, `PaymentRecord`, `PaymentRecordTransition`, `CreatePaymentRecord`, `TransitionPaymentRecord`, `PaymentRecordPolicy`, named `manage_payments` permission) with one payment per obligation, opening states limited to not required, unknown or pending, a terminal paid state requiring a retained reference and settlement date, append-only transition history protected by Eloquent events and database triggers, `payment_record.created` and `payment_record.status_transitioned` audit evidence, and a Livewire payment interface. Payment state never reads or writes work or filing status, and no transfer is ever initiated, authorised or confirmed.
 - Implemented and verified filing records (`FilingStatus`, `FilingRecord`, `FilingRecordTransition`, `CreateFilingRecord`, `TransitionFilingRecord`, `FilingRecordPolicy`, named `manage_filings` permission) with one filing per obligation, opening states limited to not required or not filed, required filing reference and filed date before authority outcome states, append-only transition history protected by Eloquent events and database triggers, `filing_record.created` and `filing_record.status_transitioned` audit evidence, and a Livewire filing interface. Filing state never reads or writes work status and no payment record, EmaraTax automation or authority transmission exists.
 - Implemented and verified explicit audited workflow-version migration (`MigrateWorkItemWorkflowVersion`) for one open work item to a later published version of the same workflow key, with a required reason, rejection of completed or cancelled work, rejection of a target version defining no transition from the current status, preserved transition, assignment and checklist history, append-only `work_item.workflow_version_migrated` audit evidence and a Livewire "Migrate version" interface.
-- Implemented and verified retained document evidence (`DocumentEvidence`, `DocumentScanEvent`, `StoreDocumentEvidence`, `documents.download`) with immutable firm-scoped metadata and scan history, strict size, extension and detected-MIME validation, generated tenant-private paths, an assignment-aware `evidence` ability, quarantine when scanning is unavailable, infected-payload removal, clean-only checksum-verified downloads, distinct upload, scan and download audit events, and Livewire controls in the work register. The default scanner is explicitly unavailable and never marks a production upload clean.
+- Implemented and verified the client service and tax profile foundation (`ClientServiceEnrollment`, `TaxRegistration`, `TaxPeriod`, their create actions and client-profile Livewire controls) with explicit responsible active members, retained registration facts, actual non-overlapping periods, strict firm scoping, permission checks and audit evidence. No service, registration or period is inferred, and registration identifiers are omitted from audit payloads.

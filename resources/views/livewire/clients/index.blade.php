@@ -14,7 +14,7 @@ FORM: Continuous identity ledger with a compact creation station.
                     {{ __('Client register') }}
                 </h1>
                 <p class="mt-4 max-w-2xl text-base leading-7 text-zinc-400">
-                    {{ __('Create the canonical client identity before adding contacts, tax registrations, periods or compliance work.') }}
+                    {{ __('Create the canonical client identity, then maintain explicit service ownership, tax registrations and actual periods.') }}
                 </p>
             </div>
             <flux:badge color="amber" icon="shield-check">{{ __('Firm administrator controlled') }}</flux:badge>
@@ -40,18 +40,19 @@ FORM: Continuous identity ledger with a compact creation station.
             </div>
 
             <div class="overflow-hidden border-y border-white/8">
-                <div class="hidden grid-cols-[8rem_minmax(0,1.4fr)_minmax(0,1fr)_7rem] gap-4 border-b border-white/8 px-4 py-3 text-xs font-medium text-zinc-500 sm:grid">
+                <div class="hidden grid-cols-[8rem_minmax(0,1.4fr)_minmax(0,1fr)_7rem_8rem] gap-4 border-b border-white/8 px-4 py-3 text-xs font-medium text-zinc-500 sm:grid">
                     <span>{{ __('Code') }}</span>
                     <span>{{ __('Legal identity') }}</span>
                     <span>{{ __('Entity type') }}</span>
                     <span class="text-right">{{ __('Status') }}</span>
+                    <span class="text-right">{{ __('Profile') }}</span>
                 </div>
 
                 <div class="divide-y divide-white/8">
                     @forelse ($this->clients as $client)
                         <article
                             wire:key="client-{{ $client->id }}"
-                            class="grid gap-4 px-4 py-5 transition-colors duration-150 hover:bg-white/[0.025] sm:grid-cols-[8rem_minmax(0,1.4fr)_minmax(0,1fr)_7rem] sm:items-center"
+                            class="grid gap-4 px-4 py-5 transition-colors duration-150 hover:bg-white/[0.025] sm:grid-cols-[8rem_minmax(0,1.4fr)_minmax(0,1fr)_7rem_8rem] sm:items-center"
                         >
                             <div>
                                 <span class="mb-1 block text-xs text-zinc-500 sm:hidden">{{ __('Code') }}</span>
@@ -72,6 +73,16 @@ FORM: Continuous identity ledger with a compact creation station.
                                 <flux:badge :color="$client->status->badgeColor()">
                                     {{ $client->status->label() }}
                                 </flux:badge>
+                            </div>
+                            <div class="sm:text-right">
+                                <p class="mb-2 text-xs text-zinc-500">
+                                    {{ trans_choice('{0} No services|{1} 1 service|[2,*] :count services', $client->service_enrollments_count, ['count' => $client->service_enrollments_count]) }}
+                                    ·
+                                    {{ trans_choice('{0} No registrations|{1} 1 registration|[2,*] :count registrations', $client->tax_registrations_count, ['count' => $client->tax_registrations_count]) }}
+                                </p>
+                                <flux:button size="sm" variant="ghost" wire:click="openProfile('{{ $client->id }}')">
+                                    {{ __('Manage') }}
+                                </flux:button>
                             </div>
                         </article>
                     @empty
@@ -157,8 +168,121 @@ FORM: Continuous identity ledger with a compact creation station.
             </div>
 
             <p class="mt-4 px-1 text-xs leading-5 text-zinc-600">
-                {{ __('Tax registrations, contacts, documents and compliance dates are intentionally excluded from this step.') }}
+                {{ __('This step captures identity only. Service and tax profile records are maintained from the client register.') }}
             </p>
         </aside>
     </div>
+
+    <flux:modal wire:model.self="showProfileModal" class="md:w-[64rem]">
+        <div class="space-y-7">
+            <div class="flex items-start justify-between gap-4">
+                <div>
+                    <flux:heading size="lg">{{ __('Client service and tax profile') }}</flux:heading>
+                    <flux:text class="mt-2">{{ $selectedClientLabel }}</flux:text>
+                </div>
+                <flux:button variant="ghost" icon="x-mark" wire:click="closeProfile">{{ __('Close') }}</flux:button>
+            </div>
+
+            @if ($this->selectedClient)
+                <div class="grid gap-8 lg:grid-cols-2">
+                    <section aria-labelledby="service-enrollment-heading">
+                        <h3 id="service-enrollment-heading" class="text-sm font-semibold text-zinc-100">{{ __('Service enrollments') }}</h3>
+                        <div class="mt-3 divide-y divide-white/8 border-y border-white/8">
+                            @forelse ($this->selectedClient->serviceEnrollments as $enrollment)
+                                <div class="py-3">
+                                    <div class="flex items-center justify-between gap-3">
+                                        <p class="text-sm font-medium text-zinc-200">{{ $enrollment->service->label() }}</p>
+                                        <flux:badge color="green">{{ $enrollment->status->label() }}</flux:badge>
+                                    </div>
+                                    <p class="mt-1 text-xs text-zinc-500">
+                                        {{ __('Responsible: :name · From :date', [
+                                            'name' => $enrollment->responsibleMembership->user->name,
+                                            'date' => $enrollment->starts_on->format('d M Y'),
+                                        ]) }}
+                                    </p>
+                                </div>
+                            @empty
+                                <p class="py-5 text-sm text-zinc-500">{{ __('No service enrollment is recorded.') }}</p>
+                            @endforelse
+                        </div>
+
+                        <form wire:submit="addService" class="mt-5 grid gap-4 sm:grid-cols-2">
+                            <flux:select wire:model="service" :label="__('Service')" required>
+                                @foreach ($this->services as $serviceOption)
+                                    <flux:select.option :value="$serviceOption->value">{{ $serviceOption->label() }}</flux:select.option>
+                                @endforeach
+                            </flux:select>
+                            <flux:select wire:model="responsibleMembershipId" :label="__('Responsible member')" required>
+                                <flux:select.option value="">{{ __('Select member') }}</flux:select.option>
+                                @foreach ($this->responsibleMembers as $member)
+                                    <flux:select.option :value="$member->id">{{ $member->user->name }} · {{ $member->role->label() }}</flux:select.option>
+                                @endforeach
+                            </flux:select>
+                            <flux:input type="date" wire:model="serviceStartsOn" :label="__('Starts on')" required />
+                            <flux:input type="date" wire:model="serviceEndsOn" :label="__('Ends on')" />
+                            <flux:button type="submit" variant="filled" class="sm:col-span-2">{{ __('Add service enrollment') }}</flux:button>
+                        </form>
+                    </section>
+
+                    <section aria-labelledby="tax-registration-heading">
+                        <h3 id="tax-registration-heading" class="text-sm font-semibold text-zinc-100">{{ __('Tax registrations and actual periods') }}</h3>
+                        <div class="mt-3 space-y-3">
+                            @forelse ($this->selectedClient->taxRegistrations as $registration)
+                                <div class="rounded-xl bg-zinc-900/70 p-4 ring-1 ring-white/8">
+                                    <div class="flex items-center justify-between gap-3">
+                                        <p class="text-sm font-medium text-zinc-200">{{ $registration->tax_type->label() }}</p>
+                                        <flux:badge color="zinc">{{ $registration->status->label() }}</flux:badge>
+                                    </div>
+                                    <p class="mt-1 text-xs text-zinc-500">{{ $registration->registration_number }}</p>
+                                    <ul class="mt-3 space-y-1">
+                                        @forelse ($registration->periods as $period)
+                                            <li class="text-xs text-zinc-400">
+                                                {{ $period->label }} · {{ $period->starts_on->format('d M Y') }} to {{ $period->ends_on->format('d M Y') }}
+                                            </li>
+                                        @empty
+                                            <li class="text-xs text-zinc-500">{{ __('No actual periods recorded.') }}</li>
+                                        @endforelse
+                                    </ul>
+                                </div>
+                            @empty
+                                <p class="py-5 text-sm text-zinc-500">{{ __('No tax registration is recorded.') }}</p>
+                            @endforelse
+                        </div>
+
+                        <form wire:submit="addRegistration" class="mt-5 grid gap-4 sm:grid-cols-2">
+                            <flux:select wire:model="taxType" :label="__('Tax type')" required>
+                                @foreach ($this->taxTypes as $taxTypeOption)
+                                    <flux:select.option :value="$taxTypeOption->value">{{ $taxTypeOption->label() }}</flux:select.option>
+                                @endforeach
+                            </flux:select>
+                            <flux:select wire:model="registrationStatus" :label="__('Status')" required>
+                                @foreach ($this->registrationStatuses as $statusOption)
+                                    <flux:select.option :value="$statusOption->value">{{ $statusOption->label() }}</flux:select.option>
+                                @endforeach
+                            </flux:select>
+                            <flux:input wire:model="registrationNumber" :label="__('Registration number')" maxlength="64" required />
+                            <flux:input type="date" wire:model="registrationEffectiveFrom" :label="__('Effective from')" />
+                            <flux:input type="date" wire:model="registrationEffectiveTo" :label="__('Effective to')" />
+                            <flux:button type="submit" variant="filled" class="sm:col-span-2">{{ __('Add tax registration') }}</flux:button>
+                        </form>
+
+                        @if ($this->selectedClient->taxRegistrations->isNotEmpty())
+                            <form wire:submit="addPeriod" class="mt-6 grid gap-4 sm:grid-cols-2">
+                                <flux:select wire:model="periodRegistrationId" :label="__('Registration')" required>
+                                    <flux:select.option value="">{{ __('Select registration') }}</flux:select.option>
+                                    @foreach ($this->selectedClient->taxRegistrations as $registration)
+                                        <flux:select.option :value="$registration->id">{{ $registration->tax_type->label() }} · {{ $registration->registration_number }}</flux:select.option>
+                                    @endforeach
+                                </flux:select>
+                                <flux:input wire:model="periodLabel" :label="__('Actual period label')" maxlength="100" required />
+                                <flux:input type="date" wire:model="periodStartsOn" :label="__('Starts on')" required />
+                                <flux:input type="date" wire:model="periodEndsOn" :label="__('Ends on')" required />
+                                <flux:button type="submit" variant="ghost" class="sm:col-span-2">{{ __('Add actual tax period') }}</flux:button>
+                            </form>
+                        @endif
+                    </section>
+                </div>
+            @endif
+        </div>
+    </flux:modal>
 </div>

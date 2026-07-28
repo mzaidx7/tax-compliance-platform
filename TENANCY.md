@@ -456,3 +456,14 @@ Every tenant-owned cache or file feature must prove:
 5. The configured file disk is private and non-serving.
 
 Exports, imports, notifications and scheduled jobs must add their own negative cross-tenant tests on top of this infrastructure.
+
+## Client Service And Tax Profile
+
+Client profile records are tenant-owned facts:
+
+- A service enrollment belongs to one firm and client, names one explicit service and may name one active membership from the same firm as responsible.
+- A tax registration belongs to one firm and client, stores its supplied tax type and registration identifier, and never implies authority validation.
+- A tax period belongs to one registration in the same firm, uses supplied start and end dates and rejects overlaps. Dates never create or change a period automatically.
+- Creation requires trusted active firm context, the compliance-operations feature and authorization for the client.
+- Every create action writes append-only audit evidence. Registration identifiers are excluded from audit payloads.
+- Composite foreign keys and global firm scopes enforce the tenant boundary, with negative cross-firm tests.
