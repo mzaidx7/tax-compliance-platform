@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Contracts\MalwareScanner;
+use App\Http\Middleware\ResolveFirmContext;
 use App\Support\FeatureFlags;
 use App\Support\OperationalHealth;
 use App\Support\UnavailableMalwareScanner;
@@ -15,6 +16,7 @@ use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Validation\Rules\Password;
+use Livewire\Livewire;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -37,6 +39,10 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        Livewire::addPersistentMiddleware([
+            ResolveFirmContext::class,
+        ]);
+
         $this->configureDefaults();
     }
 
