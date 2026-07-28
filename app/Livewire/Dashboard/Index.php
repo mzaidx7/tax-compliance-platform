@@ -6,6 +6,7 @@ namespace App\Livewire\Dashboard;
 
 use App\Actions\Operations\DeleteOperationalFilter;
 use App\Actions\Operations\SaveOperationalFilter;
+use App\Enums\AssignmentRole;
 use App\Enums\ClientStatus;
 use App\Enums\ObligationStatus;
 use App\Enums\OperationalFilterSurface;
@@ -105,7 +106,10 @@ final class Index extends Component
     }
 
     /**
-     * @return array{due_soon: int, overdue: int, high_risk: int, overdue_payments: int}
+     * @return array{
+     *  due_soon: int, overdue: int, high_risk: int, overdue_payments: int,
+     *  awaiting_client: int, under_review: int, unassigned: int, active_workload: int
+     * }
      */
     #[Computed]
     public function summary(): array
@@ -132,6 +136,16 @@ final class Index extends Component
             'overdue_payments' => (clone $payments)
                 ->where('status', PaymentStatus::Overdue)
                 ->count(),
+            'awaiting_client' => (clone $workItems)
+                ->whereIn('status', [WorkItemStatus::AwaitingClient, WorkItemStatus::AwaitingClientApproval])
+                ->count(),
+            'under_review' => (clone $workItems)
+                ->where('status', WorkItemStatus::UnderReview)
+                ->count(),
+            'unassigned' => (clone $workItems)
+                ->whereDoesntHave('assignmentHistories')
+                ->count(),
+            'active_workload' => (clone $workItems)->count(),
         ];
     }
 
@@ -178,6 +192,78 @@ final class Index extends Component
             ->orderBy('updated_at')
             ->limit(5)
             ->get();
+    }
+
+    /** @return Collection<int, WorkItem> */
+    #[Computed]
+    public function awaitingClientWork(): Collection
+    {
+        return $this->filterWorkItems($this->visibleWorkItems())
+            ->with('obligation.client')
+            ->whereIn('status', [WorkItemStatus::AwaitingClient, WorkItemStatus::AwaitingClientApproval])
+            ->orderBy('updated_at')->limit(8)->get();
+    }
+
+    /** @return Collection<int, WorkItem> */
+    #[Computed]
+    public function underReviewWork(): Collection
+    {
+        return $this->filterWorkItems($this->visibleWorkItems())
+            ->with('obligation.client')
+            ->where('status', WorkItemStatus::UnderReview)
+            ->orderBy('updated_at')->limit(8)->get();
+    }
+
+    /** @return Collection<int, WorkItem> */
+    #[Computed]
+    public function unassignedWork(): Collection
+    {
+        return $this->filterWorkItems($this->visibleWorkItems())
+            ->with('obligation.client')
+            ->whereNotIn('status', [WorkItemStatus::Completed, WorkItemStatus::Cancelled])
+            ->whereDoesntHave('assignmentHistories')
+            ->orderBy('created_at')->limit(8)->get();
+    }
+
+    /**
+     * @return list<array{name: string, preparer: int, reviewer: int, manager: int, total: int}>
+     */
+    #[Computed]
+    public function workloadByMember(): array
+    {
+        $workItems = $this->filterWorkItems($this->visibleWorkItems())
+            ->with('assignmentHistories.assignedMembership.user')
+            ->whereNotIn('status', [WorkItemStatus::Completed, WorkItemStatus::Cancelled])
+            ->limit(500)->get();
+        $workload = [];
+
+        foreach ($workItems as $workItem) {
+            foreach (AssignmentRole::cases() as $role) {
+                $assignment = $workItem->currentAssignment($role);
+                $membership = $assignment?->assignedMembership;
+                if ($membership === null) {
+                    continue;
+                }
+                $key = $membership->id;
+                $workload[$key] ??= [
+                    'name' => $membership->user->name,
+                    'preparer' => 0,
+                    'reviewer' => 0,
+                    'manager' => 0,
+                    'total' => 0,
+                ];
+                $column = match ($role) {
+                    AssignmentRole::Preparer => 'preparer',
+                    AssignmentRole::Reviewer => 'reviewer',
+                    AssignmentRole::ResponsibleManager => 'manager',
+                };
+                $workload[$key][$column]++;
+                $workload[$key]['total']++;
+            }
+        }
+        usort($workload, static fn (array $left, array $right): int => [$right['total'], $left['name']] <=> [$left['total'], $right['name']]);
+
+        return array_slice($workload, 0, 12);
     }
 
     public function render(): View
@@ -331,7 +417,10 @@ final class Index extends Component
 
     private function flushOperationalData(): void
     {
-        unset($this->summary, $this->priorityObligations, $this->highRiskWork, $this->overduePayments);
+        unset(
+            $this->summary, $this->priorityObligations, $this->highRiskWork, $this->overduePayments,
+            $this->awaitingClientWork, $this->underReviewWork, $this->unassignedWork, $this->workloadByMember,
+        );
     }
 
     private function currentUser(): User

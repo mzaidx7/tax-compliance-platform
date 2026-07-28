@@ -5,13 +5,12 @@
 - Last updated: 2026-07-28
 - Updated by: Codex GPT-5.6
 - Platform repository status: independent repository on `main`, remote `mzaidx7/tax-compliance-platform`
-- Current milestone: Operational reports and spreadsheet-safe exports packet completed
+- Current milestone: Dashboard work-state queues and workload visibility packet completed
 
 ## Current Objective
-
 Create a UAE-focused compliance operations and e-invoicing readiness platform under a TBT subdomain while keeping its application, data, deployment and release lifecycle separate from the public TBT website.
 
-The immediate objective is the remaining Stage 4 dashboard queues for awaiting-client, under-review, unassigned and workload state. Imports, regulated calculators, duplicate merge and readiness scoring remain decision-gated.
+The immediate objective is a deterministic synthetic 200-client acceptance harness for the Stage 4 compliance MVP. Imports, regulated calculators, duplicate merge and readiness scoring remain decision-gated.
 
 ## Canonical Files
 
@@ -121,6 +120,7 @@ The immediate objective is the remaining Stage 4 dashboard queues for awaiting-c
 - Dashboard and work-register filters can be retained, applied and explicitly deleted only by their owner in the active firm. Applying a filter reuses existing authorized queries, and audit metadata excludes names and values.
 - The notification centre exposes only a recipient's active-firm request and delivery states, with append-only read evidence. Explicit daily manager summaries use encrypted idempotent delivery and stored operational counts without inferring compliance.
 - Operational reports provide monthly schedules, tax-period lists, current expiring-document metadata and workload/completion rows. Preview and audited spreadsheet-safe export share one definition and exclude sensitive identifiers and reasons.
+- The dashboard exposes distinct awaiting-client, under-review and explicitly unassigned queues plus workload by current assignee, all through the existing firm, role and saved-client-filter boundaries.
 - Filing state uses its own record, lifecycle and append-only history, gated by the named `manage_filings` permission, and never reads or writes work status.
 - Payment state uses its own record, lifecycle and append-only history, gated by the named `manage_payments` permission, and never reads or writes work or filing status. `paid` is terminal and requires a reference and settlement date.
 - Append-only history is enforced at two layers: Eloquent model events and database triggers on `work_item_transitions`, `filing_record_transitions`, `payment_record_transitions` and `audit_logs`.
@@ -171,7 +171,7 @@ The immediate objective is the remaining Stage 4 dashboard queues for awaiting-c
 - Laravel Pint check passed.
 - Larastan passed with zero errors.
 - Full workflow feature suite (`tests/Feature/Workflows`, including checklist, transition, reviewer-decision and workflow-version migration tests) passed with no failures.
-- PHPUnit passed 457 tests with 1,410 assertions after Build Packet 53.
+- PHPUnit passed 460 tests with 1,429 assertions after Build Packet 54.
 - Database triggers were verified to reject raw query-builder updates and deletes on `work_item_transitions`, which Eloquent model events alone do not cover.
 - Vite production build passed.
 - All migrations, including append-only deadline overrides, and seven synthetic domain seeders passed from a fresh database.

@@ -663,3 +663,13 @@ Operational reports are permission-gated tenant projections:
 - A report owner with `view_reports` may download their own recognised operational-report artifact after checksum and byte verification. Audit-register exports retain their stricter audit permission.
 - Reports exclude contact details, document references, reasons, tax registration identifiers and audit contents.
 - No statutory date, tax, risk or compliance value is calculated.
+
+## Dashboard Work-State Queues
+
+Dashboard queues remain read-only projections over retained work and assignment state:
+
+- Awaiting-client and under-review membership comes only from the stored work-item status.
+- Unassigned means an active work item has no retained assignment history. No owner is inferred.
+- Workload counts group current assignees derived from the latest append-only assignment event for each role.
+- Manager-wide and assigned-member visibility reuse the existing authorised work query, and saved client filters narrow that query without broadening access.
+- Each queue links to the existing work register for action and stores no duplicate operational state.

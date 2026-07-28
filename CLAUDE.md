@@ -19,7 +19,7 @@ Treat the master plan as canonical scope and `MEMORY.md` as the current implemen
 ## Current State
 
 - Stage 3 compliance walking skeleton is active.
-- Build Packet 53 is complete.
+- Build Packet 54 is complete.
 - Work assignment, append-only reassignment, immutable workflow versions, pinned checklists, checklist completion evidence, checklist-gated review submission, reviewer return and approval decisions and explicit audited workflow-version migration are implemented.
 - Every work item is pinned to a published firm-owned workflow definition and checklist version.
 - Moving from `in_preparation` to `under_review` requires retained completion evidence for every required item on the pinned checklist.
@@ -57,21 +57,22 @@ Treat the master plan as canonical scope and `MEMORY.md` as the current implemen
 - Dashboard and work-register filters can be saved by their owner within one firm, reapplied through the existing authorised queries and explicitly deleted only by that owner. Filter names and values are excluded from audit payloads.
 - The in-app notification centre shows only the signed-in recipient's active-firm request and attempt states, with append-only read receipts. Explicit daily manager summaries snapshot stored operational counts through the existing encrypted, idempotent email boundary.
 - Operational reports cover monthly schedules, overlapping tax periods, current expiring-document metadata and workload/completion state. Preview and spreadsheet-safe export share one definition, and report owners can download their own integrity-checked artifact without audit-register permission.
+- The dashboard exposes separate awaiting-client, under-review and explicitly unassigned work queues plus workload by current assignee. Existing firm, role and saved-client-filter boundaries apply to every projection.
 - Two operational notification templates exist, `work_item_high_risk` and `payment_overdue`, both fired only by an explicit recorded change and addressed to the current responsible manager.
 - Regulated-rule generation modules are not implemented.
 - The full current verification baseline is recorded in `MEMORY.md`.
 
 ## Next Safe Packet
 
-Complete the remaining Stage 4 dashboard queues for awaiting-client, under-review and unassigned work, with workload visibility and existing saved filters.
+Build a deterministic synthetic 200-client acceptance harness for the Stage 4 compliance MVP.
 
 Keep it bounded:
 
-- Derive queue membership only from stored work status and current append-only assignment history.
-- Preserve manager-wide versus assigned-member visibility.
-- Keep each queue distinct and link users to the existing work register for action.
-- Treat missing assignments as explicit unassigned state, never as an inferred owner.
-- Reuse dashboard client, horizon and owner-only saved filters where relevant.
+- Generate synthetic, clearly labelled firms, members, clients, services, tax periods, obligations, work and assignments through an explicit acceptance command or seeder.
+- Make repeated runs deterministic and safe, with no production or imported data dependency.
+- Prove firm isolation, role visibility and operational reconciliation at the 200-client scale.
+- Record bounded runtime and record-count evidence without inventing a production performance claim.
+- Keep the harness outside the default production seed path.
 - Continue to keep imports, merge, scoring and regulated formulas behind their recorded decision gates.
 - Do not add VAT or Corporate Tax formulas without approved sourced golden cases.
 - Keep import processing gated until conflict, reversal and retention decisions are approved.

@@ -94,6 +94,22 @@
                 </div>
                 <dd class="text-3xl font-semibold tracking-[-0.03em] text-red-300 sm:text-right">{{ $this->summary['overdue_payments'] }}</dd>
             </div>
+            <div class="grid gap-2 py-4 sm:grid-cols-[minmax(0,1fr)_7rem] sm:items-center">
+                <div><dt class="text-sm font-medium text-zinc-200">{{ __('Work awaiting client') }}</dt><dd class="mt-1 text-sm text-zinc-500">{{ __('Explicit awaiting-client or awaiting-client-approval status.') }}</dd></div>
+                <dd class="text-3xl font-semibold tracking-[-0.03em] text-amber-300 sm:text-right">{{ $this->summary['awaiting_client'] }}</dd>
+            </div>
+            <div class="grid gap-2 py-4 sm:grid-cols-[minmax(0,1fr)_7rem] sm:items-center">
+                <div><dt class="text-sm font-medium text-zinc-200">{{ __('Work under review') }}</dt><dd class="mt-1 text-sm text-zinc-500">{{ __('Explicit under-review work state.') }}</dd></div>
+                <dd class="text-3xl font-semibold tracking-[-0.03em] text-white sm:text-right">{{ $this->summary['under_review'] }}</dd>
+            </div>
+            <div class="grid gap-2 py-4 sm:grid-cols-[minmax(0,1fr)_7rem] sm:items-center">
+                <div><dt class="text-sm font-medium text-zinc-200">{{ __('Unassigned active work') }}</dt><dd class="mt-1 text-sm text-zinc-500">{{ __('Active records with no retained assignment history.') }}</dd></div>
+                <dd class="text-3xl font-semibold tracking-[-0.03em] text-red-300 sm:text-right">{{ $this->summary['unassigned'] }}</dd>
+            </div>
+            <div class="grid gap-2 py-4 sm:grid-cols-[minmax(0,1fr)_7rem] sm:items-center">
+                <div><dt class="text-sm font-medium text-zinc-200">{{ __('Visible active workload') }}</dt><dd class="mt-1 text-sm text-zinc-500">{{ __('Non-terminal work inside your existing visibility boundary.') }}</dd></div>
+                <dd class="text-3xl font-semibold tracking-[-0.03em] text-white sm:text-right">{{ $this->summary['active_workload'] }}</dd>
+            </div>
         </dl>
     </section>
 
@@ -188,4 +204,48 @@
             </section>
         </aside>
     </div>
+
+    <section class="mt-12" aria-labelledby="work-queues-heading">
+        <div class="mb-4 flex items-end justify-between gap-4">
+            <div><h2 id="work-queues-heading" class="text-lg font-semibold text-zinc-100">{{ __('Work-state queues') }}</h2><p class="mt-1 text-sm text-zinc-500">{{ __('Stored workflow state only. Open the work register to act.') }}</p></div>
+            <flux:button size="sm" variant="ghost" :href="route('work-items.index')" wire:navigate>{{ __('Open work register') }}</flux:button>
+        </div>
+        <div class="grid gap-8 lg:grid-cols-3">
+            @foreach ([
+                [__('Awaiting client'), $this->awaitingClientWork, __('No visible work is awaiting client action.')],
+                [__('Under review'), $this->underReviewWork, __('No visible work is under review.')],
+                [__('Unassigned'), $this->unassignedWork, __('No visible active work is unassigned.')],
+            ] as [$heading, $items, $empty])
+                <section>
+                    <h3 class="text-sm font-semibold text-zinc-200">{{ $heading }}</h3>
+                    <div class="mt-3 divide-y divide-white/8 border-y border-white/8">
+                        @forelse ($items as $workItem)
+                            <div class="py-3">
+                                <p class="truncate text-sm font-medium text-zinc-200">{{ $workItem->obligation->client->internal_code }} / {{ $workItem->obligation->obligation_type }}</p>
+                                <p class="mt-1 text-xs text-zinc-500">{{ $workItem->status->label() }}</p>
+                            </div>
+                        @empty
+                            <p class="py-6 text-sm leading-6 text-zinc-500">{{ $empty }}</p>
+                        @endforelse
+                    </div>
+                </section>
+            @endforeach
+        </div>
+    </section>
+
+    <section class="mt-12" aria-labelledby="workload-heading">
+        <div class="mb-4"><h2 id="workload-heading" class="text-lg font-semibold text-zinc-100">{{ __('Visible workload by member') }}</h2><p class="mt-1 text-sm text-zinc-500">{{ __('Current retained assignments across up to 500 visible active work records.') }}</p></div>
+        <div class="overflow-x-auto border-y border-white/8">
+            <table class="min-w-full divide-y divide-white/8 text-left text-sm">
+                <thead><tr><th class="px-4 py-3 text-xs font-semibold text-zinc-400">{{ __('Member') }}</th><th class="px-4 py-3 text-xs font-semibold text-zinc-400">{{ __('Preparer') }}</th><th class="px-4 py-3 text-xs font-semibold text-zinc-400">{{ __('Reviewer') }}</th><th class="px-4 py-3 text-xs font-semibold text-zinc-400">{{ __('Manager') }}</th><th class="px-4 py-3 text-xs font-semibold text-zinc-400">{{ __('Total assignments') }}</th></tr></thead>
+                <tbody class="divide-y divide-white/8">
+                    @forelse ($this->workloadByMember as $row)
+                        <tr><td class="px-4 py-3 font-medium text-zinc-200">{{ $row['name'] }}</td><td class="px-4 py-3 text-zinc-400">{{ $row['preparer'] }}</td><td class="px-4 py-3 text-zinc-400">{{ $row['reviewer'] }}</td><td class="px-4 py-3 text-zinc-400">{{ $row['manager'] }}</td><td class="px-4 py-3 text-zinc-200">{{ $row['total'] }}</td></tr>
+                    @empty
+                        <tr><td colspan="5" class="px-6 py-10 text-center text-sm text-zinc-500">{{ __('No visible active assignments.') }}</td></tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+    </section>
 </div>
