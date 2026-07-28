@@ -5,10 +5,14 @@ declare(strict_types=1);
 namespace App\Livewire\WorkItems;
 
 use App\Actions\Documents\StoreDocumentEvidence;
+use App\Actions\Operations\DeleteOperationalFilter;
+use App\Actions\Operations\SaveOperationalFilter;
 use App\Enums\DocumentPurpose;
 use App\Enums\Feature;
+use App\Enums\OperationalFilterSurface;
 use App\Enums\Permission;
 use App\Enums\WorkItemStatus;
+use App\Models\SavedOperationalFilter;
 use App\Models\User;
 use App\Models\WorkItem;
 use App\Support\FeatureFlags;
@@ -17,6 +21,7 @@ use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\Rule;
 use Livewire\Attributes\Computed;
@@ -35,6 +40,10 @@ final class Index extends Component
     public string $search = '';
 
     public string $status = '';
+
+    public string $savedFilterName = '';
+
+    public string $selectedSavedFilterId = '';
 
     public bool $showEvidenceModal = false;
 
@@ -71,6 +80,40 @@ final class Index extends Component
         $this->reset('search', 'status');
         $this->resetPage();
         unset($this->workGroups);
+    }
+
+    public function saveFilter(SaveOperationalFilter $action): void
+    {
+        $saved = $action->handle(
+            $this->currentUser(),
+            OperationalFilterSurface::WorkRegister,
+            $this->savedFilterName,
+            ['search' => $this->search, 'status' => $this->status],
+        );
+        $this->selectedSavedFilterId = $saved->id;
+        $this->reset('savedFilterName');
+        unset($this->savedFilters);
+    }
+
+    public function applySavedFilter(): void
+    {
+        $filter = SavedOperationalFilter::query()
+            ->where('user_id', $this->currentUser()->id)
+            ->where('surface', OperationalFilterSurface::WorkRegister)
+            ->findOrFail($this->selectedSavedFilterId);
+        Gate::authorize('view', $filter);
+        $this->search = (string) ($filter->filters['search'] ?? '');
+        $this->status = (string) ($filter->filters['status'] ?? '');
+        $this->resetPage();
+        unset($this->workGroups);
+    }
+
+    public function deleteSavedFilter(DeleteOperationalFilter $action): void
+    {
+        $filter = SavedOperationalFilter::query()->findOrFail($this->selectedSavedFilterId);
+        $action->handle($this->currentUser(), $filter);
+        $this->reset('selectedSavedFilterId');
+        unset($this->savedFilters);
     }
 
     /**
@@ -217,6 +260,17 @@ final class Index extends Component
     public function statuses(): array
     {
         return WorkItemStatus::cases();
+    }
+
+    /** @return Collection<int, SavedOperationalFilter> */
+    #[Computed]
+    public function savedFilters(): Collection
+    {
+        return SavedOperationalFilter::query()
+            ->where('user_id', $this->currentUser()->id)
+            ->where('surface', OperationalFilterSurface::WorkRegister)
+            ->orderBy('name')
+            ->get();
     }
 
     public function render(): View

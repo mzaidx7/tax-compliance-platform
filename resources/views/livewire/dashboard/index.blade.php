@@ -25,13 +25,44 @@
         </div>
     </header>
 
+    <section class="mt-8 border-y border-white/8 py-5" aria-labelledby="dashboard-filter-heading">
+        <h2 id="dashboard-filter-heading" class="sr-only">{{ __('Dashboard filters') }}</h2>
+        <div class="grid gap-4 lg:grid-cols-[minmax(12rem,1fr)_10rem_minmax(12rem,1fr)_auto] lg:items-end">
+            <flux:select wire:model.live="clientId" :label="__('Client scope')">
+                <flux:select.option value="">{{ __('All visible clients') }}</flux:select.option>
+                @foreach ($this->clients as $client)
+                    <flux:select.option :value="$client->id">{{ $client->internal_code }} / {{ $client->legal_name }}</flux:select.option>
+                @endforeach
+            </flux:select>
+            <flux:select wire:model.live="horizonDays" :label="__('Due horizon')">
+                @foreach ([7, 14, 30, 60, 90] as $days)
+                    <flux:select.option :value="$days">{{ trans_choice('{1} 1 day|[2,*] :count days', $days, ['count' => $days]) }}</flux:select.option>
+                @endforeach
+            </flux:select>
+            <flux:select wire:model="selectedSavedFilterId" :label="__('Your saved filters')">
+                <flux:select.option value="">{{ __('Select saved filter') }}</flux:select.option>
+                @foreach ($this->savedFilters as $savedFilter)
+                    <flux:select.option :value="$savedFilter->id">{{ $savedFilter->name }}</flux:select.option>
+                @endforeach
+            </flux:select>
+            <div class="flex gap-2">
+                <flux:button variant="ghost" wire:click="applySavedFilter" :disabled="$selectedSavedFilterId === ''">{{ __('Apply') }}</flux:button>
+                <flux:button variant="danger" wire:click="deleteSavedFilter" :disabled="$selectedSavedFilterId === ''" wire:confirm="{{ __('Delete this saved filter?') }}">{{ __('Delete') }}</flux:button>
+            </div>
+        </div>
+        <div class="mt-4 grid gap-4 sm:grid-cols-[minmax(12rem,1fr)_auto] sm:items-end">
+            <flux:input wire:model="savedFilterName" :label="__('Save current dashboard view as')" :placeholder="__('Quarter-end clients')" maxlength="80" />
+            <flux:button variant="filled" wire:click="saveFilter" :disabled="trim($savedFilterName) === ''">{{ __('Save filter') }}</flux:button>
+        </div>
+    </section>
+
     <section class="mt-8" aria-labelledby="operational-summary-heading">
         <div class="mb-4 flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
             <div>
                 <h2 id="operational-summary-heading" class="text-lg font-semibold text-zinc-100">{{ __('Recorded priorities') }}</h2>
                 <p class="mt-1 text-sm text-zinc-500">{{ __('Counts stay separate because each operational state has a different meaning.') }}</p>
             </div>
-            <p class="text-xs text-zinc-500">{{ __('Due soon means today through the next 30 days') }}</p>
+            <p class="text-xs text-zinc-500">{{ __('Due soon means today through the next :days days', ['days' => $horizonDays]) }}</p>
         </div>
 
         <dl class="divide-y divide-white/8 border-y border-white/8">

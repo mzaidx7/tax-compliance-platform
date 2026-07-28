@@ -40,6 +40,20 @@
                 {{ __('Clear filters') }}
             </flux:button>
         </div>
+        <div class="mt-4 grid gap-3 border-t border-white/8 pt-4 lg:grid-cols-[minmax(12rem,1fr)_auto_minmax(12rem,1fr)_auto] lg:items-end">
+            <flux:select wire:model="selectedSavedFilterId" :label="__('Saved filter')">
+                <flux:select.option value="">{{ __('Select your saved filter') }}</flux:select.option>
+                @foreach ($this->savedFilters as $savedFilter)
+                    <flux:select.option :value="$savedFilter->id">{{ $savedFilter->name }}</flux:select.option>
+                @endforeach
+            </flux:select>
+            <div class="flex gap-2">
+                <flux:button variant="ghost" wire:click="applySavedFilter" :disabled="$selectedSavedFilterId === ''">{{ __('Apply') }}</flux:button>
+                <flux:button variant="danger" wire:click="deleteSavedFilter" :disabled="$selectedSavedFilterId === ''" wire:confirm="{{ __('Delete this saved filter?') }}">{{ __('Delete') }}</flux:button>
+            </div>
+            <flux:input wire:model="savedFilterName" :label="__('Save current filters as')" :placeholder="__('My review queue')" maxlength="80" />
+            <flux:button variant="filled" wire:click="saveFilter" :disabled="trim($savedFilterName) === ''">{{ __('Save filter') }}</flux:button>
+        </div>
     </section>
 
     <section class="mt-7" aria-labelledby="work-register-results">

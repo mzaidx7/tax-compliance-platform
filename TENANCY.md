@@ -629,3 +629,14 @@ The schedule is a read-only projection over retained tenant records:
 - The client timeline derives only from retained client status, obligation, work-transition, filing-transition and payment-transition evidence.
 - Timeline reasons remain in their protected source records and are not duplicated into the projection.
 - The schedule stores no date, infers no status and performs no statutory calculation.
+
+## Saved Operational Filters
+
+Saved filters are private user preferences inside one firm:
+
+- Each record belongs to one firm, one global user and one constrained surface: dashboard or work register.
+- Filter schemas are validated per surface. Client references resolve through the active firm's scope.
+- Only the owner in the active firm may view, update or explicitly delete a saved filter.
+- Applying a saved filter feeds values into the same existing tenant-scoped and permission-filtered queries. It never stores or broadens query authorization.
+- Filter names and values are excluded from audit payloads; audit metadata records only the surface and filter keys.
+- No shared filter, administrator transfer or cross-firm reuse exists.

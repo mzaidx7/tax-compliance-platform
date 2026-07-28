@@ -4,18 +4,28 @@ declare(strict_types=1);
 
 namespace App\Livewire\Dashboard;
 
+use App\Actions\Operations\DeleteOperationalFilter;
+use App\Actions\Operations\SaveOperationalFilter;
+use App\Enums\ClientStatus;
 use App\Enums\ObligationStatus;
+use App\Enums\OperationalFilterSurface;
 use App\Enums\PaymentStatus;
 use App\Enums\Permission;
 use App\Enums\RiskLevel;
 use App\Enums\WorkItemStatus;
+use App\Models\Client;
 use App\Models\Obligation;
 use App\Models\PaymentRecord;
+use App\Models\SavedOperationalFilter;
+use App\Models\User;
 use App\Models\WorkItem;
 use App\Tenancy\FirmContext;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Gate;
+use Illuminate\Validation\Rule;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Title;
 use Livewire\Component;
@@ -23,23 +33,94 @@ use Livewire\Component;
 #[Title('Dashboard')]
 final class Index extends Component
 {
+    public string $clientId = '';
+
+    public int $horizonDays = 30;
+
+    public string $savedFilterName = '';
+
+    public string $selectedSavedFilterId = '';
+
+    public function updatedHorizonDays(): void
+    {
+        $this->validate(['horizonDays' => ['required', 'integer', Rule::in([7, 14, 30, 60, 90])]]);
+        $this->flushOperationalData();
+    }
+
+    public function updatedClientId(): void
+    {
+        $this->validate(['clientId' => ['nullable', 'string', 'max:26']]);
+        $this->flushOperationalData();
+    }
+
+    public function saveFilter(SaveOperationalFilter $action): void
+    {
+        $saved = $action->handle(
+            $this->currentUser(),
+            OperationalFilterSurface::Dashboard,
+            $this->savedFilterName,
+            ['client_id' => $this->clientId, 'horizon_days' => $this->horizonDays],
+        );
+        $this->selectedSavedFilterId = $saved->id;
+        $this->reset('savedFilterName');
+        unset($this->savedFilters);
+    }
+
+    public function applySavedFilter(): void
+    {
+        $filter = SavedOperationalFilter::query()
+            ->where('user_id', $this->currentUser()->id)
+            ->where('surface', OperationalFilterSurface::Dashboard)
+            ->findOrFail($this->selectedSavedFilterId);
+        Gate::authorize('view', $filter);
+        $this->clientId = (string) ($filter->filters['client_id'] ?? '');
+        $this->horizonDays = (int) ($filter->filters['horizon_days'] ?? 30);
+        $this->flushOperationalData();
+    }
+
+    public function deleteSavedFilter(DeleteOperationalFilter $action): void
+    {
+        $filter = SavedOperationalFilter::query()->findOrFail($this->selectedSavedFilterId);
+        $action->handle($this->currentUser(), $filter);
+        $this->reset('selectedSavedFilterId');
+        unset($this->savedFilters);
+    }
+
+    /** @return EloquentCollection<int, Client> */
+    #[Computed]
+    public function clients(): EloquentCollection
+    {
+        return Client::query()->where('status', ClientStatus::Active)->orderBy('legal_name')->get();
+    }
+
+    /** @return EloquentCollection<int, SavedOperationalFilter> */
+    #[Computed]
+    public function savedFilters(): EloquentCollection
+    {
+        return SavedOperationalFilter::query()
+            ->where('user_id', $this->currentUser()->id)
+            ->where('surface', OperationalFilterSurface::Dashboard)
+            ->orderBy('name')
+            ->get();
+    }
+
     /**
      * @return array{due_soon: int, overdue: int, high_risk: int, overdue_payments: int}
      */
     #[Computed]
     public function summary(): array
     {
-        $obligations = $this->visibleObligations()
+        $obligations = $this->filterObligations($this->visibleObligations())
             ->where('status', ObligationStatus::Open);
-        $workItems = $this->visibleWorkItems()
+        $workItems = $this->filterWorkItems($this->visibleWorkItems())
             ->whereNotIn('status', [WorkItemStatus::Completed, WorkItemStatus::Cancelled]);
-        $payments = $this->visiblePayments();
+        $payments = $this->filterPayments($this->visiblePayments());
 
         return [
             'due_soon' => (clone $obligations)
                 ->whereRaw(
                     'coalesce(effective_due_date, statutory_due_date) between ? and ?',
-                    [today()->toDateString(), today()->addDays(30)->toDateString()],
+                    [today()->toDateString(), today()->addDays($this->horizonDays)->toDateString()],
                 )
                 ->count(),
             'overdue' => (clone $obligations)
@@ -60,10 +141,10 @@ final class Index extends Component
     #[Computed]
     public function priorityObligations(): Collection
     {
-        return $this->visibleObligations()
+        return $this->filterObligations($this->visibleObligations())
             ->with(['client', 'workItems' => static fn ($query) => $query->orderBy('created_at')])
             ->where('status', ObligationStatus::Open)
-            ->whereRaw('coalesce(effective_due_date, statutory_due_date) <= ?', [today()->addDays(30)->toDateString()])
+            ->whereRaw('coalesce(effective_due_date, statutory_due_date) <= ?', [today()->addDays($this->horizonDays)->toDateString()])
             ->orderByRaw('coalesce(effective_due_date, statutory_due_date)')
             ->orderBy('id')
             ->limit(8)
@@ -76,7 +157,7 @@ final class Index extends Component
     #[Computed]
     public function highRiskWork(): Collection
     {
-        return $this->visibleWorkItems()
+        return $this->filterWorkItems($this->visibleWorkItems())
             ->with(['obligation.client'])
             ->where('risk_status', RiskLevel::High)
             ->whereNotIn('status', [WorkItemStatus::Completed, WorkItemStatus::Cancelled])
@@ -91,7 +172,7 @@ final class Index extends Component
     #[Computed]
     public function overduePayments(): Collection
     {
-        return $this->visiblePayments()
+        return $this->filterPayments($this->visiblePayments())
             ->with(['obligation.client'])
             ->where('status', PaymentStatus::Overdue)
             ->orderBy('updated_at')
@@ -216,5 +297,48 @@ final class Index extends Component
                     )',
                 ),
         );
+    }
+
+    /** @param Builder<Obligation> $query
+     * @return Builder<Obligation>
+     */
+    private function filterObligations(Builder $query): Builder
+    {
+        return $query->when($this->clientId !== '', fn (Builder $query): Builder => $query->where('client_id', $this->clientId));
+    }
+
+    /** @param Builder<WorkItem> $query
+     * @return Builder<WorkItem>
+     */
+    private function filterWorkItems(Builder $query): Builder
+    {
+        return $query->when(
+            $this->clientId !== '',
+            fn (Builder $query): Builder => $query->whereHas('obligation', fn (Builder $query): Builder => $query->where('client_id', $this->clientId)),
+        );
+    }
+
+    /** @param Builder<PaymentRecord> $query
+     * @return Builder<PaymentRecord>
+     */
+    private function filterPayments(Builder $query): Builder
+    {
+        return $query->when(
+            $this->clientId !== '',
+            fn (Builder $query): Builder => $query->whereHas('obligation', fn (Builder $query): Builder => $query->where('client_id', $this->clientId)),
+        );
+    }
+
+    private function flushOperationalData(): void
+    {
+        unset($this->summary, $this->priorityObligations, $this->highRiskWork, $this->overduePayments);
+    }
+
+    private function currentUser(): User
+    {
+        $user = auth()->user();
+        abort_unless($user instanceof User, 401);
+
+        return $user;
     }
 }
