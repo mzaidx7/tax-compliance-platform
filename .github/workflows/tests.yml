@@ -58,6 +58,9 @@ jobs:
       - name: Install frontend dependencies
         run: npm ci
 
+      - name: Build production assets
+        run: npm run build
+
       - name: Check PHP formatting
         run: composer lint:check
 
@@ -72,7 +75,7 @@ jobs:
       - name: Test tenancy and platform boundaries
         id: test-boundaries
         continue-on-error: true
-        run: bash .github/scripts/run-test-group.sh "Tenancy and platform boundary tests" tests/Feature/Audit tests/Feature/Authorization tests/Feature/Exports tests/Feature/Feature tests/Feature/Livewire tests/Feature/Notifications tests/Feature/Operations tests/Feature/Tenancy
+        run: bash .github/scripts/run-test-group.sh "Tenancy and platform boundary tests" tests/Feature/Audit tests/Feature/Authorization tests/Feature/Exports tests/Feature/Livewire tests/Feature/Notifications tests/Feature/Operations tests/Feature/Tenancy
 
       - name: Test compliance operations
         id: test-compliance
@@ -99,9 +102,6 @@ jobs:
       - name: Enforce workflow and readiness foundation tests
         if: always() && steps.test-workflows.outcome != 'success'
         run: exit 1
-
-      - name: Build production assets
-        run: npm run build
 
       - name: Audit production dependencies
         run: |
