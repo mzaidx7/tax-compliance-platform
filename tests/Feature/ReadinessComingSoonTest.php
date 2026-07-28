@@ -24,7 +24,7 @@ final class ReadinessComingSoonTest extends TestCase
             ->withSession(['active_firm_id' => $firm->id])
             ->get(route('readiness.coming-soon'))
             ->assertOk()
-            ->assertSee('E-invoicing readiness is coming next.')
+            ->assertSee('E-invoicing readiness is coming soon.')
             ->assertSee('Return to compliance dashboard')
             ->assertDontSee('Create rule version');
     }

@@ -6,8 +6,8 @@
 <div class="mx-auto w-full max-w-7xl">
     <header class="border-b border-white/8 pb-8">
         <p class="mb-3 text-sm font-medium text-amber-300">{{ app(\App\Tenancy\FirmContext::class)->firm()->name }}</p>
-        <h1 class="max-w-3xl text-balance text-4xl font-semibold tracking-[-0.03em] text-white sm:text-5xl">{{ __('Compliance schedule') }}</h1>
-        <p class="mt-5 max-w-3xl text-base leading-7 text-zinc-400">{{ __('Month, week and list views of recorded effective deadlines. Select a client to add its retained operational timeline. Dates describe stored records and do not guarantee compliance.') }}</p>
+        <h1 class="max-w-3xl text-balance text-4xl font-semibold tracking-[-0.03em] text-white sm:text-5xl">{{ __('Compliance calendar') }}</h1>
+        <p class="mt-5 max-w-3xl text-base leading-7 text-zinc-400">{{ __('View recorded client deadlines by month, week or list. Filter the calendar by client and deadline status.') }}</p>
     </header>
 
     <section class="mt-8" aria-labelledby="schedule-controls-heading">
@@ -116,7 +116,7 @@
     <section class="mt-12" aria-labelledby="client-timeline-heading">
         <div class="mb-4">
             <h2 id="client-timeline-heading" class="text-lg font-semibold text-zinc-100">{{ __('Client timeline') }}</h2>
-            <p class="mt-1 text-sm text-zinc-500">{{ $clientId === '' ? __('Select one client to inspect retained operational history.') : __('Latest retained client, obligation, work, filing and payment events. Reasons remain in their protected source records.') }}</p>
+            <p class="mt-1 text-sm text-zinc-500">{{ $clientId === '' ? __('Select a client to view its recent compliance history.') : __('Recent client, deadline, work, filing and payment activity. Reasons remain available in the related records.') }}</p>
         </div>
         @if ($clientId !== '')
             <ol class="divide-y divide-white/8 border-y border-white/8">
@@ -129,7 +129,7 @@
                         </div>
                     </li>
                 @empty
-                    <li class="py-10 text-center text-sm text-zinc-500">{{ __('No retained timeline events exist for this client.') }}</li>
+                    <li class="py-10 text-center text-sm text-zinc-500">{{ __('No activity has been recorded for this client.') }}</li>
                 @endforelse
             </ol>
         @endif

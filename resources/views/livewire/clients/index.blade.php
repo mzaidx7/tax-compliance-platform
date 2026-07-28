@@ -11,10 +11,10 @@ FORM: Continuous identity ledger with a compact creation station.
             <div>
                 <p class="mb-3 text-sm font-medium text-amber-300">{{ $this->currentFirmName }}</p>
                 <h1 class="text-balance text-4xl font-semibold tracking-[-0.03em] text-white sm:text-5xl">
-                    {{ __('Client register') }}
+                    {{ __('Clients') }}
                 </h1>
                 <p class="mt-4 max-w-2xl text-base leading-7 text-zinc-400">
-                    {{ __('Create the canonical client identity, then maintain explicit service ownership, tax registrations and actual periods.') }}
+                    {{ __('Add and manage clients, their services, tax registrations, tax periods and responsible team members.') }}
                 </p>
             </div>
             <div class="flex flex-wrap items-center gap-3">
@@ -30,8 +30,8 @@ FORM: Continuous identity ledger with a compact creation station.
         <section aria-labelledby="client-register-heading">
             <div class="mb-5 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
                 <div>
-                    <h2 id="client-register-heading" class="text-lg font-semibold text-zinc-100">{{ __('Canonical identities') }}</h2>
-                    <p class="mt-1 text-sm text-zinc-500">{{ __('Codes are unique inside the active firm workspace.') }}</p>
+                    <h2 id="client-register-heading" class="text-lg font-semibold text-zinc-100">{{ __('Client list') }}</h2>
+                    <p class="mt-1 text-sm text-zinc-500">{{ __('Each client code must be unique within your firm.') }}</p>
                 </div>
                 <div class="w-full sm:max-w-xs">
                     <flux:input
@@ -97,7 +97,7 @@ FORM: Continuous identity ledger with a compact creation station.
                             </p>
                             <p class="mx-auto mt-2 max-w-md text-sm leading-6 text-zinc-500">
                                 {{ $search === ''
-                                    ? __('Create the first canonical identity using the controlled form beside this register.')
+                                    ? __('Add your first client using the form beside this list.')
                                     : __('Check the code or name and try a broader search.') }}
                             </p>
                         </div>
@@ -183,7 +183,7 @@ FORM: Continuous identity ledger with a compact creation station.
             <div>
                 <flux:heading size="lg">{{ __('Import client identities') }}</flux:heading>
                 <flux:text class="mt-2 max-w-2xl">
-                    {{ __('Preview a CSV before committing it. Every accepted row is revalidated and committed atomically; the source file is not retained.') }}
+                    {{ __('Check the CSV before importing it. Accepted rows are validated again when you confirm, and the uploaded file is not kept.') }}
                 </flux:text>
             </div>
 

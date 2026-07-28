@@ -40,7 +40,7 @@
                             {{ __('Every deadline, owner and review state in one controlled workspace.') }}
                         </h1>
                         <p class="mt-7 max-w-2xl text-lg leading-8 text-zinc-400">
-                            {{ __('A firm-scoped operations platform for client records, obligations, evidence, workflow handovers and management reporting. Built for traceable work, not opaque automation.') }}
+                            {{ __('Manage clients, deadlines, documents, assignments, reviews and reports in one secure workspace. Important changes remain available in the activity history.') }}
                         </p>
 
                         <div class="mt-10 flex flex-wrap items-center gap-4">
@@ -71,8 +71,8 @@
                             <div class="divide-y divide-white/8 px-6">
                                 @foreach ([
                                     [__('Compliance schedule'), __('Effective deadlines, due windows and client timelines'), 'calendar-days'],
-                                    [__('Controlled workflows'), __('Assignments, checklists, review decisions and retained history'), 'queue-list'],
-                                    [__('Evidence and reporting'), __('Document metadata, audit records and safe operational exports'), 'shield-check'],
+                                    [__('Team workflow'), __('Assignments, checklists, review decisions and work history'), 'queue-list'],
+                                    [__('Records and reports'), __('Document details, activity history and controlled exports'), 'shield-check'],
                                 ] as [$title, $description, $icon])
                                     <div class="grid grid-cols-[2.75rem_minmax(0,1fr)] gap-4 py-6">
                                         <span class="grid size-11 place-items-center rounded-xl bg-zinc-950 text-amber-300 ring-1 ring-white/8">

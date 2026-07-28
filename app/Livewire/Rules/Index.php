@@ -36,7 +36,7 @@ use Livewire\Attributes\Computed;
 use Livewire\Attributes\Title;
 use Livewire\Component;
 
-#[Title('Rule governance')]
+#[Title('Deadline rules')]
 final class Index extends Component
 {
     public string $templateKey = '';

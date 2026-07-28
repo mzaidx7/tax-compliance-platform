@@ -7,10 +7,10 @@
                     {{ __('Planned for a future release') }}
                 </div>
                 <h1 id="readiness-heading" class="max-w-3xl text-balance text-5xl font-semibold tracking-[-0.04em] text-white sm:text-6xl">
-                    {{ __('E-invoicing readiness is coming next.') }}
+                    {{ __('E-invoicing readiness is coming soon.') }}
                 </h1>
                 <p class="mt-6 max-w-2xl text-lg leading-8 text-zinc-400">
-                    {{ __('Release 1 is focused on dependable compliance operations. Readiness assessment and data-cleanup workflows are being developed separately so they can be reviewed and released with the care they require.') }}
+                    {{ __('The current release focuses on day-to-day tax and compliance work. Tools for reviewing and improving e-invoicing data will be released separately after further testing.') }}
                 </p>
 
                 <div class="mt-10 flex flex-wrap gap-3">

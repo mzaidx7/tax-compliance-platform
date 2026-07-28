@@ -5,10 +5,10 @@
             <div>
                 <p class="mb-3 text-sm font-medium text-amber-300">{{ __('Client records') }}</p>
                 <h1 class="text-balance text-4xl font-semibold tracking-[-0.03em] text-white sm:text-5xl">
-                    {{ __('Document expiry register') }}
+                    {{ __('Document expiry') }}
                 </h1>
                 <p class="mt-4 max-w-3xl text-base leading-7 text-zinc-400">
-                    {{ __('Track supplied metadata and generate internal expiry reminders. No document scan or validity conclusion is stored here.') }}
+                    {{ __('Record document expiry dates and follow up before renewals are due. The platform stores the details entered by your team and does not confirm whether a document is legally valid.') }}
                 </p>
             </div>
             <flux:badge color="amber" icon="calendar-days">{{ __('Metadata only') }}</flux:badge>
@@ -19,8 +19,8 @@
         <section aria-labelledby="expiry-register-heading">
             <div class="flex items-end justify-between gap-4">
                 <div>
-                    <h2 id="expiry-register-heading" class="text-lg font-semibold text-zinc-100">{{ __('Current document metadata') }}</h2>
-                    <p class="mt-1 text-sm text-zinc-500">{{ __('Renewals preserve the earlier record and replace it in this current view.') }}</p>
+                    <h2 id="expiry-register-heading" class="text-lg font-semibold text-zinc-100">{{ __('Current documents') }}</h2>
+                    <p class="mt-1 text-sm text-zinc-500">{{ __('When a document is renewed, the previous record remains in the history.') }}</p>
                 </div>
                 <span class="text-xs text-zinc-500">{{ $this->currentDocuments->count() }} {{ __('current records') }}</span>
             </div>
@@ -72,8 +72,8 @@
                     </article>
                 @empty
                     <div class="px-6 py-14 text-center">
-                        <p class="text-sm font-medium text-zinc-200">{{ __('No document metadata recorded') }}</p>
-                        <p class="mx-auto mt-2 max-w-md text-sm leading-6 text-zinc-500">{{ __('Publish a type, then record supplied metadata using the controlled forms.') }}</p>
+                        <p class="text-sm font-medium text-zinc-200">{{ __('No documents recorded') }}</p>
+                        <p class="mx-auto mt-2 max-w-md text-sm leading-6 text-zinc-500">{{ __('Create a document type, then add the document details supplied by the client.') }}</p>
                     </div>
                 @endforelse
             </div>
@@ -81,7 +81,7 @@
 
         <aside class="space-y-6">
             <section aria-labelledby="record-document-heading" class="rounded-2xl bg-zinc-900/70 p-6 ring-1 ring-white/8">
-                <h2 id="record-document-heading" class="text-lg font-semibold text-zinc-100">{{ __('Record metadata') }}</h2>
+                <h2 id="record-document-heading" class="text-lg font-semibold text-zinc-100">{{ __('Add document details') }}</h2>
                 <p class="mt-2 text-sm leading-6 text-zinc-500">{{ __('Dates are stored exactly as supplied. Select a prior record only for a renewal.') }}</p>
                 <form wire:submit="recordDocument" class="mt-5 space-y-4">
                     <flux:select wire:model="clientId" :label="__('Client')" required>
@@ -105,13 +105,13 @@
                     <flux:input wire:model="referenceLabel" :label="__('Reference label')" maxlength="100" />
                     <flux:input type="date" wire:model="issuedOn" :label="__('Issued on')" />
                     <flux:input type="date" wire:model="expiresOn" :label="__('Expires on')" />
-                    <flux:button type="submit" variant="primary" class="w-full">{{ __('Record metadata') }}</flux:button>
+                    <flux:button type="submit" variant="primary" class="w-full">{{ __('Save document details') }}</flux:button>
                 </form>
             </section>
 
             <section aria-labelledby="publish-type-heading" class="rounded-2xl bg-zinc-900/70 p-6 ring-1 ring-white/8">
                 <h2 id="publish-type-heading" class="text-lg font-semibold text-zinc-100">{{ __('Publish document type') }}</h2>
-                <p class="mt-2 text-sm leading-6 text-zinc-500">{{ __('Publishing the same key creates an immutable next version.') }}</p>
+                <p class="mt-2 text-sm leading-6 text-zinc-500">{{ __('Changing an existing document type creates a new version and keeps the previous version in the history.') }}</p>
                 <form wire:submit="publishType" class="mt-5 space-y-4">
                     <flux:input wire:model="typeKey" :label="__('Stable key')" placeholder="trade_licence" maxlength="64" required />
                     <flux:input wire:model="typeName" :label="__('Display name')" placeholder="Trade licence" maxlength="100" required />

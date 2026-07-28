@@ -10,16 +10,16 @@
                     {{ app(\App\Tenancy\FirmContext::class)->firm()->name }}
                 </p>
                 <h1 class="max-w-3xl text-balance text-4xl font-semibold tracking-[-0.03em] text-white sm:text-5xl">
-                    {{ __('Operational horizon') }}
+                    {{ __('Compliance overview') }}
                 </h1>
                 <p class="mt-5 max-w-3xl text-base leading-7 text-zinc-400">
-                    {{ __('A firm-scoped view of recorded deadlines, work risk and overdue payment state. These measures describe stored operations and do not calculate or guarantee compliance.') }}
+                    {{ __('See upcoming deadlines, overdue items, work risks and payment follow-ups for your firm. The figures come from information recorded by your team.') }}
                 </p>
             </div>
 
             @can('viewAny', \App\Models\WorkItem::class)
                 <flux:button :href="route('work-items.index')" variant="filled" icon="queue-list" wire:navigate>
-                    {{ __('Open work register') }}
+                    {{ __('Open work tracker') }}
                 </flux:button>
             @endcan
         </div>
@@ -59,8 +59,8 @@
     <section class="mt-8" aria-labelledby="operational-summary-heading">
         <div class="mb-4 flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
             <div>
-                <h2 id="operational-summary-heading" class="text-lg font-semibold text-zinc-100">{{ __('Recorded priorities') }}</h2>
-                <p class="mt-1 text-sm text-zinc-500">{{ __('Counts stay separate because each operational state has a different meaning.') }}</p>
+                <h2 id="operational-summary-heading" class="text-lg font-semibold text-zinc-100">{{ __('What needs attention') }}</h2>
+                <p class="mt-1 text-sm text-zinc-500">{{ __('Each number shows a separate type of deadline or work item.') }}</p>
             </div>
             <p class="text-xs text-zinc-500">{{ __('Due soon means today through the next :days days', ['days' => $horizonDays]) }}</p>
         </div>
@@ -68,29 +68,29 @@
         <dl class="grid border-y border-white/8 sm:grid-cols-2 xl:grid-cols-4">
             <div class="flex min-h-40 flex-col justify-between border-b border-white/8 px-4 py-5 sm:border-r xl:border-b-0">
                 <div>
-                    <dt class="text-sm font-medium text-zinc-200">{{ __('Open obligations due soon') }}</dt>
-                    <dd class="mt-2 text-sm leading-6 text-zinc-500">{{ __('Stored due dates inside the selected horizon.') }}</dd>
+                    <dt class="text-sm font-medium text-zinc-200">{{ __('Deadlines due soon') }}</dt>
+                    <dd class="mt-2 text-sm leading-6 text-zinc-500">{{ __('Open deadlines within the selected number of days.') }}</dd>
                 </div>
                 <dd class="mt-5 text-4xl font-semibold tracking-[-0.03em] text-white">{{ $this->summary['due_soon'] }}</dd>
             </div>
             <div class="flex min-h-40 flex-col justify-between border-b border-white/8 px-4 py-5 xl:border-b-0 xl:border-r">
                 <div>
-                    <dt class="text-sm font-medium text-zinc-200">{{ __('Open obligations past due') }}</dt>
-                    <dd class="mt-2 text-sm leading-6 text-zinc-500">{{ __('Open records whose effective due date has passed.') }}</dd>
+                    <dt class="text-sm font-medium text-zinc-200">{{ __('Overdue deadlines') }}</dt>
+                    <dd class="mt-2 text-sm leading-6 text-zinc-500">{{ __('Open deadlines with a due date that has passed.') }}</dd>
                 </div>
                 <dd class="mt-5 text-4xl font-semibold tracking-[-0.03em] text-red-300">{{ $this->summary['overdue'] }}</dd>
             </div>
             <div class="flex min-h-40 flex-col justify-between border-b border-white/8 px-4 py-5 sm:border-r xl:border-b-0">
                 <div>
-                    <dt class="text-sm font-medium text-zinc-200">{{ __('Active work marked high risk') }}</dt>
-                    <dd class="mt-2 text-sm leading-6 text-zinc-500">{{ __('Explicit recorded risk only. Nothing is inferred.') }}</dd>
+                    <dt class="text-sm font-medium text-zinc-200">{{ __('High-risk work') }}</dt>
+                    <dd class="mt-2 text-sm leading-6 text-zinc-500">{{ __('Work that your team has marked as high risk.') }}</dd>
                 </div>
                 <dd class="mt-5 text-4xl font-semibold tracking-[-0.03em] text-red-300">{{ $this->summary['high_risk'] }}</dd>
             </div>
             <div class="flex min-h-40 flex-col justify-between border-b border-white/8 px-4 py-5 xl:border-b-0 xl:border-r">
                 <div>
-                    <dt class="text-sm font-medium text-zinc-200">{{ __('Payments recorded overdue') }}</dt>
-                    <dd class="mt-2 text-sm leading-6 text-zinc-500">{{ __('Explicit payment state only. No transfer is inferred.') }}</dd>
+                    <dt class="text-sm font-medium text-zinc-200">{{ __('Overdue payments') }}</dt>
+                    <dd class="mt-2 text-sm leading-6 text-zinc-500">{{ __('Payments that your team has marked as overdue.') }}</dd>
                 </div>
                 <dd class="mt-5 text-4xl font-semibold tracking-[-0.03em] text-red-300">{{ $this->summary['overdue_payments'] }}</dd>
             </div>
@@ -103,11 +103,11 @@
                 <dd class="mt-5 text-3xl font-semibold tracking-[-0.03em] text-white">{{ $this->summary['under_review'] }}</dd>
             </div>
             <div class="flex min-h-36 flex-col justify-between border-b border-white/8 px-4 py-5 sm:border-b-0 sm:border-r">
-                <div><dt class="text-sm font-medium text-zinc-200">{{ __('Unassigned active work') }}</dt><dd class="mt-2 text-sm leading-6 text-zinc-500">{{ __('No retained assignment history.') }}</dd></div>
+                <div><dt class="text-sm font-medium text-zinc-200">{{ __('Unassigned work') }}</dt><dd class="mt-2 text-sm leading-6 text-zinc-500">{{ __('Active work with no assigned team member.') }}</dd></div>
                 <dd class="mt-5 text-3xl font-semibold tracking-[-0.03em] text-red-300">{{ $this->summary['unassigned'] }}</dd>
             </div>
             <div class="flex min-h-36 flex-col justify-between px-4 py-5">
-                <div><dt class="text-sm font-medium text-zinc-200">{{ __('Visible active workload') }}</dt><dd class="mt-2 text-sm leading-6 text-zinc-500">{{ __('Non-terminal work you can access.') }}</dd></div>
+                <div><dt class="text-sm font-medium text-zinc-200">{{ __('Active workload') }}</dt><dd class="mt-2 text-sm leading-6 text-zinc-500">{{ __('Open work that you have permission to view.') }}</dd></div>
                 <dd class="mt-5 text-3xl font-semibold tracking-[-0.03em] text-white">{{ $this->summary['active_workload'] }}</dd>
             </div>
         </dl>
@@ -121,7 +121,7 @@
                     <p class="mt-1 text-sm text-zinc-500">{{ __('Overdue first, then the next recorded deadlines.') }}</p>
                 </div>
                 @can('viewAny', \App\Models\Obligation::class)
-                    <flux:button size="sm" variant="ghost" :href="route('obligations.index')" wire:navigate>{{ __('View obligations') }}</flux:button>
+                    <flux:button size="sm" variant="ghost" :href="route('obligations.index')" wire:navigate>{{ __('View deadlines') }}</flux:button>
                 @endcan
             </div>
 
@@ -161,7 +161,7 @@
                 @empty
                     <div class="py-10 text-center">
                         <p class="text-sm font-medium text-zinc-200">{{ __('No deadlines need attention') }}</p>
-                        <p class="mt-2 text-sm text-zinc-500">{{ __('No visible open obligation is overdue or due in the next 30 days.') }}</p>
+                        <p class="mt-2 text-sm text-zinc-500">{{ __('No open deadline is overdue or due in the next 30 days.') }}</p>
                     </div>
                 @endforelse
             </div>
@@ -207,8 +207,8 @@
 
     <section class="mt-12" aria-labelledby="work-queues-heading">
         <div class="mb-4 flex items-end justify-between gap-4">
-            <div><h2 id="work-queues-heading" class="text-lg font-semibold text-zinc-100">{{ __('Work-state queues') }}</h2><p class="mt-1 text-sm text-zinc-500">{{ __('Stored workflow state only. Open the work register to act.') }}</p></div>
-            <flux:button size="sm" variant="ghost" :href="route('work-items.index')" wire:navigate>{{ __('Open work register') }}</flux:button>
+            <div><h2 id="work-queues-heading" class="text-lg font-semibold text-zinc-100">{{ __('Work by stage') }}</h2><p class="mt-1 text-sm text-zinc-500">{{ __('Open the work tracker to update assignments or progress.') }}</p></div>
+            <flux:button size="sm" variant="ghost" :href="route('work-items.index')" wire:navigate>{{ __('Open work tracker') }}</flux:button>
         </div>
         <div class="grid gap-8 lg:grid-cols-3">
             @foreach ([
@@ -234,7 +234,7 @@
     </section>
 
     <section class="mt-12" aria-labelledby="workload-heading">
-        <div class="mb-4"><h2 id="workload-heading" class="text-lg font-semibold text-zinc-100">{{ __('Visible workload by member') }}</h2><p class="mt-1 text-sm text-zinc-500">{{ __('Current retained assignments across up to 500 visible active work records.') }}</p></div>
+        <div class="mb-4"><h2 id="workload-heading" class="text-lg font-semibold text-zinc-100">{{ __('Team workload') }}</h2><p class="mt-1 text-sm text-zinc-500">{{ __('Current assignments for work that you have permission to view.') }}</p></div>
         <div class="overflow-x-auto border-y border-white/8">
             <table class="min-w-full divide-y divide-white/8 text-left text-sm">
                 <thead><tr><th class="px-4 py-3 text-xs font-semibold text-zinc-400">{{ __('Member') }}</th><th class="px-4 py-3 text-xs font-semibold text-zinc-400">{{ __('Preparer') }}</th><th class="px-4 py-3 text-xs font-semibold text-zinc-400">{{ __('Reviewer') }}</th><th class="px-4 py-3 text-xs font-semibold text-zinc-400">{{ __('Manager') }}</th><th class="px-4 py-3 text-xs font-semibold text-zinc-400">{{ __('Total assignments') }}</th></tr></thead>

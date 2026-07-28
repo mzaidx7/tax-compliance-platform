@@ -2,20 +2,20 @@
     <header class="border-b border-white/8 pb-8">
         <div class="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
             <div>
-                <p class="mb-3 text-sm font-medium text-amber-300">{{ __('Governed configuration') }}</p>
-                <h1 class="text-balance text-4xl font-semibold tracking-[-0.03em] text-white sm:text-5xl">{{ __('Obligation rule governance') }}</h1>
+        <p class="mb-3 text-sm font-medium text-amber-300">{{ __('Administration') }}</p>
+        <h1 class="text-balance text-4xl font-semibold tracking-[-0.03em] text-white sm:text-5xl">{{ __('Deadline rules') }}</h1>
                 <p class="mt-4 max-w-3xl text-base leading-7 text-zinc-400">
-                    {{ __('Prepare source-linked rule versions, separate preparation from verification, and publish only code-backed calculators.') }}
+            {{ __('Create and review the rules used to prepare client deadlines. Every published rule keeps its source, reviewer and version history.') }}
                 </p>
             </div>
-            <flux:badge color="amber" icon="shield-check">{{ __('No automated obligation generation') }}</flux:badge>
+        <flux:badge color="amber" icon="shield-check">{{ __('Review required') }}</flux:badge>
         </div>
     </header>
 
     <div class="mt-9 grid gap-8 xl:grid-cols-[minmax(0,1fr)_24rem]">
         <section aria-labelledby="rule-register-heading">
-            <h2 id="rule-register-heading" class="text-lg font-semibold text-zinc-100">{{ __('Rule register') }}</h2>
-            <p class="mt-1 text-sm text-zinc-500">{{ __('Published content is immutable. A correction starts a new version.') }}</p>
+                <h2 id="rule-register-heading" class="text-lg font-semibold text-zinc-100">{{ __('Rule list') }}</h2>
+                <p class="mt-1 text-sm text-zinc-500">{{ __('A published rule cannot be edited. Any correction is saved as a new version.') }}</p>
 
             <div class="mt-5 space-y-5">
                 @forelse ($this->templates as $template)

@@ -4,10 +4,10 @@
             <div>
                 <p class="mb-2 text-sm font-medium text-amber-300">{{ $this->currentFirmName }}</p>
                 <h1 class="text-3xl font-semibold tracking-[-0.03em] text-zinc-50 sm:text-4xl">
-                    {{ __('Access register') }}
+                    {{ __('Team members') }}
                 </h1>
                 <p class="mt-3 max-w-2xl text-sm leading-6 text-zinc-400">
-                    {{ __('Review members, update access and manage time-limited invitations. Every change is isolated to this firm and recorded in the audit history.') }}
+                    {{ __('Invite team members, assign roles, update access and review invitation status. Every change is recorded in the activity history.') }}
                 </p>
             </div>
             <flux:badge color="amber" icon="shield-check">{{ $this->currentRoleLabel }}</flux:badge>

@@ -31,7 +31,7 @@ use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 use Livewire\WithFileUploads;
 use Livewire\WithPagination;
 
-#[Title('Work register')]
+#[Title('Work tracker')]
 final class Index extends Component
 {
     use WithFileUploads;

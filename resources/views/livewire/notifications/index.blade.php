@@ -1,16 +1,16 @@
 <div class="mx-auto w-full max-w-6xl">
     <header class="border-b border-white/8 pb-8">
         <p class="mb-3 text-sm font-medium text-amber-300">{{ app(\App\Tenancy\FirmContext::class)->firm()->name }}</p>
-        <h1 class="text-balance text-4xl font-semibold tracking-[-0.03em] text-white sm:text-5xl">{{ __('Notification centre') }}</h1>
-        <p class="mt-4 max-w-3xl text-base leading-7 text-zinc-400">{{ __('Your firm-scoped delivery evidence and operational notices. Message contents and provider details are not exposed here.') }}</p>
+        <h1 class="text-balance text-4xl font-semibold tracking-[-0.03em] text-white sm:text-5xl">{{ __('Notifications') }}</h1>
+        <p class="mt-4 max-w-3xl text-base leading-7 text-zinc-400">{{ __('Review reminders and updates about your firm’s compliance work. Delivery status is shown without exposing private message content.') }}</p>
     </header>
 
     @if ($this->canGenerateSummary())
         <section class="mt-8 border-y border-white/8 py-5" aria-labelledby="manager-summary-heading">
             <div class="grid gap-4 sm:grid-cols-[minmax(14rem,1fr)_auto] sm:items-end">
                 <div>
-                    <h2 id="manager-summary-heading" class="text-lg font-semibold text-zinc-100">{{ __('Generate manager summary') }}</h2>
-                    <p class="mt-1 text-sm text-zinc-500">{{ __('Explicitly queue one daily summary of stored due, overdue, risk and payment states for an active manager.') }}</p>
+                    <h2 id="manager-summary-heading" class="text-lg font-semibold text-zinc-100">{{ __('Send a manager summary') }}</h2>
+                    <p class="mt-1 text-sm text-zinc-500">{{ __('Send a daily summary of upcoming deadlines, overdue work, recorded risks and payment follow-ups to an active manager.') }}</p>
                     <div class="mt-4 max-w-xl">
                         <flux:select wire:model="managerMembershipId" :label="__('Recipient manager')" required>
                             <flux:select.option value="">{{ __('Select active manager') }}</flux:select.option>
@@ -20,7 +20,7 @@
                         </flux:select>
                     </div>
                 </div>
-                <flux:button variant="filled" wire:click="generateManagerSummary" :disabled="$managerMembershipId === ''">{{ __('Queue summary') }}</flux:button>
+                <flux:button variant="filled" wire:click="generateManagerSummary" :disabled="$managerMembershipId === ''">{{ __('Send summary') }}</flux:button>
             </div>
         </section>
     @endif
@@ -29,7 +29,7 @@
         <div class="mb-4 flex items-end justify-between gap-4">
             <div>
                 <h2 id="notice-history-heading" class="text-lg font-semibold text-zinc-100">{{ __('Your notices') }}</h2>
-                <p class="mt-1 text-sm text-zinc-500">{{ __('Queued, delivered and failed request states remain separate from whether you have read the notice.') }}</p>
+                <p class="mt-1 text-sm text-zinc-500">{{ __('See whether each notification is waiting, delivered or unsuccessful, and whether it has been read.') }}</p>
             </div>
             <span class="text-xs text-zinc-500">{{ trans_choice('{0} No notices|{1} 1 notice|[2,*] :count notices', $this->requests->total(), ['count' => $this->requests->total()]) }}</span>
         </div>

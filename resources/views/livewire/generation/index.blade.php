@@ -2,10 +2,10 @@
     <header class="border-b border-white/8 pb-8">
         <div class="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
             <div>
-                <p class="mb-3 text-sm font-medium text-amber-300">{{ __('Controlled generation') }}</p>
-                <h1 class="text-balance text-4xl font-semibold tracking-[-0.03em] text-white sm:text-5xl">{{ __('Obligation generation preview') }}</h1>
+        <p class="mb-3 text-sm font-medium text-amber-300">{{ __('Review before saving') }}</p>
+        <h1 class="text-balance text-4xl font-semibold tracking-[-0.03em] text-white sm:text-5xl">{{ __('Create deadlines from rules') }}</h1>
                 <p class="mt-4 max-w-3xl text-base leading-7 text-zinc-400">
-                    {{ __('Preview an immutable calculation snapshot before committing one idempotent obligation. Current rules accept only a manually supplied due date.') }}
+            {{ __('Check the client, period, rule and due date before creating a deadline. Nothing is saved until you review and confirm the preview.') }}
                 </p>
             </div>
             <flux:badge color="amber" icon="eye">{{ __('Preview required') }}</flux:badge>
@@ -14,8 +14,8 @@
 
     <div class="mt-9 grid gap-8 lg:grid-cols-[23rem_minmax(0,1fr)]">
         <section aria-labelledby="generation-input-heading" class="rounded-2xl bg-zinc-900/70 p-6 ring-1 ring-white/8">
-            <h2 id="generation-input-heading" class="text-lg font-semibold text-zinc-100">{{ __('Generation inputs') }}</h2>
-            <p class="mt-2 text-sm leading-6 text-zinc-500">{{ __('Selections are validated together. The platform does not infer a client period or due date.') }}</p>
+        <h2 id="generation-input-heading" class="text-lg font-semibold text-zinc-100">{{ __('Deadline details') }}</h2>
+        <p class="mt-2 text-sm leading-6 text-zinc-500">{{ __('Select the client, service, period and approved rule. Enter the due date exactly as reviewed by your team.') }}</p>
 
             <form wire:submit="preview" class="mt-5 space-y-4">
                 <flux:select wire:model="clientId" :label="__('Client')" required>

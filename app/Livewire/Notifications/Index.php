@@ -21,7 +21,7 @@ use Livewire\Attributes\Title;
 use Livewire\Component;
 use Livewire\WithPagination;
 
-#[Title('Notification centre')]
+#[Title('Notifications')]
 final class Index extends Component
 {
     use WithPagination;

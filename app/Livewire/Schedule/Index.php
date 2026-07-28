@@ -20,7 +20,7 @@ use Livewire\Attributes\Computed;
 use Livewire\Attributes\Title;
 use Livewire\Component;
 
-#[Title('Compliance schedule')]
+#[Title('Compliance calendar')]
 final class Index extends Component
 {
     public string $mode = 'month';

@@ -11,15 +11,15 @@ FORM: Deadline review rail, grounded structure seven, seed 75cba0e2.
             <div>
                 <p class="mb-3 text-sm font-medium text-amber-300">{{ $this->currentFirmName }}</p>
                 <h1 class="text-balance text-4xl font-semibold tracking-[-0.03em] text-white sm:text-5xl">
-                    {{ __('Manual obligations') }}
+                    {{ __('Tax and compliance deadlines') }}
                 </h1>
                 <p class="mt-4 max-w-2xl text-base leading-7 text-zinc-400">
-                    {{ __('Review due dates, ownership and controlled work progress without blending deadline, filing or payment state.') }}
+                    {{ __('Record and review each client deadline, the responsible team and the progress of related work.') }}
                 </p>
             </div>
             <div class="flex flex-wrap items-center gap-2">
-                <flux:badge color="amber" icon="pencil-square">{{ __('Human entered') }}</flux:badge>
-                <flux:badge color="zinc" icon="shield-check">{{ __('Role controlled') }}</flux:badge>
+                <flux:badge color="amber" icon="pencil-square">{{ __('Manually entered') }}</flux:badge>
+                <flux:badge color="zinc" icon="shield-check">{{ __('Access controlled') }}</flux:badge>
             </div>
         </div>
     </header>
@@ -31,8 +31,8 @@ FORM: Deadline review rail, grounded structure seven, seed 75cba0e2.
         <section aria-labelledby="obligation-register-heading">
             <div class="mb-5 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
                 <div>
-                    <h2 id="obligation-register-heading" class="text-lg font-semibold text-zinc-100">{{ __('Deadline register') }}</h2>
-                    <p class="mt-1 text-sm text-zinc-500">{{ __('Work, filing and payment states will be tracked separately.') }}</p>
+                    <h2 id="obligation-register-heading" class="text-lg font-semibold text-zinc-100">{{ __('Deadline list') }}</h2>
+                    <p class="mt-1 text-sm text-zinc-500">{{ __('Each deadline keeps its work, filing and payment progress separate.') }}</p>
                 </div>
                 <div class="w-full sm:max-w-xs">
                     <flux:input
@@ -337,7 +337,7 @@ FORM: Deadline review rail, grounded structure seven, seed 75cba0e2.
                         icon="exclamation-triangle"
                         :heading="__('An active client is required')"
                     >
-                        {{ __('Ask a firm administrator to create or reactivate a canonical client before recording an obligation.') }}
+                        {{ __('Ask a firm administrator to add or reactivate a client before recording a deadline.') }}
                     </flux:callout>
                 @else
                     <form wire:submit="createObligation" class="space-y-5">

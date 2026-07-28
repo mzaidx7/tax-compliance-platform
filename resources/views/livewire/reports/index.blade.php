@@ -1,8 +1,8 @@
 <div class="mx-auto w-full max-w-7xl">
     <header class="border-b border-white/8 pb-8">
         <p class="mb-3 text-sm font-medium text-amber-300">{{ app(\App\Tenancy\FirmContext::class)->firm()->name }}</p>
-        <h1 class="text-balance text-4xl font-semibold tracking-[-0.03em] text-white sm:text-5xl">{{ __('Operational reports') }}</h1>
-        <p class="mt-4 max-w-3xl text-base leading-7 text-zinc-400">{{ __('Firm-scoped schedules, periods, document-expiry metadata and workload state. Reports use stored records only and do not calculate statutory dates, tax, risk or compliance.') }}</p>
+    <h1 class="text-balance text-4xl font-semibold tracking-[-0.03em] text-white sm:text-5xl">{{ __('Reports') }}</h1>
+    <p class="mt-4 max-w-3xl text-base leading-7 text-zinc-400">{{ __('Review and download summaries of client deadlines, tax periods, document expiries and team workload. Reports use information recorded by your firm.') }}</p>
     </header>
 
     <section class="mt-8" aria-labelledby="report-controls-heading">
@@ -22,7 +22,7 @@
         <div class="mb-4 flex flex-wrap items-end justify-between gap-4">
             <div>
                 <h2 id="report-results-heading" class="text-lg font-semibold text-zinc-100">{{ \App\Enums\OperationalReportType::from($reportType)->label() }}</h2>
-                <p class="mt-1 text-sm text-zinc-500">{{ __('Visible columns exactly match the export definition. Up to 100 rows are previewed.') }}</p>
+        <p class="mt-1 text-sm text-zinc-500">{{ __('The preview shows up to 100 rows. The downloaded CSV uses the same columns.') }}</p>
             </div>
             <span class="text-xs text-zinc-500">{{ trans_choice('{0} No preview rows|{1} 1 preview row|[2,*] :count preview rows', count($this->report['rows']), ['count' => count($this->report['rows'])]) }}</span>
         </div>

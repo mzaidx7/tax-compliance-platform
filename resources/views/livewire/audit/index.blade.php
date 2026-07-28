@@ -6,10 +6,10 @@
                     {{ app(\App\Tenancy\FirmContext::class)->firm()->name }}
                 </p>
                 <h1 class="text-balance text-4xl font-semibold tracking-[-0.03em] text-white sm:text-5xl">
-                    {{ __('Audit register') }}
+                    {{ __('Activity history') }}
                 </h1>
                 <p class="mt-4 max-w-2xl text-base leading-7 text-zinc-400">
-                    {{ __('Retained evidence of significant actions in this firm. This register is read only. Records cannot be edited or removed from here or anywhere else in the application.') }}
+                    {{ __('See who created, changed, approved or downloaded information in your firm. This history is read only and cannot be edited or deleted.') }}
                 </p>
             </div>
         </div>

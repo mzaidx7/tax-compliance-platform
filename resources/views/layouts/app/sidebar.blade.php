@@ -60,22 +60,22 @@
                         )
                             @can('viewAny', \App\Models\Obligation::class)
                                 <flux:sidebar.item icon="calendar-days" :href="route('obligations.index')" :current="request()->routeIs('obligations.*')" wire:navigate>
-                                    {{ __('Obligations') }}
+                                    {{ __('Deadlines') }}
                                 </flux:sidebar.item>
                                 <flux:sidebar.item icon="calendar" :href="route('schedule.index')" :current="request()->routeIs('schedule.*')" wire:navigate>
-                                    {{ __('Schedule') }}
+                                    {{ __('Calendar') }}
                                 </flux:sidebar.item>
                                 <flux:sidebar.item icon="book-open" :href="route('rules.index')" :current="request()->routeIs('rules.*')" wire:navigate>
-                                    {{ __('Rule governance') }}
+                                    {{ __('Deadline rules') }}
                                 </flux:sidebar.item>
                                 <flux:sidebar.item icon="sparkles" :href="route('generation.index')" :current="request()->routeIs('generation.*')" wire:navigate>
-                                    {{ __('Generation preview') }}
+                                    {{ __('Create deadlines') }}
                                 </flux:sidebar.item>
                             @endcan
 
                             @can('viewAny', \App\Models\WorkItem::class)
                                 <flux:sidebar.item icon="queue-list" :href="route('work-items.index')" :current="request()->routeIs('work-items.*')" wire:navigate>
-                                    {{ __('Work register') }}
+                                    {{ __('Work tracker') }}
                                 </flux:sidebar.item>
                             @endcan
                             @if ($firmContext->membership()?->hasPermission(\App\Enums\Permission::ViewReports))
@@ -93,14 +93,14 @@
                         )
                             @can('viewAny', \App\Models\AuditLog::class)
                                 <flux:sidebar.item icon="shield-check" :href="route('audit.index')" :current="request()->routeIs('audit.*')" wire:navigate>
-                                    {{ __('Audit register') }}
+                                    {{ __('Activity history') }}
                                 </flux:sidebar.item>
                             @endcan
                         @endif
 
                         @can('viewAny', \App\Models\FirmMembership::class)
                             <flux:sidebar.item icon="users" :href="route('members.index')" :current="request()->routeIs('members.*')" wire:navigate>
-                                {{ __('Members') }}
+                                {{ __('Team members') }}
                             </flux:sidebar.item>
                         @endcan
                     @endif

@@ -61,7 +61,7 @@ use Livewire\Attributes\Title;
 use Livewire\Component;
 use Livewire\WithPagination;
 
-#[Title('Manual obligations')]
+#[Title('Tax and compliance deadlines')]
 final class Index extends Component
 {
     use WithPagination;

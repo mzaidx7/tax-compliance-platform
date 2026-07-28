@@ -27,7 +27,7 @@ use Livewire\Attributes\Locked;
 use Livewire\Attributes\Title;
 use Livewire\Component;
 
-#[Title('Firm members')]
+#[Title('Team members')]
 class Index extends Component
 {
     public string $email = '';

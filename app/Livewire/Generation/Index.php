@@ -31,7 +31,7 @@ use Livewire\Attributes\Computed;
 use Livewire\Attributes\Title;
 use Livewire\Component;
 
-#[Title('Obligation generation')]
+#[Title('Create deadlines')]
 final class Index extends Component
 {
     public string $clientId = '';

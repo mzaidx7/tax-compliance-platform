@@ -45,7 +45,7 @@ final class ClientManagementTest extends TestCase
             ->get(route('clients.index'))
             ->assertOk()
             ->assertSee($firm->name)
-            ->assertSee('Client register');
+            ->assertSee('Clients');
     }
 
     public function test_non_administrator_cannot_open_client_register(): void

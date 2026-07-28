@@ -16,7 +16,7 @@ use Livewire\Attributes\Computed;
 use Livewire\Attributes\Title;
 use Livewire\Component;
 
-#[Title('Operational reports')]
+#[Title('Reports')]
 final class Index extends Component
 {
     public string $reportType = 'monthly_schedule';

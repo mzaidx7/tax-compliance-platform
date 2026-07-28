@@ -49,7 +49,7 @@ final class ManualObligationTest extends TestCase
             ->get(route('obligations.index'))
             ->assertOk()
             ->assertSee($firm->name)
-            ->assertSee('Manual obligations');
+            ->assertSee('Tax and compliance deadlines');
     }
 
     public function test_manager_creates_a_manual_obligation_with_audit_history(): void

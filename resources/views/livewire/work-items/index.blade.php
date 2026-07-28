@@ -6,10 +6,10 @@
                     {{ app(\App\Tenancy\FirmContext::class)->firm()->name }}
                 </p>
                 <h1 class="text-balance text-4xl font-semibold tracking-[-0.03em] text-white sm:text-5xl">
-                    {{ __('Work register') }}
+                    {{ __('Work tracker') }}
                 </h1>
                 <p class="mt-4 max-w-3xl text-base leading-7 text-zinc-400">
-                    {{ __('Primary work and corrective follow-ups stay together. Completed originals remain unchanged while each follow-up keeps its own state, risk and accountable team.') }}
+                    {{ __('Track each compliance job, its assigned preparer, reviewer and manager, its current stage, and any follow-up work.') }}
                 </p>
             </div>
 

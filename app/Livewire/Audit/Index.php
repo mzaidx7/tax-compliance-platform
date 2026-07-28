@@ -29,7 +29,7 @@ use Livewire\WithPagination;
  * and it relies on the tenant global scope so one firm can never read another
  * firm's retained evidence.
  */
-#[Title('Audit register')]
+#[Title('Activity history')]
 final class Index extends Component
 {
     use WithPagination;
