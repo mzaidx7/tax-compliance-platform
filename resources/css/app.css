@@ -37,6 +37,14 @@
 }
 
 @layer base {
+    html {
+        color-scheme: dark;
+        background: var(--color-zinc-950);
+    }
+
+    body {
+        min-width: 320px;
+    }
 
     *,
     ::after,
@@ -44,6 +52,21 @@
     ::backdrop,
     ::file-selector-button {
         border-color: var(--color-gray-200, currentColor);
+    }
+
+    :focus-visible {
+        scroll-margin-block: 6rem;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        *,
+        ::before,
+        ::after {
+            scroll-behavior: auto !important;
+            transition-duration: 0.01ms !important;
+            animation-duration: 0.01ms !important;
+            animation-iteration-count: 1 !important;
+        }
     }
 }
 
@@ -64,6 +87,25 @@ select:focus[data-flux-control] {
 ::selection {
     background: color-mix(in oklab, var(--color-amber-400) 72%, transparent);
     color: var(--color-zinc-950);
+}
+
+* {
+    scrollbar-color: var(--color-zinc-700) var(--color-zinc-950);
+}
+
+.release-file-input::file-selector-button {
+    margin-inline-end: 1rem;
+    border: 0;
+    border-radius: 0.5rem;
+    background: var(--color-amber-300);
+    padding: 0.5rem 0.75rem;
+    color: #000;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.release-file-input::file-selector-button:hover {
+    background: var(--color-amber-200);
 }
 
 /* \[:where(&)\]:size-4 {

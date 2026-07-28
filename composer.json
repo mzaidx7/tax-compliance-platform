@@ -1,11 +1,13 @@
 {
     "$schema": "https://getcomposer.org/schema.json",
-    "name": "laravel/livewire-starter-kit",
+    "name": "think-beyond-tax/compliance-platform",
     "type": "project",
-    "description": "The official Laravel starter kit for Livewire.",
+    "description": "Firm-scoped compliance operations for Think Beyond Tax.",
     "keywords": [
+        "compliance-operations",
         "laravel",
-        "framework"
+        "livewire",
+        "multi-tenant"
     ],
     "license": "MIT",
     "require": {

@@ -5,12 +5,12 @@
 - Last updated: 2026-07-28
 - Updated by: Codex GPT-5.6
 - Platform repository status: independent repository on `main`, remote `mzaidx7/tax-compliance-platform`
-- Current milestone: Release 1 compliance operations scope approved and release hardening started
+- Current milestone: Compliance Operations V1 repository release candidate completed
 
 ## Current Objective
 Create a UAE-focused compliance operations and e-invoicing readiness platform under a TBT subdomain while keeping its application, data, deployment and release lifecycle separate from the public TBT website.
 
-The immediate objective is to finish and publish Release 1 as an internal Compliance Operations MVP. Build bounded CSV client onboarding, finish frontend and production hardening, deploy, and keep e-invoicing readiness preserved behind a coming-soon boundary. Automated regulated calculators remain decision-gated.
+The immediate objective is to configure the real production host, pass `platform:release-check`, deploy the verified commit, and complete post-deployment browser and operational smoke checks. E-invoicing remains preserved behind its coming-soon boundary.
 
 ## Canonical Files
 
@@ -171,7 +171,7 @@ The immediate objective is to finish and publish Release 1 as an internal Compli
 - Laravel Pint check passed.
 - Larastan passed with zero errors.
 - Full workflow feature suite (`tests/Feature/Workflows`, including checklist, transition, reviewer-decision and workflow-version migration tests) passed with no failures.
-- PHPUnit passed 463 tests with 1,454 assertions after Build Packet 55.
+- PHPUnit passed 471 tests with 1,493 assertions for the Compliance Operations V1 release candidate.
 - Database triggers were verified to reject raw query-builder updates and deletes on `work_item_transitions`, which Eloquent model events alone do not cover.
 - Vite production build passed.
 - All migrations, including append-only deadline overrides, and seven synthetic domain seeders passed from a fresh database.

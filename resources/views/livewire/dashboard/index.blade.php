@@ -65,50 +65,50 @@
             <p class="text-xs text-zinc-500">{{ __('Due soon means today through the next :days days', ['days' => $horizonDays]) }}</p>
         </div>
 
-        <dl class="divide-y divide-white/8 border-y border-white/8">
-            <div class="grid gap-2 py-4 sm:grid-cols-[minmax(0,1fr)_7rem] sm:items-center">
+        <dl class="grid border-y border-white/8 sm:grid-cols-2 xl:grid-cols-4">
+            <div class="flex min-h-40 flex-col justify-between border-b border-white/8 px-4 py-5 sm:border-r xl:border-b-0">
                 <div>
                     <dt class="text-sm font-medium text-zinc-200">{{ __('Open obligations due soon') }}</dt>
-                    <dd class="mt-1 text-sm text-zinc-500">{{ __('Stored statutory due dates from today through 30 days.') }}</dd>
+                    <dd class="mt-2 text-sm leading-6 text-zinc-500">{{ __('Stored due dates inside the selected horizon.') }}</dd>
                 </div>
-                <dd class="text-3xl font-semibold tracking-[-0.03em] text-white sm:text-right">{{ $this->summary['due_soon'] }}</dd>
+                <dd class="mt-5 text-4xl font-semibold tracking-[-0.03em] text-white">{{ $this->summary['due_soon'] }}</dd>
             </div>
-            <div class="grid gap-2 py-4 sm:grid-cols-[minmax(0,1fr)_7rem] sm:items-center">
+            <div class="flex min-h-40 flex-col justify-between border-b border-white/8 px-4 py-5 xl:border-b-0 xl:border-r">
                 <div>
                     <dt class="text-sm font-medium text-zinc-200">{{ __('Open obligations past due') }}</dt>
-                    <dd class="mt-1 text-sm text-zinc-500">{{ __('Open records whose stored statutory due date has passed.') }}</dd>
+                    <dd class="mt-2 text-sm leading-6 text-zinc-500">{{ __('Open records whose effective due date has passed.') }}</dd>
                 </div>
-                <dd class="text-3xl font-semibold tracking-[-0.03em] text-red-300 sm:text-right">{{ $this->summary['overdue'] }}</dd>
+                <dd class="mt-5 text-4xl font-semibold tracking-[-0.03em] text-red-300">{{ $this->summary['overdue'] }}</dd>
             </div>
-            <div class="grid gap-2 py-4 sm:grid-cols-[minmax(0,1fr)_7rem] sm:items-center">
+            <div class="flex min-h-40 flex-col justify-between border-b border-white/8 px-4 py-5 sm:border-r xl:border-b-0">
                 <div>
                     <dt class="text-sm font-medium text-zinc-200">{{ __('Active work marked high risk') }}</dt>
-                    <dd class="mt-1 text-sm text-zinc-500">{{ __('Explicitly recorded risk on non-terminal work. No risk is inferred.') }}</dd>
+                    <dd class="mt-2 text-sm leading-6 text-zinc-500">{{ __('Explicit recorded risk only. Nothing is inferred.') }}</dd>
                 </div>
-                <dd class="text-3xl font-semibold tracking-[-0.03em] text-red-300 sm:text-right">{{ $this->summary['high_risk'] }}</dd>
+                <dd class="mt-5 text-4xl font-semibold tracking-[-0.03em] text-red-300">{{ $this->summary['high_risk'] }}</dd>
             </div>
-            <div class="grid gap-2 py-4 sm:grid-cols-[minmax(0,1fr)_7rem] sm:items-center">
+            <div class="flex min-h-40 flex-col justify-between border-b border-white/8 px-4 py-5 xl:border-b-0 xl:border-r">
                 <div>
                     <dt class="text-sm font-medium text-zinc-200">{{ __('Payments recorded overdue') }}</dt>
-                    <dd class="mt-1 text-sm text-zinc-500">{{ __('Explicit payment state only. This platform does not initiate or confirm transfers.') }}</dd>
+                    <dd class="mt-2 text-sm leading-6 text-zinc-500">{{ __('Explicit payment state only. No transfer is inferred.') }}</dd>
                 </div>
-                <dd class="text-3xl font-semibold tracking-[-0.03em] text-red-300 sm:text-right">{{ $this->summary['overdue_payments'] }}</dd>
+                <dd class="mt-5 text-4xl font-semibold tracking-[-0.03em] text-red-300">{{ $this->summary['overdue_payments'] }}</dd>
             </div>
-            <div class="grid gap-2 py-4 sm:grid-cols-[minmax(0,1fr)_7rem] sm:items-center">
-                <div><dt class="text-sm font-medium text-zinc-200">{{ __('Work awaiting client') }}</dt><dd class="mt-1 text-sm text-zinc-500">{{ __('Explicit awaiting-client or awaiting-client-approval status.') }}</dd></div>
-                <dd class="text-3xl font-semibold tracking-[-0.03em] text-amber-300 sm:text-right">{{ $this->summary['awaiting_client'] }}</dd>
+            <div class="flex min-h-36 flex-col justify-between border-b border-white/8 px-4 py-5 sm:border-r">
+                <div><dt class="text-sm font-medium text-zinc-200">{{ __('Work awaiting client') }}</dt><dd class="mt-2 text-sm leading-6 text-zinc-500">{{ __('Awaiting client or client approval.') }}</dd></div>
+                <dd class="mt-5 text-3xl font-semibold tracking-[-0.03em] text-amber-300">{{ $this->summary['awaiting_client'] }}</dd>
             </div>
-            <div class="grid gap-2 py-4 sm:grid-cols-[minmax(0,1fr)_7rem] sm:items-center">
-                <div><dt class="text-sm font-medium text-zinc-200">{{ __('Work under review') }}</dt><dd class="mt-1 text-sm text-zinc-500">{{ __('Explicit under-review work state.') }}</dd></div>
-                <dd class="text-3xl font-semibold tracking-[-0.03em] text-white sm:text-right">{{ $this->summary['under_review'] }}</dd>
+            <div class="flex min-h-36 flex-col justify-between border-b border-white/8 px-4 py-5 xl:border-r">
+                <div><dt class="text-sm font-medium text-zinc-200">{{ __('Work under review') }}</dt><dd class="mt-2 text-sm leading-6 text-zinc-500">{{ __('Submitted to an assigned reviewer.') }}</dd></div>
+                <dd class="mt-5 text-3xl font-semibold tracking-[-0.03em] text-white">{{ $this->summary['under_review'] }}</dd>
             </div>
-            <div class="grid gap-2 py-4 sm:grid-cols-[minmax(0,1fr)_7rem] sm:items-center">
-                <div><dt class="text-sm font-medium text-zinc-200">{{ __('Unassigned active work') }}</dt><dd class="mt-1 text-sm text-zinc-500">{{ __('Active records with no retained assignment history.') }}</dd></div>
-                <dd class="text-3xl font-semibold tracking-[-0.03em] text-red-300 sm:text-right">{{ $this->summary['unassigned'] }}</dd>
+            <div class="flex min-h-36 flex-col justify-between border-b border-white/8 px-4 py-5 sm:border-b-0 sm:border-r">
+                <div><dt class="text-sm font-medium text-zinc-200">{{ __('Unassigned active work') }}</dt><dd class="mt-2 text-sm leading-6 text-zinc-500">{{ __('No retained assignment history.') }}</dd></div>
+                <dd class="mt-5 text-3xl font-semibold tracking-[-0.03em] text-red-300">{{ $this->summary['unassigned'] }}</dd>
             </div>
-            <div class="grid gap-2 py-4 sm:grid-cols-[minmax(0,1fr)_7rem] sm:items-center">
-                <div><dt class="text-sm font-medium text-zinc-200">{{ __('Visible active workload') }}</dt><dd class="mt-1 text-sm text-zinc-500">{{ __('Non-terminal work inside your existing visibility boundary.') }}</dd></div>
-                <dd class="text-3xl font-semibold tracking-[-0.03em] text-white sm:text-right">{{ $this->summary['active_workload'] }}</dd>
+            <div class="flex min-h-36 flex-col justify-between px-4 py-5">
+                <div><dt class="text-sm font-medium text-zinc-200">{{ __('Visible active workload') }}</dt><dd class="mt-2 text-sm leading-6 text-zinc-500">{{ __('Non-terminal work you can access.') }}</dd></div>
+                <dd class="mt-5 text-3xl font-semibold tracking-[-0.03em] text-white">{{ $this->summary['active_workload'] }}</dd>
             </div>
         </dl>
     </section>

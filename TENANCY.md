@@ -372,6 +372,17 @@ The action:
 - Neutralizes dangerous string cells beginning with formula characters, including full-width variants.
 - Preserves typed numeric values as numbers.
 - Uses standards-compatible CSV quoting with an explicit empty proprietary escape character.
+
+## Client CSV Onboarding
+
+Release 1 client onboarding remains bounded and tenant-scoped:
+
+- Preview accepts up to 500 rows and 2 MB with required `internal_code` and `legal_name` headers.
+- Every code is normalized and checked against duplicates in the file and the active firm. Another firm's code does not conflict or become visible.
+- Accepted and rejected counts reconcile exactly to parsed non-empty rows, with row-level recovery messages.
+- Commit refuses any rejected row and revalidates every accepted identity through `CreateClient` inside one transaction.
+- Each client and the import summary create audit evidence. Field values are not copied into the summary event.
+- The uploaded raw file is temporary and is not retained as an application artifact.
 - Stores the artifact through `TenantStorage`.
 - Records only filename, path, checksum, size and count metadata in append-only audit history.
 - Removes the artifact if its audit record cannot be created.

@@ -19,7 +19,7 @@ Treat the master plan as canonical scope and `MEMORY.md` as the current implemen
 ## Current State
 
 - Stage 3 compliance walking skeleton is active.
-- Build Packet 55 is complete. Release 1 compliance operations hardening is now the only active delivery track.
+- The Compliance Operations V1 repository release candidate is complete. Production host verification, deployment and post-deployment smoke checks remain.
 - Work assignment, append-only reassignment, immutable workflow versions, pinned checklists, checklist completion evidence, checklist-gated review submission, reviewer return and approval decisions and explicit audited workflow-version migration are implemented.
 - Every work item is pinned to a published firm-owned workflow definition and checklist version.
 - Moving from `in_preparation` to `under_review` requires retained completion evidence for every required item on the pinned checklist.
@@ -59,20 +59,23 @@ Treat the master plan as canonical scope and `MEMORY.md` as the current implemen
 - Operational reports cover monthly schedules, overlapping tax periods, current expiring-document metadata and workload/completion state. Preview and spreadsheet-safe export share one definition, and report owners can download their own integrity-checked artifact without audit-register permission.
 - The dashboard exposes separate awaiting-client, under-review and explicitly unassigned work queues plus workload by current assignee. Existing firm, role and saved-client-filter boundaries apply to every projection.
 - `platform:seed-compliance-acceptance --synthetic-only` builds a deterministic, clean-database-only 200-client fixture with reconciled obligations, work, checklists and assignments. It is disabled in production and is not part of the default seed path.
+- Client onboarding supports preview-first CSV files of up to 500 rows, row-level validation, exact reconciliation, atomic commit and import audit evidence without retaining the raw file.
+- E-invoicing operational routes are not published in V1. One accessible coming-soon surface preserves the future product boundary.
+- The release candidate includes a product-specific public entry page, compact operational dashboard, production security headers, corrected CI, dependency gates, a release configuration command and deployment runbook.
 - Two operational notification templates exist, `work_item_high_risk` and `payment_overdue`, both fired only by an explicit recorded change and addressed to the current responsible manager.
 - Regulated-rule generation modules are not implemented.
 - The full current verification baseline is recorded in `MEMORY.md`.
 
 ## Next Safe Packet
 
-Build the shortest release-critical path for the internal Compliance Operations MVP.
+Deploy the verified Compliance Operations V1 release candidate.
 
 Keep it bounded:
 
-- Add bounded CSV client onboarding with validation preview, reconciliation, error reporting and safe commit behavior.
-- Replace operational access to e-invoicing readiness with an accessible coming-soon surface while preserving its feature-gated implementation.
-- Complete frontend consistency, responsive behavior, accessibility and release-state UX.
-- Add CI and production-readiness checks, then verify the actual deployment environment before publishing.
+- Verify the actual PHP, MySQL, cron, queue-worker, private-storage, mail and backup capabilities of the selected host.
+- Configure production secrets and feature flags, then require `platform:release-check` to pass.
+- Deploy the exact verified commit and run every post-deployment smoke check in `RELEASE.md`.
+- Complete browser review at 375, 768, 1024 and 1440 pixel widths against the deployed or otherwise reachable application.
 - Continue to keep imports, merge, scoring and regulated formulas behind their recorded decision gates.
 - Do not add VAT or Corporate Tax formulas without approved sourced golden cases.
 - Keep import processing gated until conflict, reversal and retention decisions are approved.

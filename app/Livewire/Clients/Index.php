@@ -8,7 +8,9 @@ use App\Actions\Clients\AddClientContact;
 use App\Actions\Clients\AddClientServiceEnrollment;
 use App\Actions\Clients\AddTaxPeriod;
 use App\Actions\Clients\AddTaxRegistration;
+use App\Actions\Clients\CommitClientCsvImport;
 use App\Actions\Clients\CreateClient;
+use App\Actions\Clients\PreviewClientCsvImport;
 use App\Actions\Clients\TransitionClientServiceEnrollment;
 use App\Actions\Clients\TransitionClientStatus;
 use App\Enums\ClientContactPurpose;
@@ -36,11 +38,14 @@ use Illuminate\Support\Facades\Gate;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Title;
 use Livewire\Component;
+use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
+use Livewire\WithFileUploads;
 use Livewire\WithPagination;
 
 #[Title('Clients')]
 final class Index extends Component
 {
+    use WithFileUploads;
     use WithPagination;
 
     public string $search = '';
@@ -52,6 +57,17 @@ final class Index extends Component
     public string $tradeName = '';
 
     public string $entityType = '';
+
+    public ?TemporaryUploadedFile $clientImportFile = null;
+
+    /** @var list<array{line: int, internalCode: string, legalName: string, tradeName: string, entityType: string, errors: list<string>, valid: bool}> */
+    public array $clientImportRows = [];
+
+    public int $clientImportAccepted = 0;
+
+    public int $clientImportRejected = 0;
+
+    public bool $showImportModal = false;
 
     public bool $showProfileModal = false;
 
@@ -142,6 +158,41 @@ final class Index extends Component
             variant: 'success',
             text: "Client {$client->internal_code} created.",
         );
+    }
+
+    public function openImport(): void
+    {
+        $this->resetClientImport();
+        $this->showImportModal = true;
+    }
+
+    public function previewClientImport(PreviewClientCsvImport $preview): void
+    {
+        $this->validate([
+            'clientImportFile' => ['required', 'file', 'mimes:csv,txt', 'max:2048'],
+        ]);
+
+        $result = $preview->handle($this->currentUser(), $this->clientImportFile);
+        $this->clientImportRows = $result['rows'];
+        $this->clientImportAccepted = $result['accepted'];
+        $this->clientImportRejected = $result['rejected'];
+    }
+
+    public function commitClientImport(CommitClientCsvImport $commit): void
+    {
+        $count = $commit->handle($this->currentUser(), $this->clientImportRows);
+        $this->showImportModal = false;
+        $this->resetClientImport();
+        $this->resetPage();
+        unset($this->clients);
+
+        Flux::toast(variant: 'success', text: "{$count} client records imported.");
+    }
+
+    public function resetClientImport(): void
+    {
+        $this->reset('clientImportFile', 'clientImportRows', 'clientImportAccepted', 'clientImportRejected');
+        $this->resetValidation('clientImportFile');
     }
 
     public function openProfile(string $clientId): void

@@ -17,7 +17,12 @@ FORM: Continuous identity ledger with a compact creation station.
                     {{ __('Create the canonical client identity, then maintain explicit service ownership, tax registrations and actual periods.') }}
                 </p>
             </div>
-            <flux:badge color="amber" icon="shield-check">{{ __('Firm administrator controlled') }}</flux:badge>
+            <div class="flex flex-wrap items-center gap-3">
+                <flux:button variant="ghost" icon="arrow-up-tray" wire:click="openImport">
+                    {{ __('Import CSV') }}
+                </flux:button>
+                <flux:badge color="amber" icon="shield-check">{{ __('Firm administrator controlled') }}</flux:badge>
+            </div>
         </div>
     </header>
 
@@ -172,6 +177,102 @@ FORM: Continuous identity ledger with a compact creation station.
             </p>
         </aside>
     </div>
+
+    <flux:modal wire:model.self="showImportModal" class="md:w-[56rem]">
+        <div class="space-y-7">
+            <div>
+                <flux:heading size="lg">{{ __('Import client identities') }}</flux:heading>
+                <flux:text class="mt-2 max-w-2xl">
+                    {{ __('Preview a CSV before committing it. Every accepted row is revalidated and committed atomically; the source file is not retained.') }}
+                </flux:text>
+            </div>
+
+            <div class="grid gap-5 border-y border-white/8 py-6 md:grid-cols-[minmax(0,1fr)_auto] md:items-end">
+                <flux:field>
+                    <flux:label>{{ __('CSV file') }}</flux:label>
+                    <input
+                        wire:model="clientImportFile"
+                        type="file"
+                        accept=".csv,text/csv,text/plain"
+                        class="release-file-input mt-2 block min-h-11 w-full rounded-xl border border-white/10 bg-zinc-950 px-3 py-2 text-sm text-zinc-300 focus:outline-none focus:ring-2 focus:ring-amber-300"
+                    />
+                    <flux:description>{{ __('Maximum 500 rows and 2 MB. Required headers: internal_code, legal_name. Optional: trade_name, entity_type.') }}</flux:description>
+                    <flux:error name="clientImportFile" />
+                </flux:field>
+                <flux:button
+                    variant="primary"
+                    wire:click="previewClientImport"
+                    wire:loading.attr="disabled"
+                    wire:target="clientImportFile,previewClientImport"
+                >
+                    <span wire:loading.remove wire:target="previewClientImport">{{ __('Validate and preview') }}</span>
+                    <span wire:loading wire:target="previewClientImport">{{ __('Validating...') }}</span>
+                </flux:button>
+            </div>
+
+            @if ($clientImportRows !== [])
+                <section aria-labelledby="import-reconciliation-heading">
+                    <div class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+                        <div>
+                            <h3 id="import-reconciliation-heading" class="text-sm font-semibold text-zinc-100">{{ __('Import reconciliation') }}</h3>
+                            <p class="mt-1 text-sm text-zinc-500">{{ __('Accepted and rejected counts always reconcile to the previewed rows.') }}</p>
+                        </div>
+                        <div class="flex gap-2">
+                            <flux:badge color="green">{{ $clientImportAccepted }} {{ __('accepted') }}</flux:badge>
+                            <flux:badge :color="$clientImportRejected > 0 ? 'red' : 'zinc'">{{ $clientImportRejected }} {{ __('rejected') }}</flux:badge>
+                        </div>
+                    </div>
+
+                    <div class="mt-5 max-h-80 overflow-auto border-y border-white/8">
+                        <table class="min-w-full divide-y divide-white/8 text-left text-sm">
+                            <thead class="sticky top-0 bg-zinc-900">
+                                <tr>
+                                    <th class="px-3 py-3 text-xs font-semibold text-zinc-400">{{ __('Line') }}</th>
+                                    <th class="px-3 py-3 text-xs font-semibold text-zinc-400">{{ __('Code') }}</th>
+                                    <th class="px-3 py-3 text-xs font-semibold text-zinc-400">{{ __('Legal name') }}</th>
+                                    <th class="px-3 py-3 text-xs font-semibold text-zinc-400">{{ __('Result') }}</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-white/8">
+                                @foreach ($clientImportRows as $row)
+                                    <tr wire:key="import-row-{{ $row['line'] }}">
+                                        <td class="px-3 py-3 text-zinc-500">{{ $row['line'] }}</td>
+                                        <td class="px-3 py-3 font-medium text-zinc-200">{{ $row['internalCode'] ?: __('Missing') }}</td>
+                                        <td class="px-3 py-3 text-zinc-300">{{ $row['legalName'] ?: __('Missing') }}</td>
+                                        <td class="px-3 py-3">
+                                            @if ($row['valid'])
+                                                <span class="text-green-300">{{ __('Ready') }}</span>
+                                            @else
+                                                <ul class="space-y-1 text-xs leading-5 text-red-300">
+                                                    @foreach ($row['errors'] as $error)
+                                                        <li>{{ $error }}</li>
+                                                    @endforeach
+                                                </ul>
+                                            @endif
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+            @endif
+
+            <div class="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+                <flux:button variant="ghost" wire:click="$set('showImportModal', false)">{{ __('Cancel') }}</flux:button>
+                <flux:button
+                    variant="primary"
+                    wire:click="commitClientImport"
+                    :disabled="$clientImportRows === [] || $clientImportRejected > 0"
+                    wire:loading.attr="disabled"
+                    wire:target="commitClientImport"
+                >
+                    <span wire:loading.remove wire:target="commitClientImport">{{ __('Commit accepted clients') }}</span>
+                    <span wire:loading wire:target="commitClientImport">{{ __('Committing import...') }}</span>
+                </flux:button>
+            </div>
+        </div>
+    </flux:modal>
 
     <flux:modal wire:model.self="showProfileModal" class="md:w-[64rem]">
         <div class="space-y-7">

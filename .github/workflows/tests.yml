@@ -6,12 +6,25 @@ on:
       - main
   pull_request:
 
+concurrency:
+  group: release-ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 permissions:
   contents: read
 
 jobs:
   ci:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      APP_ENV: testing
+      APP_DEBUG: false
+      DB_CONNECTION: sqlite
+      DB_DATABASE: database/database.sqlite
+      CACHE_STORE: array
+      SESSION_DRIVER: array
+      QUEUE_CONNECTION: sync
 
     steps:
       - name: Checkout code
@@ -30,9 +43,28 @@ jobs:
         uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version: '22'
+          cache: npm
 
-      - name: Setup Application
-        run: composer setup
+      - name: Install PHP dependencies
+        run: composer install --no-interaction --prefer-dist --no-progress
 
-      - name: Run CI Checks
+      - name: Configure test application
+        run: |
+          cp .env.example .env
+          touch database/database.sqlite
+          php artisan key:generate
+          php artisan migrate --force
+
+      - name: Install frontend dependencies
+        run: npm ci
+
+      - name: Run backend checks
         run: composer ci:check
+
+      - name: Build production assets
+        run: npm run build
+
+      - name: Audit production dependencies
+        run: |
+          composer audit --locked --no-interaction
+          npm audit --audit-level=high --omit=dev

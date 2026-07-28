@@ -80,6 +80,18 @@ php artisan platform:operations-status --json
 
 The command exits successfully only when both scheduler and queue-worker heartbeats are fresh. A missing or stale heartbeat returns a failure exit code.
 
+## Release Configuration Check
+
+Before opening production access, run:
+
+```shell
+php artisan platform:release-check
+```
+
+The command fails unless production mode, disabled debug output, HTTPS, application key, persistent queue, cache and sessions, encrypted secure cookies, operational mail, Compliance Operations features and the V1 e-invoicing boundary are configured. Use `--json` to retain machine-readable release evidence.
+
+This check validates application configuration. It does not replace direct host, backup, mail, worker, scheduler or browser verification.
+
 ## Feature Flags
 
 All incomplete modules are disabled by default:

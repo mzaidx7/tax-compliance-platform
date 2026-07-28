@@ -54,29 +54,6 @@
 
                         @if (
                             app(\App\Support\FeatureFlags::class)->enabled(
-                                \App\Enums\Feature::EInvoicingReadiness,
-                                $firmContext->firmId(),
-                            )
-                        )
-                            @can('viewAny', \App\Models\DataQualityRuleDefinition::class)
-                                <flux:sidebar.item icon="circle-stack" :href="route('readiness.rules.index')" :current="request()->routeIs('readiness.rules.*')" wire:navigate>
-                                    {{ __('Readiness rules') }}
-                                </flux:sidebar.item>
-                            @endcan
-                            @can('viewAny', \App\Models\PartyRecord::class)
-                                <flux:sidebar.item icon="identification" :href="route('readiness.parties.index')" :current="request()->routeIs('readiness.parties.*')" wire:navigate>
-                                    {{ __('Party readiness') }}
-                                </flux:sidebar.item>
-                            @endcan
-                            @can('viewAny', \App\Models\InvoiceReadinessSample::class)
-                                <flux:sidebar.item icon="document-text" :href="route('readiness.invoices.index')" :current="request()->routeIs('readiness.invoices.*')" wire:navigate>
-                                    {{ __('Invoice samples') }}
-                                </flux:sidebar.item>
-                            @endcan
-                        @endif
-
-                        @if (
-                            app(\App\Support\FeatureFlags::class)->enabled(
                                 \App\Enums\Feature::ComplianceOperations,
                                 $firmContext->firmId(),
                             )
@@ -128,6 +105,16 @@
                         @endcan
                     @endif
                 </flux:sidebar.group>
+                @if ($hasFirmContext)
+                    <flux:sidebar.group :heading="__('Future release')" class="grid">
+                        <flux:sidebar.item icon="sparkles" :href="route('readiness.coming-soon')" :current="request()->routeIs('readiness.*')" wire:navigate>
+                            <span class="flex min-w-0 flex-1 items-center justify-between gap-3">
+                                <span>{{ __('E-invoicing readiness') }}</span>
+                                <span class="rounded-full bg-amber-300/10 px-2 py-0.5 text-[0.65rem] font-semibold text-amber-300">{{ __('Soon') }}</span>
+                            </span>
+                        </flux:sidebar.item>
+                    </flux:sidebar.group>
+                @endif
             </flux:sidebar.nav>
 
             <flux:spacer />
