@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\Jobs;
 
+use App\Actions\Documents\GenerateDocumentExpiryReminders;
 use App\Jobs\Middleware\SetFirmContext;
+use App\Tenancy\FirmContext;
 use App\Tenancy\TenantCache;
 use Carbon\CarbonImmutable;
 use Illuminate\Contracts\Queue\ShouldBeEncrypted;
@@ -79,8 +81,16 @@ final class RecordFirmScheduledWorkHeartbeat implements FirmAwareJob, ShouldBeEn
         return [10, 30, 60];
     }
 
-    public function handle(TenantCache $cache): void
-    {
+    public function handle(
+        TenantCache $cache,
+        FirmContext $firmContext,
+        GenerateDocumentExpiryReminders $generateDocumentExpiryReminders,
+    ): void {
+        $firm = $firmContext->firm();
+        $remindersGenerated = $generateDocumentExpiryReminders->handle(
+            $this->scheduledFor->setTimezone($firm->timezone),
+        );
+
         $cache->put(
             $this->heartbeatCacheKey(),
             [
@@ -89,6 +99,7 @@ final class RecordFirmScheduledWorkHeartbeat implements FirmAwareJob, ShouldBeEn
                 'processed_at' => Date::now()->utc()->toIso8601String(),
                 'generation_key' => $this->generationKey(),
                 'correlation_id' => $this->correlationId(),
+                'document_expiry_reminders_generated' => $remindersGenerated,
             ],
             max(60, (int) config('platform.operations.scheduled_work_heartbeat_ttl_seconds', 86400)),
         );

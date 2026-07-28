@@ -470,3 +470,15 @@ Client profile records are tenant-owned facts:
 - Client contacts belong to the same firm and client, and retain an explicit purpose and preferred channel. Audit metadata records only the contact record id, purpose and channel, not the name, email or phone.
 - Client and service status changes are explicit reason-required actions. Their history tables reject update and deletion through both model guards and database triggers.
 - An ended service enrollment is terminal. Dates never pause, resume or end an enrollment automatically.
+
+## Client Document Expiry Metadata
+
+Client document expiry is separate from work-item `DocumentEvidence`:
+
+- `DocumentTypeVersion` is a published, immutable firm-owned configuration with a stable key, monotonically increasing version, explicit expiry requirement, reminder offsets and optional overdue repeat interval.
+- `ClientDocument` stores metadata only. It contains no logical file path, upload field or download route.
+- A renewal creates a new append-only record linked through `supersedes_client_document_id`; the earlier record is never updated.
+- Reference labels, issue dates and expiry dates are omitted from audit payloads because metadata may still be personal data.
+- Firm-aware scheduled work compares the supplied expiry date with the firm's local calendar date and creates idempotent reminder evidence only for configured upcoming offsets, expiry day and configured repeated overdue intervals.
+- Reminder evidence is append-only. It does not send a client message or assert that a document is valid, invalid or regulator-approved.
+- Published type versions, client document metadata and reminder evidence reject model and raw database update or deletion.

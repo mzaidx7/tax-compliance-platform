@@ -54,7 +54,7 @@ The application schedule:
 - Records a scheduler heartbeat every minute.
 - Dispatches a queue-worker heartbeat every minute.
 - Discovers active firms every five minutes in bounded database chunks.
-- Dispatches one encrypted and unique firm-aware heartbeat job per active firm and generation slot.
+- Dispatches one encrypted and unique firm-aware scheduled-work job per active firm and generation slot.
 - Prevents overlapping heartbeat tasks.
 - Uses shared cache locks so only one server dispatches each task.
 
@@ -62,7 +62,7 @@ The target environment must use a shared lock-capable cache store before multipl
 
 The firm dispatcher accepts no firm identifier. It discovers active firms from the database, and each queued job carries only its trusted firm identity and deterministic generation slot. The worker establishes firm context through queue middleware and restores any previous context after processing. A firm suspended before processing fails closed.
 
-Each per-firm heartbeat is stored in the tenant cache under its deterministic generation key. Re-running the same slot overwrites the same cache record, while Laravel's unique job lock prevents duplicate queued copies while the original is pending or running. Future obligation and reminder jobs must use the same firm-aware middleware, bounded work units and deterministic generation keys.
+Each per-firm heartbeat is stored in the tenant cache under its deterministic generation key. Re-running the same slot overwrites the same cache record, while Laravel's unique job lock prevents duplicate queued copies while the original is pending or running. The job also generates idempotent document-expiry reminder evidence using the firm's local calendar date. Reminder uniqueness prevents repeated five-minute schedule slots from creating duplicate evidence for the same document, kind and day. Future obligation jobs must use the same firm-aware middleware, bounded work units and deterministic generation keys.
 
 ## Health Check
 

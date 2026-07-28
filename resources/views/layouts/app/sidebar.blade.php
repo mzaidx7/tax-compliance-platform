@@ -43,6 +43,9 @@
                                 <flux:sidebar.item icon="building-office-2" :href="route('clients.index')" :current="request()->routeIs('clients.*')" wire:navigate>
                                     {{ __('Clients') }}
                                 </flux:sidebar.item>
+                                <flux:sidebar.item icon="document-text" :href="route('documents.index')" :current="request()->routeIs('documents.index')" wire:navigate>
+                                    {{ __('Document expiry') }}
+                                </flux:sidebar.item>
                             @endcan
                         @endif
 
