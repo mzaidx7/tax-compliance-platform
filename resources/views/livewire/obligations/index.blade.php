@@ -99,26 +99,33 @@ FORM: Deadline review rail, grounded structure seven, seed 75cba0e2.
                                     </flux:badge>
                                 </div>
                                 @can('update', $obligation)
+                                    <details class="group mt-2 text-left lg:text-right">
+                                        <summary class="inline-flex min-h-9 cursor-pointer list-none items-center gap-2 rounded-lg px-2.5 py-1.5 text-sm font-medium text-zinc-300 outline-none transition hover:bg-white/[0.06] hover:text-white focus-visible:ring-2 focus-visible:ring-amber-300">
+                                            <flux:icon.calendar-days class="size-4" />
+                                            {{ __('Deadline actions') }}
+                                            <flux:icon.chevron-down class="size-4 transition group-open:rotate-180" />
+                                        </summary>
+                                        <div class="mt-2 flex flex-wrap gap-1.5 lg:justify-end">
                                     <flux:button
-                                        class="mb-2"
                                         size="sm"
                                         variant="ghost"
                                         icon="calendar-days"
                                         wire:click="openDeadlineOverride('{{ $obligation->id }}')"
                                     >
-                                        {{ __('Override deadline') }}
+                                        {{ __('Change deadline') }}
                                     </flux:button>
                                     @if ($obligation->status === \App\Enums\ObligationStatus::Open)
                                         <flux:button
-                                            class="mb-2"
                                             size="sm"
                                             variant="ghost"
                                             icon="archive-box"
                                             wire:click="openDisposition('{{ $obligation->id }}')"
                                         >
-                                            {{ __('Cancel or supersede') }}
+                                            {{ __('Cancel or replace') }}
                                         </flux:button>
                                     @endif
+                                        </div>
+                                    </details>
                                 @endcan
                                 @if ($obligation->workItem)
                                     @php
@@ -180,7 +187,13 @@ FORM: Deadline review rail, grounded structure seven, seed 75cba0e2.
                                             ) }}
                                         </p>
                                     @endif
-                                    <div class="mt-2 flex flex-wrap gap-1 lg:justify-end">
+                                    <details class="group mt-2 text-left lg:text-right">
+                                        <summary class="inline-flex min-h-9 cursor-pointer list-none items-center gap-2 rounded-lg px-2.5 py-1.5 text-sm font-medium text-zinc-300 outline-none transition hover:bg-white/[0.06] hover:text-white focus-visible:ring-2 focus-visible:ring-amber-300">
+                                            <flux:icon.wrench-screwdriver class="size-4" />
+                                            {{ __('Work actions') }}
+                                            <flux:icon.chevron-down class="size-4 transition group-open:rotate-180" />
+                                        </summary>
+                                        <div class="mt-2 flex flex-wrap gap-1.5 lg:justify-end">
                                     @if ($obligation->workItem->checklist)
                                         <flux:button
                                             size="sm"
@@ -281,7 +294,8 @@ FORM: Deadline review rail, grounded structure seven, seed 75cba0e2.
                                             {{ $obligation->taxRecord ? __('Update tax') : __('Open tax') }}
                                         </flux:button>
                                     @endif
-                                    </div>
+                                        </div>
+                                    </details>
                                 @else
                                     @can('create', \App\Models\WorkItem::class)
                                     <flux:button
