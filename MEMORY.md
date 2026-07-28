@@ -9,13 +9,13 @@
 - Platform repository status: independent repository on `main`, remote `mzaidx7/tax-compliance-platform`
 - Parent repository status for this directory: separate nested repository, outside website delivery
 - Current phase: Stage 4, client and data foundation
-- Current milestone: Stage 5 data-quality rule governance packet completed
+- Current milestone: Synthetic party master and correction governance packet completed
 
 ## Current Objective
 
 Create a UAE-focused compliance operations and e-invoicing readiness platform under a TBT subdomain while keeping its application, data, deployment and release lifecycle separate from the public TBT website.
 
-The immediate objective is manually recorded synthetic party-master identity and field provenance with human-approved corrections, without import files, merges or readiness scoring. Import processing remains gated on product-owner decisions for conflict handling, reversal and retention.
+The immediate objective is explainable manually recorded party issues linked to published readiness rules with append-only resolution evidence, without automated evaluation or scoring. Import processing remains gated on product-owner decisions for conflict handling, reversal and retention.
 
 ## Canonical Files
 
@@ -177,7 +177,7 @@ The immediate objective is manually recorded synthetic party-master identity and
 - Laravel Pint check passed.
 - Larastan passed with zero errors.
 - Full workflow feature suite (`tests/Feature/Workflows`, including checklist, transition, reviewer-decision and workflow-version migration tests) passed with no failures.
-- PHPUnit passed 422 tests with 1,276 assertions after Build Packet 45.
+- PHPUnit passed 428 tests with 1,296 assertions after Build Packet 46.
 - Database triggers were verified to reject raw query-builder updates and deletes on `work_item_transitions`, which Eloquent model events alone do not cover.
 - Vite production build passed.
 - All migrations, including append-only deadline overrides, and seven synthetic domain seeders passed from a fresh database.
@@ -303,3 +303,4 @@ Start by reading `AGENTS.md` and the master plan. Reconcile this file against Gi
 - Implemented and verified changed-rule proposals (`RuleChangeProposal`, immutable preview linkage, `ProposeRuleChange`) and append-only approvals (`RuleChangeProposalDecision`, `ApproveRuleChange`). A proposal accepts only an open governed obligation and later published version of the same template, retains issued and proposed dates, reason and exact generation preview, and changes no issued record. Approval is separate, idempotently commits the preview, uses `DisposeObligation` to link and supersede the original, retains both obligations and snapshots, rejects stale or repeated decisions, and exposes the comparison and approval sequence in the generation interface.
 - Implemented and verified governed calculator golden cases (`CalculatorGoldenCaseSet`, immutable `CalculatorGoldenCase`, append-only `CalculatorGoldenCaseVerification`) with official UAE source links, expected and observed snapshots, separate preparation, verification and set approval, database mutation guards and rule-governance UI. `ObligationCalculator::isRegulatory()` makes the boundary explicit; regulatory rule approval fails without an approved set whose every latest verification passes and records the selected set on the rule version. `manual_date_passthrough` remains non-regulatory and adds no statutory formula.
 - Implemented and verified Stage 5 data-quality rule governance (`DataQualityRuleDefinition`, `DataQualityRuleVersion`, `DataQualityRuleEvent`) behind `e_invoicing_readiness` and the named `manage_readiness_rules` permission. Stable identities distinguish party-master from invoice-transaction rules; immutable versions retain applicability, severity, warning or blocking behavior, explanation, remediation, official or internal source, formula-version effect and change summary; separate preparation and verification precede publication; newer publication supersedes prior content without mutation; model and database guards retain lifecycle evidence; a dedicated Operate UI, route and navigation expose no imports, scoring, correction or transmission.
+- Implemented and verified synthetic party-master governance (`PartyRecord`, append-only `PartyFieldVersion`, immutable `PartyCorrectionProposal`, append-only `PartyCorrectionDecision`) behind readiness permissions. A party belongs to one firm client and can explicitly be customer, supplier or both; manually supplied field values retain verification state and source provenance; a correction requires a different value and evidence; an independent manager approval appends a superseding version while rejection writes none; stale and repeated decisions fail; raw mutation is blocked; audit payloads exclude field values and source notes; dedicated UI and navigation provide no file import, merge, inferred readiness state or score.

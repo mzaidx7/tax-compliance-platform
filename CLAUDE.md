@@ -19,7 +19,7 @@ Treat the master plan as canonical scope and `MEMORY.md` as the current implemen
 ## Current State
 
 - Stage 3 compliance walking skeleton is active.
-- Build Packet 45 is complete.
+- Build Packet 46 is complete.
 - Work assignment, append-only reassignment, immutable workflow versions, pinned checklists, checklist completion evidence, checklist-gated review submission, reviewer return and approval decisions and explicit audited workflow-version migration are implemented.
 - Every work item is pinned to a published firm-owned workflow definition and checklist version.
 - Moving from `in_preparation` to `under_review` requires retained completion evidence for every required item on the pinned checklist.
@@ -49,21 +49,22 @@ Treat the master plan as canonical scope and `MEMORY.md` as the current implemen
 - Changed-rule handling is preview-first. A proposal compares an open governed obligation with a later published version of the same template, retains old and proposed dates plus the immutable generation preview, and requires a separate approval that issues a deterministic replacement before superseding the original.
 - Calculator golden-case sets are versioned governance records with immutable sourced expectations, independent executable verification and approval. Calculators declare whether they are regulatory; regulatory rule approval requires and records the latest approved passing case set, while `manual_date_passthrough` remains explicitly non-regulatory.
 - Stage 5 readiness rule governance is active behind `e_invoicing_readiness`. Stable rule identities explicitly separate party-master and invoice-transaction domains; versions retain applicability, severity, warning or blocking behavior, explanation, remediation, source and formula effect through independent review and immutable publication.
+- Synthetic party-master identities are client-owned and can explicitly carry customer, supplier or both roles. Field values and provenance are append-only; corrections remain immutable proposals until an independent authorised approval or rejection, and approval appends a new field version without overwriting the earlier value.
 - Two operational notification templates exist, `work_item_high_risk` and `payment_overdue`, both fired only by an explicit recorded change and addressed to the current responsible manager.
 - Regulated-rule generation modules are not implemented.
 - The full current verification baseline is recorded in `MEMORY.md`.
 
 ## Next Safe Packet
 
-Add manually recorded synthetic party-master records with field-level provenance, without file import or readiness scoring.
+Add explainable manually recorded party issues linked to published readiness rules, without automated evaluation or scoring.
 
 Keep it bounded:
 
-- Add firm and client-owned party identities that can carry customer, supplier or both roles without duplicating legal identity.
-- Add explicit identifiers and structured addresses with verification state and provenance.
-- Record manual source references and field-level source events without storing an import file.
-- Preserve every canonical-field change through a proposal and human approval boundary.
-- Do not infer readiness status, run bulk imports, merge parties or calculate a score.
+- Link each issue to one party, current field version where relevant, and one published party-master rule version.
+- Snapshot severity, behavior, explanation and remediation so later rule publication cannot rewrite an existing issue.
+- Require explicit open, resolved or not-applicable decisions with actor, reason and timestamp.
+- Preserve issue evidence and resolution history as append-only records.
+- Do not infer a party readiness status, run bulk imports, merge parties or calculate a score.
 - Do not add VAT or Corporate Tax formulas without approved sourced golden cases.
 - Keep import processing gated until conflict, reversal and retention decisions are approved.
 

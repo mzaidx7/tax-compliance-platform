@@ -569,3 +569,17 @@ Readiness rule governance is firm-owned and isolated from compliance obligations
 - Publishing a later version supersedes the prior published version without changing prior content.
 - Definitions and lifecycle events are append-only. Version content and lifecycle order are guarded at model and database layers.
 - This module currently evaluates no party or invoice data, imports no files, proposes no correction, merges no identity and calculates no readiness score.
+
+## Readiness Party Master And Corrections
+
+Synthetic party records are client-owned readiness evidence:
+
+- A party belongs to one firm and client and may explicitly carry customer, supplier or both roles. The stable identity and supplied active flag are immutable.
+- Current field values are derived from append-only `party_field_versions`. Each version retains field key, supplied value, verification state, source kind, source reference, actor, timestamp and optional superseded version.
+- Initial manual entry is restricted to the import-management role even though no file is imported.
+- A correction records the current version, proposed value, evidence note, proposer and timestamp without changing the current value.
+- Approval or rejection requires readiness-rule authority and a decision maker different from the proposer. Approval appends a new version; rejection appends no field value.
+- A stale proposal cannot replace a field that changed after proposal. Proposals accept only one decision.
+- Party, field, proposal and decision evidence reject model and raw database mutation or deletion.
+- Audit metadata records identifiers, field keys and outcomes but excludes field values, source references and evidence notes.
+- No party readiness status, duplicate match, merge, bulk import or readiness score is inferred.

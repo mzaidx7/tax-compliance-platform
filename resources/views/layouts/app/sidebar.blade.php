@@ -56,8 +56,13 @@
                             )
                         )
                             @can('viewAny', \App\Models\DataQualityRuleDefinition::class)
-                                <flux:sidebar.item icon="circle-stack" :href="route('readiness.rules.index')" :current="request()->routeIs('readiness.*')" wire:navigate>
+                                <flux:sidebar.item icon="circle-stack" :href="route('readiness.rules.index')" :current="request()->routeIs('readiness.rules.*')" wire:navigate>
                                     {{ __('Readiness rules') }}
+                                </flux:sidebar.item>
+                            @endcan
+                            @can('viewAny', \App\Models\PartyRecord::class)
+                                <flux:sidebar.item icon="identification" :href="route('readiness.parties.index')" :current="request()->routeIs('readiness.parties.*')" wire:navigate>
+                                    {{ __('Party readiness') }}
                                 </flux:sidebar.item>
                             @endcan
                         @endif
