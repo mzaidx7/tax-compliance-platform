@@ -5,12 +5,12 @@
 - Last updated: 2026-07-28
 - Updated by: Codex GPT-5.6
 - Platform repository status: independent repository on `main`, remote `mzaidx7/tax-compliance-platform`
-- Current milestone: Dashboard work-state queues and workload visibility packet completed
+- Current milestone: Deterministic 200-client compliance MVP acceptance fixture completed
 
 ## Current Objective
 Create a UAE-focused compliance operations and e-invoicing readiness platform under a TBT subdomain while keeping its application, data, deployment and release lifecycle separate from the public TBT website.
 
-The immediate objective is a deterministic synthetic 200-client acceptance harness for the Stage 4 compliance MVP. Imports, regulated calculators, duplicate merge and readiness scoring remain decision-gated.
+Development is paused after Build Packet 55. Stage 4 client import and regulated VAT and Corporate Tax calculators remain decision-gated; later readiness, pilot and commercial stages remain incomplete.
 
 ## Canonical Files
 
@@ -120,7 +120,7 @@ The immediate objective is a deterministic synthetic 200-client acceptance harne
 - Dashboard and work-register filters can be retained, applied and explicitly deleted only by their owner in the active firm. Applying a filter reuses existing authorized queries, and audit metadata excludes names and values.
 - The notification centre exposes only a recipient's active-firm request and delivery states, with append-only read evidence. Explicit daily manager summaries use encrypted idempotent delivery and stored operational counts without inferring compliance.
 - Operational reports provide monthly schedules, tax-period lists, current expiring-document metadata and workload/completion rows. Preview and audited spreadsheet-safe export share one definition and exclude sensitive identifiers and reasons.
-- The dashboard exposes distinct awaiting-client, under-review and explicitly unassigned queues plus workload by current assignee, all through the existing firm, role and saved-client-filter boundaries.
+- The dashboard exposes distinct awaiting-client, under-review and explicitly unassigned queues plus workload by current assignee. A separate clean-database command builds a deterministic 200-client synthetic acceptance fixture with reconciled VAT and Corporate Tax labels, work, checklists and assignments.
 - Filing state uses its own record, lifecycle and append-only history, gated by the named `manage_filings` permission, and never reads or writes work status.
 - Payment state uses its own record, lifecycle and append-only history, gated by the named `manage_payments` permission, and never reads or writes work or filing status. `paid` is terminal and requires a reference and settlement date.
 - Append-only history is enforced at two layers: Eloquent model events and database triggers on `work_item_transitions`, `filing_record_transitions`, `payment_record_transitions` and `audit_logs`.
@@ -171,7 +171,7 @@ The immediate objective is a deterministic synthetic 200-client acceptance harne
 - Laravel Pint check passed.
 - Larastan passed with zero errors.
 - Full workflow feature suite (`tests/Feature/Workflows`, including checklist, transition, reviewer-decision and workflow-version migration tests) passed with no failures.
-- PHPUnit passed 460 tests with 1,429 assertions after Build Packet 54.
+- PHPUnit passed 463 tests with 1,454 assertions after Build Packet 55.
 - Database triggers were verified to reject raw query-builder updates and deletes on `work_item_transitions`, which Eloquent model events alone do not cover.
 - Vite production build passed.
 - All migrations, including append-only deadline overrides, and seven synthetic domain seeders passed from a fresh database.

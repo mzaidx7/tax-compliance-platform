@@ -19,7 +19,7 @@ Treat the master plan as canonical scope and `MEMORY.md` as the current implemen
 ## Current State
 
 - Stage 3 compliance walking skeleton is active.
-- Build Packet 54 is complete.
+- Build Packet 55 is complete and development is paused at the product owner's request.
 - Work assignment, append-only reassignment, immutable workflow versions, pinned checklists, checklist completion evidence, checklist-gated review submission, reviewer return and approval decisions and explicit audited workflow-version migration are implemented.
 - Every work item is pinned to a published firm-owned workflow definition and checklist version.
 - Moving from `in_preparation` to `under_review` requires retained completion evidence for every required item on the pinned checklist.
@@ -58,21 +58,21 @@ Treat the master plan as canonical scope and `MEMORY.md` as the current implemen
 - The in-app notification centre shows only the signed-in recipient's active-firm request and attempt states, with append-only read receipts. Explicit daily manager summaries snapshot stored operational counts through the existing encrypted, idempotent email boundary.
 - Operational reports cover monthly schedules, overlapping tax periods, current expiring-document metadata and workload/completion state. Preview and spreadsheet-safe export share one definition, and report owners can download their own integrity-checked artifact without audit-register permission.
 - The dashboard exposes separate awaiting-client, under-review and explicitly unassigned work queues plus workload by current assignee. Existing firm, role and saved-client-filter boundaries apply to every projection.
+- `platform:seed-compliance-acceptance --synthetic-only` builds a deterministic, clean-database-only 200-client fixture with reconciled obligations, work, checklists and assignments. It is disabled in production and is not part of the default seed path.
 - Two operational notification templates exist, `work_item_high_risk` and `payment_overdue`, both fired only by an explicit recorded change and addressed to the current responsible manager.
 - Regulated-rule generation modules are not implemented.
 - The full current verification baseline is recorded in `MEMORY.md`.
 
 ## Next Safe Packet
 
-Build a deterministic synthetic 200-client acceptance harness for the Stage 4 compliance MVP.
+No packet is currently authorised. Resume by closing product decisions before implementing Stage 4 client import or regulated calculators.
 
 Keep it bounded:
 
-- Generate synthetic, clearly labelled firms, members, clients, services, tax periods, obligations, work and assignments through an explicit acceptance command or seeder.
-- Make repeated runs deterministic and safe, with no production or imported data dependency.
-- Prove firm isolation, role visibility and operational reconciliation at the 200-client scale.
-- Record bounded runtime and record-count evidence without inventing a production performance claim.
-- Keep the harness outside the default production seed path.
+- Approve import conflict, reversal and raw-file retention behavior before C2.
+- Approve official-source VAT and Corporate Tax golden cases, formulas, ownership and review before C3.
+- Decide whether the immediate product target is the bounded internal compliance MVP or the full ten-stage programme.
+- Keep duplicate merge, scoring, clean export and operational pilot work behind their recorded gates.
 - Continue to keep imports, merge, scoring and regulated formulas behind their recorded decision gates.
 - Do not add VAT or Corporate Tax formulas without approved sourced golden cases.
 - Keep import processing gated until conflict, reversal and retention decisions are approved.

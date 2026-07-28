@@ -673,3 +673,13 @@ Dashboard queues remain read-only projections over retained work and assignment 
 - Workload counts group current assignees derived from the latest append-only assignment event for each role.
 - Manager-wide and assigned-member visibility reuse the existing authorised work query, and saved client filters narrow that query without broadening access.
 - Each queue links to the existing work register for action and stores no duplicate operational state.
+
+## Synthetic Compliance MVP Acceptance Fixture
+
+The acceptance fixture is an isolated engineering aid:
+
+- `platform:seed-compliance-acceptance --synthetic-only` requires a clean non-production database and is excluded from the default seed path.
+- It creates exactly one clearly labelled synthetic firm, 200 clients, 200 manually labelled VAT or Corporate Tax obligations, 200 work items and 200 pinned checklists.
+- Deterministic status and assignment distributions exercise awaiting-client, review, workload and explicit unassigned projections.
+- Tests reconcile record counts and prove that another firm sees none of the fixture's client, obligation or work records.
+- Reported local duration is evidence for the test environment only and is not a production performance claim.
