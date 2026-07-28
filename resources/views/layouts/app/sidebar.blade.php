@@ -82,6 +82,9 @@
                                 <flux:sidebar.item icon="calendar-days" :href="route('obligations.index')" :current="request()->routeIs('obligations.*')" wire:navigate>
                                     {{ __('Obligations') }}
                                 </flux:sidebar.item>
+                                <flux:sidebar.item icon="calendar" :href="route('schedule.index')" :current="request()->routeIs('schedule.*')" wire:navigate>
+                                    {{ __('Schedule') }}
+                                </flux:sidebar.item>
                                 <flux:sidebar.item icon="book-open" :href="route('rules.index')" :current="request()->routeIs('rules.*')" wire:navigate>
                                     {{ __('Rule governance') }}
                                 </flux:sidebar.item>

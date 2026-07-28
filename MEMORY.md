@@ -4,16 +4,15 @@
 
 - Last updated: 2026-07-28
 - Updated by: Codex GPT-5.6
-- Current parent repository branch: `main`
 - Platform repository status: independent repository on `main`, remote `mzaidx7/tax-compliance-platform`
 - Current phase: Stage 4, client and data foundation
-- Current milestone: Separate synthetic invoice-transaction readiness packet completed
+- Current milestone: Accessible compliance calendar and client timeline packet completed
 
 ## Current Objective
 
 Create a UAE-focused compliance operations and e-invoicing readiness platform under a TBT subdomain while keeping its application, data, deployment and release lifecycle separate from the public TBT website.
 
-The safe implementation backlog is exhausted. Import processing, duplicate merge, readiness scoring and clean export require the product-owner decisions recorded in `CLAUDE.md`; regulated formulas additionally require approved sourced golden cases.
+The immediate objective is firm-scoped, owner-only saved operational filters for dashboard queues and work registers. Imports, duplicate merge, readiness scoring and clean export remain decision-gated; regulated formulas additionally require approved sourced golden cases.
 
 ## Canonical Files
 
@@ -120,6 +119,7 @@ The safe implementation backlog is exhausted. Import processing, duplicate merge
 - Published party-master readiness rules can support manually recorded explainable issues. Each issue retains immutable rule snapshots and optional current-field context, while an independent authorised resolution or not-applicable decision is appended separately.
 - Duplicate candidates retain explicit deterministic signal evidence, normalized comparison values and normalizer versions. Independent authorised decisions confirm or dismiss a candidate without automatic discovery, probability scoring or merge execution.
 - Synthetic invoice-transaction samples retain manually supplied field values and source references separately from party readiness. Published invoice-domain rules support immutable explainable issues and independent resolution decisions without tax, total, validity or readiness calculations.
+- An accessible compliance schedule exposes month, week and list views of stored effective deadlines plus a selected client's retained operational timeline. It remains firm-scoped and performs no statutory calculation.
 - Filing state uses its own record, lifecycle and append-only history, gated by the named `manage_filings` permission, and never reads or writes work status.
 - Payment state uses its own record, lifecycle and append-only history, gated by the named `manage_payments` permission, and never reads or writes work or filing status. `paid` is terminal and requires a reference and settlement date.
 - Append-only history is enforced at two layers: Eloquent model events and database triggers on `work_item_transitions`, `filing_record_transitions`, `payment_record_transitions` and `audit_logs`.
@@ -171,7 +171,7 @@ The safe implementation backlog is exhausted. Import processing, duplicate merge
 - Laravel Pint check passed.
 - Larastan passed with zero errors.
 - Full workflow feature suite (`tests/Feature/Workflows`, including checklist, transition, reviewer-decision and workflow-version migration tests) passed with no failures.
-- PHPUnit passed 442 tests with 1,342 assertions after Build Packet 49.
+- PHPUnit passed 446 tests with 1,358 assertions after Build Packet 50.
 - Database triggers were verified to reject raw query-builder updates and deletes on `work_item_transitions`, which Eloquent model events alone do not cover.
 - Vite production build passed.
 - All migrations, including append-only deadline overrides, and seven synthetic domain seeders passed from a fresh database.

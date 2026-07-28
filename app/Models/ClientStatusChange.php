@@ -10,8 +10,14 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Carbon;
 use LogicException;
 
+/**
+ * @property ClientStatus $previous_status
+ * @property ClientStatus $new_status
+ * @property Carbon $changed_at
+ */
 #[Fillable(['client_id', 'previous_status', 'new_status', 'changed_by', 'reason', 'changed_at'])]
 final class ClientStatusChange extends Model
 {

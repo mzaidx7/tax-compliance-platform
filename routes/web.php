@@ -16,6 +16,7 @@ use App\Livewire\Readiness\Invoices\Index as ReadinessInvoicesIndex;
 use App\Livewire\Readiness\Parties\Index as ReadinessPartiesIndex;
 use App\Livewire\Readiness\Rules\Index as ReadinessRulesIndex;
 use App\Livewire\Rules\Index as RulesIndex;
+use App\Livewire\Schedule\Index as ScheduleIndex;
 use App\Livewire\Settings\FeatureFlags as SettingsFeatureFlags;
 use App\Livewire\WorkItems\Index as WorkItemsIndex;
 use Illuminate\Support\Facades\Route;
@@ -42,6 +43,7 @@ Route::middleware(['auth', 'verified', 'firm.context'])->group(function () {
     Route::livewire('obligations', ObligationsIndex::class)->name('obligations.index');
     Route::livewire('rules', RulesIndex::class)->name('rules.index');
     Route::livewire('generation', GenerationIndex::class)->name('generation.index');
+    Route::livewire('schedule', ScheduleIndex::class)->name('schedule.index');
     Route::livewire('readiness/rules', ReadinessRulesIndex::class)->name('readiness.rules.index');
     Route::livewire('readiness/parties', ReadinessPartiesIndex::class)->name('readiness.parties.index');
     Route::livewire('readiness/invoices', ReadinessInvoicesIndex::class)->name('readiness.invoices.index');

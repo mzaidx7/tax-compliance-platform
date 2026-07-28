@@ -618,3 +618,14 @@ Invoice readiness remains separate from party readiness and retains only supplie
 - Sample, field, issue and resolution records reject model and raw database update or deletion.
 - Audit metadata excludes supplied values, source references, evidence notes and decision reasons.
 - No VAT, total, exchange-rate, validity, compliance or readiness calculation is performed.
+
+## Compliance Schedule And Client Timeline
+
+The schedule is a read-only projection over retained tenant records:
+
+- Access requires the compliance-operations feature and normal obligation-view authorization.
+- Month, week and list ranges query the effective due date with statutory-date fallback, within the active firm's global scope.
+- Client and obligation-state filters never bypass firm scoping or expose clients from another firm.
+- The client timeline derives only from retained client status, obligation, work-transition, filing-transition and payment-transition evidence.
+- Timeline reasons remain in their protected source records and are not duplicated into the projection.
+- The schedule stores no date, infers no status and performs no statutory calculation.

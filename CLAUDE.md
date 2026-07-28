@@ -19,7 +19,7 @@ Treat the master plan as canonical scope and `MEMORY.md` as the current implemen
 ## Current State
 
 - Stage 3 compliance walking skeleton is active.
-- Build Packet 49 is complete.
+- Build Packet 50 is complete.
 - Work assignment, append-only reassignment, immutable workflow versions, pinned checklists, checklist completion evidence, checklist-gated review submission, reviewer return and approval decisions and explicit audited workflow-version migration are implemented.
 - Every work item is pinned to a published firm-owned workflow definition and checklist version.
 - Moving from `in_preparation` to `under_review` requires retained completion evidence for every required item on the pinned checklist.
@@ -53,21 +53,22 @@ Treat the master plan as canonical scope and `MEMORY.md` as the current implemen
 - Explainable party issues are manually recorded against published party-master rules with immutable severity, behavior, explanation and remediation snapshots. Independent authorised decisions resolve or mark an issue not applicable without rewriting the retained issue.
 - Duplicate candidates retain explicitly selected deterministic signals, normalized comparison values, normalizer versions and contribution explanations. Independent authorised decisions confirm or dismiss a candidate, but no probability is calculated and no merge occurs.
 - Synthetic invoice-transaction samples retain manually supplied fields and provenance in a separate readiness register. Published invoice-domain rules support immutable explainable issues and independent resolution decisions without calculating tax, totals, validity or readiness.
+- The compliance schedule provides accessible month, week and list views of firm-scoped effective deadlines plus an optional client timeline built from retained client, obligation, work, filing and payment history. It calculates no statutory date.
 - Two operational notification templates exist, `work_item_high_risk` and `payment_overdue`, both fired only by an explicit recorded change and addressed to the current responsible manager.
 - Regulated-rule generation modules are not implemented.
 - The full current verification baseline is recorded in `MEMORY.md`.
 
 ## Next Safe Packet
 
-No further implementation packet is safe without resolving the product-owner decision gates below.
+Add firm-scoped saved operational filters for dashboard queues and work registers without sharing filters across firms or inferring compliance state.
 
 Keep it bounded:
 
-- Approve import conflict handling, reversal behavior and raw-file retention before E1 import processing.
-- Approve duplicate thresholds, merge value selection, dependent-reference redirection and recovery before merge execution.
-- Approve the readiness formula, weights, denominators, unresolved-duplicate treatment and rounding before scoring or readiness reporting.
-- Approve the clean-export contract after import, merge and scoring decisions establish what qualifies as clean.
-- Do not add a regulated formula without sourced golden cases and explicit approval.
+- Store named, owner-scoped filter definitions with a constrained surface key and validated filter schema.
+- Let a user apply, rename and explicitly delete only their own saved filters in the active firm.
+- Keep shared or administrator-managed filters out of this packet until ownership policy is approved.
+- Preserve all existing queue authorization and tenant scope when a saved filter is applied.
+- Continue to keep imports, merge, scoring and regulated formulas behind their recorded decision gates.
 - Do not add VAT or Corporate Tax formulas without approved sourced golden cases.
 - Keep import processing gated until conflict, reversal and retention decisions are approved.
 
