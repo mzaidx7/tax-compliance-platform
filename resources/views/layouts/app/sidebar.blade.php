@@ -65,6 +65,11 @@
                                     {{ __('Party readiness') }}
                                 </flux:sidebar.item>
                             @endcan
+                            @can('viewAny', \App\Models\InvoiceReadinessSample::class)
+                                <flux:sidebar.item icon="document-text" :href="route('readiness.invoices.index')" :current="request()->routeIs('readiness.invoices.*')" wire:navigate>
+                                    {{ __('Invoice samples') }}
+                                </flux:sidebar.item>
+                            @endcan
                         @endif
 
                         @if (

@@ -606,3 +606,15 @@ Duplicate review is explicit evidence and a human decision, not an automatic mat
 - Candidate, signal and decision records reject model and raw database update or deletion.
 - Audit metadata excludes normalized values and decision reasons.
 - No probability, readiness score, automatic discovery, merge or dependent-reference redirection is performed.
+
+## Invoice Transaction Readiness Samples
+
+Invoice readiness remains separate from party readiness and retains only supplied evidence:
+
+- A synthetic sample belongs to one firm client and has an immutable sample identity and manual source reference.
+- Each append-only sample field retains one explicitly supplied value, field key, source reference, recorder and timestamp. No field value is calculated.
+- An invoice issue links only to a published invoice-transaction rule in the same firm and optionally to one field of the selected sample.
+- The issue snapshots severity, behavior, explanation and remediation. Resolution or not-applicable requires readiness-rule authority and a different actor.
+- Sample, field, issue and resolution records reject model and raw database update or deletion.
+- Audit metadata excludes supplied values, source references, evidence notes and decision reasons.
+- No VAT, total, exchange-rate, validity, compliance or readiness calculation is performed.
