@@ -15,6 +15,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Carbon;
 use LogicException;
 
@@ -97,6 +98,12 @@ class NotificationRequest extends Model
     public function attempts(): HasMany
     {
         return $this->hasMany(NotificationAttempt::class, 'notification_id');
+    }
+
+    /** @return HasOne<NotificationReadReceipt, $this> */
+    public function readReceipt(): HasOne
+    {
+        return $this->hasOne(NotificationReadReceipt::class, 'notification_id');
     }
 
     /**

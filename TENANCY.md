@@ -640,3 +640,14 @@ Saved filters are private user preferences inside one firm:
 - Applying a saved filter feeds values into the same existing tenant-scoped and permission-filtered queries. It never stores or broadens query authorization.
 - Filter names and values are excluded from audit payloads; audit metadata records only the surface and filter keys.
 - No shared filter, administrator transfer or cross-firm reuse exists.
+
+## In-App Notification Evidence And Manager Summaries
+
+The notification centre is a recipient-owned projection over existing delivery evidence:
+
+- A signed-in user sees only notification requests addressed to their global user id inside the active firm's scope.
+- Request status and immutable attempts are visible without message contents, provider references, failure reasons or correlation metadata.
+- Marking a notice read appends one immutable receipt. It never mutates or deletes the notification request.
+- A report-authorised member may explicitly select an active manager and generate one deterministic summary request per recipient and firm-local date.
+- Summary counts derive from stored open deadlines, explicit high-risk work and explicit overdue-payment state. No compliance state is inferred.
+- The summary notification payload is encrypted in the queue and stores no counts or message content in the notification request or audit log.

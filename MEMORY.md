@@ -5,14 +5,13 @@
 - Last updated: 2026-07-28
 - Updated by: Codex GPT-5.6
 - Platform repository status: independent repository on `main`, remote `mzaidx7/tax-compliance-platform`
-- Current phase: Stage 4, client and data foundation
-- Current milestone: Owner-only saved operational filters packet completed
+- Current milestone: In-app notification centre and manager summaries packet completed
 
 ## Current Objective
 
 Create a UAE-focused compliance operations and e-invoicing readiness platform under a TBT subdomain while keeping its application, data, deployment and release lifecycle separate from the public TBT website.
 
-The immediate objective is a firm-scoped in-app notification centre and explicit idempotent manager summaries built on retained notification evidence. Imports, duplicate merge, readiness scoring and clean export remain decision-gated.
+The immediate objective is Stage 4 operational reports and spreadsheet-safe exports for monthly schedules, tax periods, expiring documents, workload and completion. Imports, duplicate merge, readiness scoring and clean export remain decision-gated.
 
 ## Canonical Files
 
@@ -120,6 +119,7 @@ The immediate objective is a firm-scoped in-app notification centre and explicit
 - Synthetic invoice-transaction samples retain manually supplied field values and source references separately from party readiness. Published invoice-domain rules support immutable explainable issues and independent resolution decisions without tax, total, validity or readiness calculations.
 - An accessible compliance schedule exposes month, week and list views of stored effective deadlines plus a selected client's retained operational timeline. It remains firm-scoped and performs no statutory calculation.
 - Dashboard and work-register filters can be retained, applied and explicitly deleted only by their owner in the active firm. Applying a filter reuses existing authorized queries, and audit metadata excludes names and values.
+- The notification centre exposes only a recipient's active-firm request and delivery states, with append-only read evidence. Explicit daily manager summaries use encrypted idempotent delivery and stored operational counts without inferring compliance.
 - Filing state uses its own record, lifecycle and append-only history, gated by the named `manage_filings` permission, and never reads or writes work status.
 - Payment state uses its own record, lifecycle and append-only history, gated by the named `manage_payments` permission, and never reads or writes work or filing status. `paid` is terminal and requires a reference and settlement date.
 - Append-only history is enforced at two layers: Eloquent model events and database triggers on `work_item_transitions`, `filing_record_transitions`, `payment_record_transitions` and `audit_logs`.
@@ -171,7 +171,7 @@ The immediate objective is a firm-scoped in-app notification centre and explicit
 - Laravel Pint check passed.
 - Larastan passed with zero errors.
 - Full workflow feature suite (`tests/Feature/Workflows`, including checklist, transition, reviewer-decision and workflow-version migration tests) passed with no failures.
-- PHPUnit passed 449 tests with 1,373 assertions after Build Packet 51.
+- PHPUnit passed 453 tests with 1,387 assertions after Build Packet 52.
 - Database triggers were verified to reject raw query-builder updates and deletes on `work_item_transitions`, which Eloquent model events alone do not cover.
 - Vite production build passed.
 - All migrations, including append-only deadline overrides, and seven synthetic domain seeders passed from a fresh database.

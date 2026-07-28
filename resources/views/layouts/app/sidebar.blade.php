@@ -32,6 +32,9 @@
                         <flux:sidebar.item icon="home" :href="route('dashboard')" :current="request()->routeIs('dashboard')" wire:navigate>
                             {{ __('Dashboard') }}
                         </flux:sidebar.item>
+                        <flux:sidebar.item icon="bell" :href="route('notifications.index')" :current="request()->routeIs('notifications.*')" wire:navigate>
+                            {{ __('Notifications') }}
+                        </flux:sidebar.item>
 
                         @if (
                             app(\App\Support\FeatureFlags::class)->enabled(

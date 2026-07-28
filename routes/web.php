@@ -11,6 +11,7 @@ use App\Livewire\Dashboard\Index as DashboardIndex;
 use App\Livewire\Documents\Index as DocumentsIndex;
 use App\Livewire\Generation\Index as GenerationIndex;
 use App\Livewire\Members\Index as MembersIndex;
+use App\Livewire\Notifications\Index as NotificationsIndex;
 use App\Livewire\Obligations\Index as ObligationsIndex;
 use App\Livewire\Readiness\Invoices\Index as ReadinessInvoicesIndex;
 use App\Livewire\Readiness\Parties\Index as ReadinessPartiesIndex;
@@ -40,6 +41,7 @@ Route::middleware(['auth', 'verified', 'firm.context'])->group(function () {
     Route::livewire('clients', ClientsIndex::class)->name('clients.index');
     Route::livewire('document-expiry', DocumentsIndex::class)->name('documents.index');
     Route::livewire('members', MembersIndex::class)->name('members.index');
+    Route::livewire('notifications', NotificationsIndex::class)->name('notifications.index');
     Route::livewire('obligations', ObligationsIndex::class)->name('obligations.index');
     Route::livewire('rules', RulesIndex::class)->name('rules.index');
     Route::livewire('generation', GenerationIndex::class)->name('generation.index');
