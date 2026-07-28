@@ -108,6 +108,17 @@ FORM: Deadline review rail, grounded structure seven, seed 75cba0e2.
                                     >
                                         {{ __('Override deadline') }}
                                     </flux:button>
+                                    @if ($obligation->status === \App\Enums\ObligationStatus::Open)
+                                        <flux:button
+                                            class="mb-2"
+                                            size="sm"
+                                            variant="ghost"
+                                            icon="archive-box"
+                                            wire:click="openDisposition('{{ $obligation->id }}')"
+                                        >
+                                            {{ __('Cancel or supersede') }}
+                                        </flux:button>
+                                    @endif
                                 @endcan
                                 @if ($obligation->workItem)
                                     @php
@@ -408,6 +419,41 @@ FORM: Deadline review rail, grounded structure seven, seed 75cba0e2.
         </aside>
         @endcan
     </div>
+
+    <flux:modal
+        name="obligation-disposition"
+        wire:model="showDispositionModal"
+        @close="closeDispositionModal"
+        class="max-w-lg"
+    >
+        <form wire:submit="disposeObligation" class="space-y-6">
+            <div>
+                <flux:heading size="lg">{{ __('Cancel or supersede obligation') }}</flux:heading>
+                <flux:text class="mt-2">{{ $dispositionLabel }}</flux:text>
+                <flux:text class="mt-2 text-zinc-500">{{ __('The obligation and all retained evidence remain unchanged. Supersession requires a separately issued open replacement.') }}</flux:text>
+            </div>
+            <flux:select wire:model.live="dispositionStatus" :label="__('Disposition')" required>
+                <flux:select.option value="">{{ __('Select disposition') }}</flux:select.option>
+                <flux:select.option value="cancelled">{{ __('Cancelled') }}</flux:select.option>
+                <flux:select.option value="superseded">{{ __('Superseded') }}</flux:select.option>
+            </flux:select>
+            @if ($dispositionStatus === 'superseded')
+                <flux:select wire:model="replacementObligationId" :label="__('Replacement obligation')" required>
+                    <flux:select.option value="">{{ __('Select replacement') }}</flux:select.option>
+                    @foreach ($this->replacementObligations as $replacement)
+                        <flux:select.option :value="$replacement->id">
+                            {{ $replacement->client->internal_code }} · {{ $replacement->obligation_type }} · {{ $replacement->effectiveDueDate()->format('j M Y') }}
+                        </flux:select.option>
+                    @endforeach
+                </flux:select>
+            @endif
+            <flux:textarea wire:model="dispositionReason" :label="__('Reason')" rows="4" maxlength="500" required />
+            <div class="flex justify-end gap-2">
+                <flux:button type="button" variant="ghost" wire:click="closeDispositionModal">{{ __('Cancel') }}</flux:button>
+                <flux:button type="submit" variant="primary">{{ __('Record disposition') }}</flux:button>
+            </div>
+        </form>
+    </flux:modal>
 
     <flux:modal
         name="deadline-override"

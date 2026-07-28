@@ -49,6 +49,7 @@ use Illuminate\Support\Carbon;
  * @property-read PaymentRecord|null $paymentRecord
  * @property-read TaxRecord|null $taxRecord
  * @property-read Collection<int, ObligationDeadlineOverride> $deadlineOverrides
+ * @property-read Collection<int, ObligationDisposition> $dispositions
  */
 #[Fillable([
     'client_id',
@@ -142,6 +143,12 @@ final class Obligation extends Model
     public function deadlineOverrides(): HasMany
     {
         return $this->hasMany(ObligationDeadlineOverride::class);
+    }
+
+    /** @return HasMany<ObligationDisposition, $this> */
+    public function dispositions(): HasMany
+    {
+        return $this->hasMany(ObligationDisposition::class);
     }
 
     public function effectiveDueDate(): CarbonInterface

@@ -19,7 +19,7 @@ Treat the master plan as canonical scope and `MEMORY.md` as the current implemen
 ## Current State
 
 - Stage 3 compliance walking skeleton is active.
-- Build Packet 41 is complete.
+- Build Packet 42 is complete.
 - Work assignment, append-only reassignment, immutable workflow versions, pinned checklists, checklist completion evidence, checklist-gated review submission, reviewer return and approval decisions and explicit audited workflow-version migration are implemented.
 - Every work item is pinned to a published firm-owned workflow definition and checklist version.
 - Moving from `in_preparation` to `under_review` requires retained completion evidence for every required item on the pinned checklist.
@@ -45,21 +45,22 @@ Treat the master plan as canonical scope and `MEMORY.md` as the current implemen
 - Obligation rule governance has stable immutable templates, draft-only content editing, source-linked versions, registered-calculator review gating, separate preparer and verifier identities, database-enforced lifecycle order and append-only events. The only registered calculator passes through a manually supplied date and explicitly performs no statutory calculation.
 - Governed obligation generation requires a persisted preview, published rule, explicit client, service, applicability date and compliance-period label or actual tax period. Preview and committed runs are immutable, deterministic reruns return the same obligation, changed inputs create a new obligation, and no issued obligation is overwritten.
 - Open obligations support explicit reason-required effective deadline overrides. The original statutory date and generated snapshots remain unchanged, each override is append-only, and operational queues use the effective date while displaying the original when different.
+- Open obligations can be explicitly cancelled or superseded through an append-only disposition. Supersession requires a different open replacement obligation in the same firm; neither path modifies the retained obligation, dates, snapshots or linked evidence.
 - Two operational notification templates exist, `work_item_high_risk` and `payment_overdue`, both fired only by an explicit recorded change and addressed to the current responsible manager.
 - Regulated-rule generation modules are not implemented.
 - The full current verification baseline is recorded in `MEMORY.md`.
 
 ## Next Safe Packet
 
-Add explicit, reason-required obligation disposition records for cancellation or supersession without deletion.
+Add preview-first changed-rule impact proposals and authorised approval without silently changing issued obligations.
 
 Keep it bounded:
 
-- Add append-only disposition records retaining old status, new status, actor, reason and timestamp.
-- Permit only explicit open-to-cancelled or open-to-superseded transitions.
-- Require an explicitly selected replacement obligation before superseding.
-- Preserve the original obligation, dates, snapshots and all linked work evidence.
-- Reject no-op, unauthorised, cross-firm and circular replacement links.
+- Compare one issued governed obligation against one later published version of the same rule template.
+- Persist the old and proposed dates, calculation snapshots, explanation and proposal reason before approval.
+- Require a separate authorised approval step to issue the replacement and supersede the original.
+- Reuse deterministic generation and disposition boundaries instead of duplicating or rewriting records.
+- Reject same-version, stale, unauthorised, cross-firm and already-resolved proposals.
 - Do not add VAT or Corporate Tax formulas without approved sourced golden cases.
 - Keep import processing gated until conflict, reversal and retention decisions are approved.
 

@@ -521,3 +521,15 @@ Deadline correction is an explicit tenant-owned operation:
 - Model guards and database triggers reject update or deletion of override history.
 - Dashboards and work registers show the original statutory date whenever it differs from the effective date.
 - An override never changes a generated input, parameter, result or explanation snapshot and never regenerates or supersedes an obligation.
+
+## Obligation Dispositions
+
+Cancellation and supersession are explicit tenant-owned status changes:
+
+- Only an authorised manager in the active firm may dispose an open obligation, with a required reason.
+- Cancellation names no replacement. Supersession requires a separately issued, different open replacement obligation resolved through the active firm scope.
+- The original obligation changes only from open to cancelled or superseded. Its dates, generated snapshots, work, filing, payment, tax and audit evidence remain retained.
+- Each event stores prior and new status, optional replacement identifier, actor, reason and timestamp in `obligation_dispositions`.
+- Model guards and database triggers reject update or deletion of disposition history.
+- Repeat disposition, self-replacement, closed replacement, cross-firm and unauthorised attempts fail closed.
+- Disposition creates no replacement automatically and performs no changed-rule calculation.

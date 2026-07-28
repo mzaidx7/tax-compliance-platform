@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Livewire\Obligations;
 
 use App\Actions\Compliance\CreateManualObligation;
+use App\Actions\Compliance\DisposeObligation;
 use App\Actions\Compliance\OverrideObligationDeadline;
 use App\Actions\Filings\CreateFilingRecord;
 use App\Actions\Filings\TransitionFilingRecord;
@@ -25,6 +26,7 @@ use App\Enums\ClientStatus;
 use App\Enums\Feature;
 use App\Enums\FilingStatus;
 use App\Enums\FirmMembershipStatus;
+use App\Enums\ObligationStatus;
 use App\Enums\PaymentStatus;
 use App\Enums\Permission;
 use App\Enums\ReviewDecision;
@@ -90,6 +92,19 @@ final class Index extends Component
     public string $deadlineOverrideDate = '';
 
     public string $deadlineOverrideReason = '';
+
+    public bool $showDispositionModal = false;
+
+    #[Locked]
+    public string $dispositionObligationId = '';
+
+    public string $dispositionLabel = '';
+
+    public string $dispositionStatus = '';
+
+    public string $replacementObligationId = '';
+
+    public string $dispositionReason = '';
 
     public bool $showAssignmentModal = false;
 
@@ -342,6 +357,38 @@ final class Index extends Component
             'deadlineOverrideDate',
             'deadlineOverrideReason',
         );
+        $this->resetValidation();
+    }
+
+    public function openDisposition(string $obligationId): void
+    {
+        $obligation = Obligation::query()->with('client')->findOrFail($obligationId);
+        Gate::authorize('update', $obligation);
+        $this->resetValidation();
+        $this->dispositionObligationId = $obligation->id;
+        $this->dispositionLabel = "{$obligation->client->internal_code} · {$obligation->obligation_type}";
+        $this->dispositionStatus = '';
+        $this->replacementObligationId = '';
+        $this->dispositionReason = '';
+        $this->showDispositionModal = true;
+    }
+
+    public function disposeObligation(DisposeObligation $action): void
+    {
+        $obligation = Obligation::query()->findOrFail($this->dispositionObligationId);
+        $action->handle($this->currentUser(), $obligation, [
+            'status' => $this->dispositionStatus,
+            'replacementObligationId' => $this->replacementObligationId === '' ? null : $this->replacementObligationId,
+            'reason' => $this->dispositionReason,
+        ]);
+        $this->closeDispositionModal();
+        unset($this->obligations);
+        Flux::toast(variant: 'success', text: __('Obligation disposition recorded.'));
+    }
+
+    public function closeDispositionModal(): void
+    {
+        $this->reset('showDispositionModal', 'dispositionObligationId', 'dispositionLabel', 'dispositionStatus', 'replacementObligationId', 'dispositionReason');
         $this->resetValidation();
     }
 
@@ -1070,6 +1117,22 @@ final class Index extends Component
         return Client::query()
             ->where('status', ClientStatus::Active)
             ->orderBy('legal_name')
+            ->get();
+    }
+
+    /** @return Collection<int, Obligation> */
+    #[Computed]
+    public function replacementObligations(): Collection
+    {
+        return Obligation::query()
+            ->with('client')
+            ->where('status', ObligationStatus::Open)
+            ->when(
+                $this->dispositionObligationId !== '',
+                fn (Builder $query): Builder => $query->whereKeyNot($this->dispositionObligationId),
+            )
+            ->orderByRaw('coalesce(effective_due_date, statutory_due_date)')
+            ->limit(100)
             ->get();
     }
 
