@@ -11,6 +11,7 @@ use App\Livewire\Dashboard\Index as DashboardIndex;
 use App\Livewire\Documents\Index as DocumentsIndex;
 use App\Livewire\Members\Index as MembersIndex;
 use App\Livewire\Obligations\Index as ObligationsIndex;
+use App\Livewire\Rules\Index as RulesIndex;
 use App\Livewire\Settings\FeatureFlags as SettingsFeatureFlags;
 use App\Livewire\WorkItems\Index as WorkItemsIndex;
 use Illuminate\Support\Facades\Route;
@@ -35,6 +36,7 @@ Route::middleware(['auth', 'verified', 'firm.context'])->group(function () {
     Route::livewire('document-expiry', DocumentsIndex::class)->name('documents.index');
     Route::livewire('members', MembersIndex::class)->name('members.index');
     Route::livewire('obligations', ObligationsIndex::class)->name('obligations.index');
+    Route::livewire('rules', RulesIndex::class)->name('rules.index');
     Route::livewire('work', WorkItemsIndex::class)->name('work-items.index');
     Route::livewire('audit', AuditIndex::class)->name('audit.index');
     Route::get('exports/{exportAuditLog}/download', ExportDownloadController::class)

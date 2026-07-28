@@ -482,3 +482,16 @@ Client document expiry is separate from work-item `DocumentEvidence`:
 - Firm-aware scheduled work compares the supplied expiry date with the firm's local calendar date and creates idempotent reminder evidence only for configured upcoming offsets, expiry day and configured repeated overdue intervals.
 - Reminder evidence is append-only. It does not send a client message or assert that a document is valid, invalid or regulator-approved.
 - Published type versions, client document metadata and reminder evidence reject model and raw database update or deletion.
+
+## Obligation Rule Governance
+
+Rule governance records are firm-owned and do not alter existing obligations:
+
+- A rule template is an immutable stable identity containing its obligation type, jurisdiction and authority.
+- A rule version contains effective dates, applicability criteria, calculator key, validated parameter shape, official source metadata, preparer and change summary.
+- Source URLs must use HTTPS on configured official UAE government hosts. Configuration currently permits the FTA, Ministry of Finance, UAE Legislation and U.AE domains and their subdomains.
+- Content may be edited only in draft. Submitting for review freezes content at model and database layers.
+- Review requires a registered PHP calculator and valid parameters. Approval requires a verifier different from the preparer and retains source verification and approval timestamps.
+- Lifecycle order is draft, under review, approved, published, then superseded or retired. Database triggers reject skipped states, post-review content rewrites, deletion and lifecycle-history mutation.
+- Publishing a later version supersedes the prior published version without changing either version's content or any existing obligation.
+- `manual_date_passthrough` is the only registered calculator. It validates and returns a human-supplied date with an explanation that no statutory calculation was performed.

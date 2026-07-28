@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+use App\Calculators\ManualDatePassthroughCalculator;
 
 $firmIds = static fn (string $value): array => array_values(array_filter(
     array_map('trim', explode(',', $value)),
@@ -54,6 +55,18 @@ return [
             'png' => ['image/png'],
             'jpg' => ['image/jpeg'],
             'jpeg' => ['image/jpeg'],
+        ],
+    ],
+
+    'rules' => [
+        'calculators' => [
+            ManualDatePassthroughCalculator::class,
+        ],
+        'official_source_hosts' => [
+            'tax.gov.ae',
+            'mof.gov.ae',
+            'uaelegislation.gov.ae',
+            'u.ae',
         ],
     ],
 

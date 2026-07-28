@@ -59,6 +59,9 @@
                                 <flux:sidebar.item icon="calendar-days" :href="route('obligations.index')" :current="request()->routeIs('obligations.*')" wire:navigate>
                                     {{ __('Obligations') }}
                                 </flux:sidebar.item>
+                                <flux:sidebar.item icon="book-open" :href="route('rules.index')" :current="request()->routeIs('rules.*')" wire:navigate>
+                                    {{ __('Rule governance') }}
+                                </flux:sidebar.item>
                             @endcan
 
                             @can('viewAny', \App\Models\WorkItem::class)
