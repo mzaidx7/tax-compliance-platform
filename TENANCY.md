@@ -594,3 +594,15 @@ Party issues are retained explainable evidence, not an inferred readiness result
 - One issue accepts one terminal decision. The issue and decision reject model and raw database update or deletion.
 - Audit metadata records identifiers and outcomes but excludes evidence notes.
 - No automated evaluation, bulk import, duplicate matching, merge or readiness score is performed.
+
+## Readiness Duplicate Candidates
+
+Duplicate review is explicit evidence and a human decision, not an automatic match:
+
+- A candidate links two different party records belonging to the same firm and client. Pair order is canonical and one deterministic pair creates one candidate.
+- Each append-only signal retains its type, both normalized comparison values, normalizer version, contribution explanation, recorder and timestamp.
+- Signal recording requires update authority over both parties. A decided candidate accepts no later signal.
+- Confirmation or dismissal requires readiness-rule authority, a decision maker different from the candidate recorder and at least one retained signal.
+- Candidate, signal and decision records reject model and raw database update or deletion.
+- Audit metadata excludes normalized values and decision reasons.
+- No probability, readiness score, automatic discovery, merge or dependent-reference redirection is performed.

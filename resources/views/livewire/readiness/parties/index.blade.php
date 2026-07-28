@@ -86,6 +86,42 @@
                     <div class="border-y border-white/8 px-6 py-14 text-center"><p class="text-sm font-medium text-zinc-200">{{ __('No party records') }}</p><p class="mt-2 text-sm text-zinc-500">{{ __('Record a synthetic party manually to begin.') }}</p></div>
                 @endforelse
             </div>
+
+            <div class="mt-10 border-t border-white/8 pt-8">
+                <h2 class="text-lg font-semibold text-zinc-100">{{ __('Duplicate candidate review') }}</h2>
+                <p class="mt-1 text-sm text-zinc-500">{{ __('Each candidate shows manually selected deterministic signals. No probability is calculated and no party is merged.') }}</p>
+                <div class="mt-5 space-y-4">
+                    @forelse ($this->duplicateCandidates as $candidate)
+                        <article class="rounded-2xl bg-zinc-900/50 p-5 ring-1 ring-white/8">
+                            <div class="flex flex-wrap items-start justify-between gap-3">
+                                <div>
+                                    <p class="text-sm font-semibold text-zinc-100">{{ $candidate->firstParty->reference }} / {{ $candidate->secondParty->reference }}</p>
+                                    <p class="mt-1 text-xs text-zinc-500">{{ $candidate->firstParty->client->legal_name }}</p>
+                                </div>
+                                <flux:badge :color="$candidate->decision ? ($candidate->decision->outcome->value === 'confirmed' ? 'amber' : 'green') : 'zinc'">
+                                    {{ $candidate->decision ? $candidate->decision->outcome->label() : __('Awaiting decision') }}
+                                </flux:badge>
+                            </div>
+                            <div class="mt-4 space-y-3">
+                                @foreach ($candidate->signals as $signal)
+                                    <div class="rounded-xl bg-zinc-950/60 px-4 py-3 ring-1 ring-white/8">
+                                        <p class="text-sm font-medium text-zinc-200">{{ $signal->signal_type->label() }}</p>
+                                        <p class="mt-1 text-xs leading-5 text-zinc-500">{{ $signal->contribution_explanation }}</p>
+                                        <p class="mt-1 text-xs text-zinc-600">{{ __('Normalizer: :version', ['version' => $signal->normalizer_version]) }}</p>
+                                    </div>
+                                @endforeach
+                            </div>
+                            @can('approveCorrection', $candidate->firstParty)
+                                @if (! $candidate->decision)
+                                    <flux:button class="mt-4" size="sm" variant="ghost" wire:click="$set('duplicateCandidateId', '{{ $candidate->id }}')">{{ __('Decide candidate') }}</flux:button>
+                                @endif
+                            @endcan
+                        </article>
+                    @empty
+                        <div class="border-y border-white/8 px-6 py-10 text-center"><p class="text-sm text-zinc-500">{{ __('No duplicate candidates have been recorded.') }}</p></div>
+                    @endforelse
+                </div>
+            </div>
         </section>
 
         <aside class="space-y-6">
@@ -126,6 +162,19 @@
                     <flux:textarea wire:model="issueEvidenceNote" :label="__('Manual issue evidence')" required />
                     <flux:button type="submit" variant="primary" class="w-full">{{ __('Record explainable issue') }}</flux:button>
                 </form>
+
+                <form wire:submit="recordDuplicateSignal" class="space-y-4 rounded-2xl bg-zinc-900/70 p-6 ring-1 ring-white/8">
+                    <h2 class="text-lg font-semibold text-zinc-100">{{ __('Record duplicate signal') }}</h2>
+                    <p class="text-sm leading-6 text-zinc-500">{{ __('Select two parties for the same client and retain the already-normalized comparison evidence. This form performs no automatic matching.') }}</p>
+                    <flux:select wire:model="duplicateFirstPartyId" :label="__('First party')" required><flux:select.option value="">{{ __('Select first party') }}</flux:select.option>@foreach ($this->parties as $party)<flux:select.option :value="$party->id">{{ $party->reference }}</flux:select.option>@endforeach</flux:select>
+                    <flux:select wire:model="duplicateSecondPartyId" :label="__('Second party')" required><flux:select.option value="">{{ __('Select second party') }}</flux:select.option>@foreach ($this->parties as $party)<flux:select.option :value="$party->id">{{ $party->reference }}</flux:select.option>@endforeach</flux:select>
+                    <flux:select wire:model="duplicateSignalType" :label="__('Signal')" required>@foreach ($this->duplicateSignalTypes() as $type)<flux:select.option :value="$type->value">{{ $type->label() }}</flux:select.option>@endforeach</flux:select>
+                    <flux:input wire:model="duplicateFirstValue" :label="__('First normalized value')" required />
+                    <flux:input wire:model="duplicateSecondValue" :label="__('Second normalized value')" required />
+                    <flux:input wire:model="duplicateNormalizerVersion" :label="__('Normalizer version')" required />
+                    <flux:textarea wire:model="duplicateExplanation" :label="__('Signal contribution explanation')" required />
+                    <flux:button type="submit" variant="primary" class="w-full">{{ __('Retain duplicate signal') }}</flux:button>
+                </form>
             @endcan
 
             @if ($decisionProposalId !== '')
@@ -143,6 +192,15 @@
                     <flux:select wire:model="resolutionOutcome" :label="__('Outcome')" required><flux:select.option value="">{{ __('Select outcome') }}</flux:select.option><flux:select.option value="resolved">{{ __('Resolved') }}</flux:select.option><flux:select.option value="not_applicable">{{ __('Not applicable') }}</flux:select.option></flux:select>
                     <flux:textarea wire:model="resolutionReason" :label="__('Resolution reason')" required />
                     <flux:button type="submit" variant="filled" class="w-full">{{ __('Record issue decision') }}</flux:button>
+                </form>
+            @endif
+
+            @if ($duplicateCandidateId !== '')
+                <form wire:submit="decideDuplicate" class="space-y-4 rounded-2xl bg-zinc-900/70 p-6 ring-1 ring-white/8">
+                    <h2 class="text-lg font-semibold text-zinc-100">{{ __('Decide duplicate candidate') }}</h2>
+                    <flux:select wire:model="duplicateOutcome" :label="__('Outcome')" required><flux:select.option value="">{{ __('Select outcome') }}</flux:select.option><flux:select.option value="confirmed">{{ __('Confirm duplicate') }}</flux:select.option><flux:select.option value="dismissed">{{ __('Dismiss') }}</flux:select.option></flux:select>
+                    <flux:textarea wire:model="duplicateDecisionReason" :label="__('Decision reason')" required />
+                    <flux:button type="submit" variant="filled" class="w-full">{{ __('Record candidate decision') }}</flux:button>
                 </form>
             @endif
         </aside>

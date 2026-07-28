@@ -5,17 +5,16 @@
 - Last updated: 2026-07-28
 - Updated by: Codex GPT-5.6
 - Current parent repository branch: `main`
-- Current parent baseline commit: `1071185`
 - Platform repository status: independent repository on `main`, remote `mzaidx7/tax-compliance-platform`
 - Parent repository status for this directory: separate nested repository, outside website delivery
 - Current phase: Stage 4, client and data foundation
-- Current milestone: Explainable party issue and resolution governance packet completed
+- Current milestone: Explainable duplicate candidate governance packet completed
 
 ## Current Objective
 
 Create a UAE-focused compliance operations and e-invoicing readiness platform under a TBT subdomain while keeping its application, data, deployment and release lifecycle separate from the public TBT website.
 
-The immediate objective is deterministic, explainable duplicate candidate signals between synthetic party records with independent human decisions, without automatic discovery, merge execution or scoring. Import processing remains gated on product-owner decisions for conflict handling, reversal and retention.
+The immediate objective is synthetic invoice-transaction sample records and manually recorded explainable invoice issues, kept separate from party readiness and without imports, calculations or scoring. Import processing remains gated on product-owner decisions for conflict handling, reversal and retention.
 
 ## Canonical Files
 
@@ -120,6 +119,7 @@ The immediate objective is deterministic, explainable duplicate candidate signal
 - The dashboard and authenticated shell now use the platform-owned dark ink, silver and restrained gold operational design.
 - Client, obligation, work item, assignment, reassignment, workflow-version, checklist-gated transition, versioned evidence, reviewer return/approval decision, explicit workflow-version migration, filing, payment, tax, governed generation and deadline override schemas are implemented.
 - Published party-master readiness rules can support manually recorded explainable issues. Each issue retains immutable rule snapshots and optional current-field context, while an independent authorised resolution or not-applicable decision is appended separately.
+- Duplicate candidates retain explicit deterministic signal evidence, normalized comparison values and normalizer versions. Independent authorised decisions confirm or dismiss a candidate without automatic discovery, probability scoring or merge execution.
 - Filing state uses its own record, lifecycle and append-only history, gated by the named `manage_filings` permission, and never reads or writes work status.
 - Payment state uses its own record, lifecycle and append-only history, gated by the named `manage_payments` permission, and never reads or writes work or filing status. `paid` is terminal and requires a reference and settlement date.
 - Append-only history is enforced at two layers: Eloquent model events and database triggers on `work_item_transitions`, `filing_record_transitions`, `payment_record_transitions` and `audit_logs`.
@@ -171,7 +171,7 @@ The immediate objective is deterministic, explainable duplicate candidate signal
 - Laravel Pint check passed.
 - Larastan passed with zero errors.
 - Full workflow feature suite (`tests/Feature/Workflows`, including checklist, transition, reviewer-decision and workflow-version migration tests) passed with no failures.
-- PHPUnit passed 432 tests with 1,310 assertions after Build Packet 47.
+- PHPUnit passed 437 tests with 1,327 assertions after Build Packet 48.
 - Database triggers were verified to reject raw query-builder updates and deletes on `work_item_transitions`, which Eloquent model events alone do not cover.
 - Vite production build passed.
 - All migrations, including append-only deadline overrides, and seven synthetic domain seeders passed from a fresh database.

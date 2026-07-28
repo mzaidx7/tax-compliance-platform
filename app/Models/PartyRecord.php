@@ -49,6 +49,18 @@ final class PartyRecord extends Model
         return $this->hasMany(PartyIssue::class);
     }
 
+    /** @return HasMany<DuplicateCandidate, $this> */
+    public function duplicateCandidatesAsFirst(): HasMany
+    {
+        return $this->hasMany(DuplicateCandidate::class, 'first_party_record_id');
+    }
+
+    /** @return HasMany<DuplicateCandidate, $this> */
+    public function duplicateCandidatesAsSecond(): HasMany
+    {
+        return $this->hasMany(DuplicateCandidate::class, 'second_party_record_id');
+    }
+
     public function currentField(string $fieldKey): ?PartyFieldVersion
     {
         return $this->fieldVersions()->where('field_key', $fieldKey)->latest('recorded_at')->latest('id')->first();

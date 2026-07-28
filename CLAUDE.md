@@ -19,7 +19,7 @@ Treat the master plan as canonical scope and `MEMORY.md` as the current implemen
 ## Current State
 
 - Stage 3 compliance walking skeleton is active.
-- Build Packet 47 is complete.
+- Build Packet 48 is complete.
 - Work assignment, append-only reassignment, immutable workflow versions, pinned checklists, checklist completion evidence, checklist-gated review submission, reviewer return and approval decisions and explicit audited workflow-version migration are implemented.
 - Every work item is pinned to a published firm-owned workflow definition and checklist version.
 - Moving from `in_preparation` to `under_review` requires retained completion evidence for every required item on the pinned checklist.
@@ -51,21 +51,22 @@ Treat the master plan as canonical scope and `MEMORY.md` as the current implemen
 - Stage 5 readiness rule governance is active behind `e_invoicing_readiness`. Stable rule identities explicitly separate party-master and invoice-transaction domains; versions retain applicability, severity, warning or blocking behavior, explanation, remediation, source and formula effect through independent review and immutable publication.
 - Synthetic party-master identities are client-owned and can explicitly carry customer, supplier or both roles. Field values and provenance are append-only; corrections remain immutable proposals until an independent authorised approval or rejection, and approval appends a new field version without overwriting the earlier value.
 - Explainable party issues are manually recorded against published party-master rules with immutable severity, behavior, explanation and remediation snapshots. Independent authorised decisions resolve or mark an issue not applicable without rewriting the retained issue.
+- Duplicate candidates retain explicitly selected deterministic signals, normalized comparison values, normalizer versions and contribution explanations. Independent authorised decisions confirm or dismiss a candidate, but no probability is calculated and no merge occurs.
 - Two operational notification templates exist, `work_item_high_risk` and `payment_overdue`, both fired only by an explicit recorded change and addressed to the current responsible manager.
 - Regulated-rule generation modules are not implemented.
 - The full current verification baseline is recorded in `MEMORY.md`.
 
 ## Next Safe Packet
 
-Add deterministic, explainable duplicate candidate signals between synthetic party records, without automatic matching, merge execution or scoring.
+Add synthetic invoice-transaction sample records and manually recorded explainable issues under the separate invoice-readiness domain, without imports, calculations or scoring.
 
 Keep it bounded:
 
-- Compare two different same-client party records through explicitly selected, deterministic signal types.
-- Retain the normalized comparison values, normalizer version, contribution explanation, recorder and timestamp.
-- Require a separate authorised human decision to confirm or dismiss a candidate, with reason and timestamp.
-- Preserve candidate signals and decisions as append-only evidence.
-- Do not automatically discover candidates, calculate a probability, merge records or calculate readiness.
+- Retain a stable synthetic transaction identity for one firm client and manually supplied sample field values with provenance.
+- Keep invoice-transaction issues linked only to published invoice-transaction rules.
+- Snapshot rule severity, behavior, explanation and remediation on each issue.
+- Require an independent authorised resolution or not-applicable decision.
+- Do not calculate VAT, totals, exchange rates, validity, compliance or readiness.
 - Do not add VAT or Corporate Tax formulas without approved sourced golden cases.
 - Keep import processing gated until conflict, reversal and retention decisions are approved.
 

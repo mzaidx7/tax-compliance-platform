@@ -6,11 +6,14 @@ namespace App\Livewire\Readiness\Parties;
 
 use App\Actions\Readiness\AddInitialPartyField;
 use App\Actions\Readiness\CreatePartyRecord;
+use App\Actions\Readiness\DecideDuplicateCandidate;
 use App\Actions\Readiness\DecidePartyFieldCorrection;
 use App\Actions\Readiness\ProposePartyFieldCorrection;
+use App\Actions\Readiness\RecordDuplicateCandidateSignal;
 use App\Actions\Readiness\RecordPartyIssue;
 use App\Actions\Readiness\ResolvePartyIssue;
 use App\Enums\ClientStatus;
+use App\Enums\DuplicateSignalType;
 use App\Enums\Feature;
 use App\Enums\PartyFieldKey;
 use App\Enums\PartyFieldVerificationState;
@@ -18,6 +21,7 @@ use App\Enums\ReadinessDataDomain;
 use App\Enums\RuleVersionStatus;
 use App\Models\Client;
 use App\Models\DataQualityRuleVersion;
+use App\Models\DuplicateCandidate;
 use App\Models\PartyCorrectionProposal;
 use App\Models\PartyFieldVersion;
 use App\Models\PartyIssue;
@@ -82,6 +86,26 @@ final class Index extends Component
     public string $resolutionOutcome = '';
 
     public string $resolutionReason = '';
+
+    public string $duplicateFirstPartyId = '';
+
+    public string $duplicateSecondPartyId = '';
+
+    public string $duplicateSignalType = 'exact_normalized_legal_name';
+
+    public string $duplicateFirstValue = '';
+
+    public string $duplicateSecondValue = '';
+
+    public string $duplicateNormalizerVersion = '';
+
+    public string $duplicateExplanation = '';
+
+    public string $duplicateCandidateId = '';
+
+    public string $duplicateOutcome = '';
+
+    public string $duplicateDecisionReason = '';
 
     public function mount(FeatureFlags $flags, FirmContext $context): void
     {
@@ -163,6 +187,37 @@ final class Index extends Component
         Flux::toast(variant: 'success', text: __('Party issue decision retained.'));
     }
 
+    public function recordDuplicateSignal(RecordDuplicateCandidateSignal $action): void
+    {
+        $result = $action->handle(
+            $this->user(),
+            PartyRecord::query()->findOrFail($this->duplicateFirstPartyId),
+            PartyRecord::query()->findOrFail($this->duplicateSecondPartyId),
+            $this->duplicateSignalType,
+            $this->duplicateFirstValue,
+            $this->duplicateSecondValue,
+            $this->duplicateNormalizerVersion,
+            $this->duplicateExplanation,
+        );
+        $this->duplicateCandidateId = $result['candidate']->id;
+        $this->reset('duplicateFirstValue', 'duplicateSecondValue', 'duplicateExplanation');
+        unset($this->duplicateCandidates);
+        Flux::toast(variant: 'success', text: __('Explainable duplicate signal retained.'));
+    }
+
+    public function decideDuplicate(DecideDuplicateCandidate $action): void
+    {
+        $action->handle(
+            $this->user(),
+            DuplicateCandidate::query()->findOrFail($this->duplicateCandidateId),
+            $this->duplicateOutcome,
+            $this->duplicateDecisionReason,
+        );
+        $this->reset('duplicateOutcome', 'duplicateDecisionReason');
+        unset($this->duplicateCandidates);
+        Flux::toast(variant: 'success', text: __('Duplicate candidate decision retained.'));
+    }
+
     /** @return Collection<int, Client> */
     #[Computed]
     public function clients(): Collection
@@ -196,6 +251,16 @@ final class Index extends Component
             ->get();
     }
 
+    /** @return Collection<int, DuplicateCandidate> */
+    #[Computed]
+    public function duplicateCandidates(): Collection
+    {
+        return DuplicateCandidate::query()
+            ->with(['firstParty.client', 'secondParty.client', 'signals', 'decision'])
+            ->orderByDesc('recorded_at')
+            ->get();
+    }
+
     /** @return list<PartyFieldKey> */
     public function fieldKeys(): array
     {
@@ -206,6 +271,12 @@ final class Index extends Component
     public function verificationStates(): array
     {
         return PartyFieldVerificationState::cases();
+    }
+
+    /** @return list<DuplicateSignalType> */
+    public function duplicateSignalTypes(): array
+    {
+        return DuplicateSignalType::cases();
     }
 
     public function render(): View
