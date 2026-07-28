@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ExportDownloadController;
 use App\Http\Controllers\FirmSelectionController;
 use App\Http\Controllers\FirmSwitchController;
 use App\Http\Controllers\InvitationAcceptanceController;
@@ -30,6 +31,8 @@ Route::middleware(['auth', 'verified', 'firm.context'])->group(function () {
     Route::livewire('members', MembersIndex::class)->name('members.index');
     Route::livewire('obligations', ObligationsIndex::class)->name('obligations.index');
     Route::livewire('audit', AuditIndex::class)->name('audit.index');
+    Route::get('exports/{exportAuditLog}/download', ExportDownloadController::class)
+        ->name('exports.download');
     Route::livewire('settings/features', SettingsFeatureFlags::class)->name('settings.features');
 });
 

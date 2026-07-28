@@ -9,6 +9,7 @@ use Carbon\CarbonImmutable;
 final readonly class ExportArtifact
 {
     public function __construct(
+        public string $auditLogId,
         public string $fileName,
         public string $logicalPath,
         public string $storedPath,

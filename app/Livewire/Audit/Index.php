@@ -11,7 +11,6 @@ use App\Models\AuditLog;
 use App\Models\User;
 use App\Support\FeatureFlags;
 use App\Tenancy\FirmContext;
-use Flux\Flux;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Contracts\View\View;
@@ -106,13 +105,13 @@ final class Index extends Component
         );
     }
 
-    public function exportRegister(ExportAuditRegister $exportAuditRegister): void
+    public function exportRegister(ExportAuditRegister $exportAuditRegister): mixed
     {
         $artifact = $exportAuditRegister->handle($this->currentUser(), $this->filters());
 
-        Flux::toast(
-            variant: 'success',
-            text: "Exported {$artifact->rowCount} retained records. The download was recorded separately.",
+        return redirect()->route(
+            'exports.download',
+            ['exportAuditLog' => $artifact->auditLogId],
         );
     }
 

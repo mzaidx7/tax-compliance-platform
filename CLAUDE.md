@@ -19,13 +19,13 @@ Treat the master plan as canonical scope and `MEMORY.md` as the current implemen
 ## Current State
 
 - Stage 3 compliance walking skeleton is active.
-- Build Packet 31 is complete.
+- Build Packet 32 is complete.
 - Work assignment, append-only reassignment, immutable workflow versions, pinned checklists, checklist completion evidence, checklist-gated review submission, reviewer return and approval decisions and explicit audited workflow-version migration are implemented.
 - Every work item is pinned to a published firm-owned workflow definition and checklist version.
 - Moving from `in_preparation` to `under_review` requires retained completion evidence for every required item on the pinned checklist.
 - Only the currently assigned reviewer may approve or return work submitted for review, through a dedicated action separate from the generic transition tool.
 - A manager may move one open work item to a later published workflow version through an explicit audited action. Publishing a later version never repins existing work.
-- Append-only history is enforced by Eloquent model events and by database triggers on `work_item_transitions`, `filing_record_transitions`, `payment_record_transitions` and `audit_logs`.
+- Append-only history is enforced by Eloquent model events and by database triggers on audit, workflow, assignment, checklist, filing, payment, tax and risk history.
 - Filing records exist with their own lifecycle, gated by the named `manage_filings` permission, and never read or write work status.
 - Payment records exist with their own lifecycle, gated by the named `manage_payments` permission, and never read or write work or filing status.
 - Work, filing and payment state are three independent stored dimensions.
@@ -34,7 +34,7 @@ Treat the master plan as canonical scope and `MEMORY.md` as the current implemen
 - Tax records exist as a fourth independent dimension with retained figures, a draft or final lifecycle and append-only amendment history, gated by the named `manage_tax_records` permission; the platform infers no statutory amount.
 - Work items carry a stored, independently-changeable risk status (unassessed, low, medium, high) with append-only history; no automated risk inference exists.
 - Assignment history and checklist completion evidence are protected against both Eloquent and raw database mutation. Controlled-reopen rollback refuses to remove its schema when linked follow-up work exists and requires a forward recovery migration instead.
-- The audit register can be exported through `ExportAuditRegister`, which shares one filter object with the viewer and records each download as its own audited action. No browser download route exists yet.
+- The audit register can be exported through `ExportAuditRegister`; its browser download resolves only an immutable firm-scoped export record, verifies the private artifact checksum and size, and records retrieval separately.
 - Completed work can be corrected through `ReopenWorkItem`, which creates a linked follow-up and never changes the original. An obligation keeps one primary work item plus any number of follow-ups.
 - Two operational notification templates exist, `work_item_high_risk` and `payment_overdue`, both fired only by an explicit recorded change and addressed to the current responsible manager.
 - Regulated-rule generation modules are not implemented.
@@ -42,13 +42,13 @@ Treat the master plan as canonical scope and `MEMORY.md` as the current implemen
 
 ## Next Safe Packet
 
-Add an authorized, audited download route for stored export artifacts.
+Add a follow-up aware work register view that groups an obligation's primary work and linked follow-ups.
 
 Keep it bounded:
 
-- Add a route that streams an artifact from tenant-private storage, resolving it through the active firm so one firm can never read another firm's file.
-- Restrict access to the permission that produced the artifact, and reject any path that is not a known stored export.
-- Record every retrieval as its own audited action, distinct from the export creation record.
+- Reuse existing obligation and work-item records. Do not introduce a second work state.
+- Display one primary work item with its linked follow-ups in chronological order.
+- Preserve firm scoping, existing work permissions and the distinction between completed original work and open corrective follow-up work.
 - Do not expose a public URL, do not make the private disk servable and do not add a deletion path.
 - Add backend, tenant-isolation and route tests.
 - Update `TENANCY.md`, this file and `MEMORY.md`.

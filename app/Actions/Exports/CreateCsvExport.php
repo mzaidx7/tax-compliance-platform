@@ -68,11 +68,12 @@ final readonly class CreateCsvExport
             $createdAt = Date::now()->toImmutable();
 
             try {
-                $this->recordAudit->handle(
+                $auditLog = $this->recordAudit->handle(
                     action: 'firm.export.created',
                     actor: $actor,
                     after: [
                         'file_name' => $fileName,
+                        'logical_path' => $logicalPath,
                         'stored_path' => $storedPath,
                         'sha256' => $sha256,
                         'bytes' => $result->bytes,
@@ -93,6 +94,7 @@ final readonly class CreateCsvExport
             }
 
             return new ExportArtifact(
+                auditLogId: $auditLog->id,
                 fileName: $fileName,
                 logicalPath: $logicalPath,
                 storedPath: $storedPath,

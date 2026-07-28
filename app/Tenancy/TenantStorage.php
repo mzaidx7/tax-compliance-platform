@@ -63,6 +63,20 @@ final readonly class TenantStorage
         return $contents;
     }
 
+    /**
+     * @return resource
+     */
+    public function readStream(string $path)
+    {
+        $stream = $this->disk()->readStream($this->path($path));
+
+        if (! is_resource($stream)) {
+            throw new RuntimeException('The tenant file stream could not be opened.');
+        }
+
+        return $stream;
+    }
+
     public function exists(string $path): bool
     {
         return $this->disk()->exists($this->path($path));

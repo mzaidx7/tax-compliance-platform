@@ -143,11 +143,13 @@ final class AuditRegisterExportTest extends TestCase
         $fixture = $this->fixture();
         $this->recordAudit($fixture, 'client.created', 'Synthetic Livewire export subject.');
 
-        Livewire::actingAs($fixture['admin'])
+        $component = Livewire::actingAs($fixture['admin'])
             ->test(Index::class)
             ->call('exportRegister')
             ->assertHasNoErrors();
 
+        $export = AuditLog::query()->where('action', 'firm.export.created')->sole();
+        $component->assertRedirect(route('exports.download', $export->id));
         $this->assertDatabaseHas('audit_logs', ['action' => 'audit_register.exported']);
     }
 
