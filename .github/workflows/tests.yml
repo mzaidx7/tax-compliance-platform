@@ -84,13 +84,21 @@ jobs:
         continue-on-error: true
         run: php artisan test --compact tests/Feature/Readiness tests/Feature/Workflows tests/Unit
 
-      - name: Enforce automated test results
-        if: always()
-        run: |
-          test "${{ steps.test-entry.outcome }}" = "success"
-          test "${{ steps.test-boundaries.outcome }}" = "success"
-          test "${{ steps.test-compliance.outcome }}" = "success"
-          test "${{ steps.test-workflows.outcome }}" = "success"
+      - name: Enforce application entry and account tests
+        if: always() && steps.test-entry.outcome != 'success'
+        run: exit 1
+
+      - name: Enforce tenancy and platform boundary tests
+        if: always() && steps.test-boundaries.outcome != 'success'
+        run: exit 1
+
+      - name: Enforce compliance operation tests
+        if: always() && steps.test-compliance.outcome != 'success'
+        run: exit 1
+
+      - name: Enforce workflow and readiness foundation tests
+        if: always() && steps.test-workflows.outcome != 'success'
+        run: exit 1
 
       - name: Build production assets
         run: npm run build
