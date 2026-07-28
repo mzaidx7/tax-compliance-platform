@@ -62,6 +62,9 @@
                                 <flux:sidebar.item icon="book-open" :href="route('rules.index')" :current="request()->routeIs('rules.*')" wire:navigate>
                                     {{ __('Rule governance') }}
                                 </flux:sidebar.item>
+                                <flux:sidebar.item icon="sparkles" :href="route('generation.index')" :current="request()->routeIs('generation.*')" wire:navigate>
+                                    {{ __('Generation preview') }}
+                                </flux:sidebar.item>
                             @endcan
 
                             @can('viewAny', \App\Models\WorkItem::class)

@@ -9,6 +9,7 @@ use App\Livewire\Audit\Index as AuditIndex;
 use App\Livewire\Clients\Index as ClientsIndex;
 use App\Livewire\Dashboard\Index as DashboardIndex;
 use App\Livewire\Documents\Index as DocumentsIndex;
+use App\Livewire\Generation\Index as GenerationIndex;
 use App\Livewire\Members\Index as MembersIndex;
 use App\Livewire\Obligations\Index as ObligationsIndex;
 use App\Livewire\Rules\Index as RulesIndex;
@@ -37,6 +38,7 @@ Route::middleware(['auth', 'verified', 'firm.context'])->group(function () {
     Route::livewire('members', MembersIndex::class)->name('members.index');
     Route::livewire('obligations', ObligationsIndex::class)->name('obligations.index');
     Route::livewire('rules', RulesIndex::class)->name('rules.index');
+    Route::livewire('generation', GenerationIndex::class)->name('generation.index');
     Route::livewire('work', WorkItemsIndex::class)->name('work-items.index');
     Route::livewire('audit', AuditIndex::class)->name('audit.index');
     Route::get('exports/{exportAuditLog}/download', ExportDownloadController::class)

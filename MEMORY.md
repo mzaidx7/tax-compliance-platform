@@ -9,13 +9,13 @@
 - Platform repository status: independent repository on `main`, remote `mzaidx7/tax-compliance-platform`
 - Parent repository status for this directory: separate nested repository, outside website delivery
 - Current phase: Stage 4, client and data foundation
-- Current milestone: Obligation rule governance packet completed
+- Current milestone: Governed obligation generation packet completed
 
 ## Current Objective
 
 Create a UAE-focused compliance operations and e-invoicing readiness platform under a TBT subdomain while keeping its application, data, deployment and release lifecycle separate from the public TBT website.
 
-The immediate objective is previewable, idempotent manual-date obligation generation from published governed rules. Import processing remains gated on product-owner decisions for conflict handling, reversal and retention.
+The immediate objective is explicit append-only deadline overrides that preserve original generated or manual dates. Import processing remains gated on product-owner decisions for conflict handling, reversal and retention.
 
 ## Canonical Files
 
@@ -177,7 +177,7 @@ The immediate objective is previewable, idempotent manual-date obligation genera
 - Laravel Pint check passed.
 - Larastan passed with zero errors.
 - Full workflow feature suite (`tests/Feature/Workflows`, including checklist, transition, reviewer-decision and workflow-version migration tests) passed with no failures.
-- PHPUnit passed 384 tests with 1,158 assertions after Build Packet 39.
+- PHPUnit passed 394 tests with 1,189 assertions after Build Packet 40.
 - Database triggers were verified to reject raw query-builder updates and deletes on `work_item_transitions`, which Eloquent model events alone do not cover.
 - Vite production build passed.
 - All 24 migrations and seven synthetic domain seeders passed in an isolated temporary database.
@@ -297,4 +297,4 @@ Start by reading `AGENTS.md` and the master plan. Reconcile this file against Gi
 - Implemented and verified payment records (`PaymentStatus`, `PaymentRecord`, `PaymentRecordTransition`, `CreatePaymentRecord`, `TransitionPaymentRecord`, `PaymentRecordPolicy`, named `manage_payments` permission) with one payment per obligation, opening states limited to not required, unknown or pending, a terminal paid state requiring a retained reference and settlement date, append-only transition history protected by Eloquent events and database triggers, `payment_record.created` and `payment_record.status_transitioned` audit evidence, and a Livewire payment interface. Payment state never reads or writes work or filing status, and no transfer is ever initiated, authorised or confirmed.
 - Implemented and verified filing records (`FilingStatus`, `FilingRecord`, `FilingRecordTransition`, `CreateFilingRecord`, `TransitionFilingRecord`, `FilingRecordPolicy`, named `manage_filings` permission) with one filing per obligation, opening states limited to not required or not filed, required filing reference and filed date before authority outcome states, append-only transition history protected by Eloquent events and database triggers, `filing_record.created` and `filing_record.status_transitioned` audit evidence, and a Livewire filing interface. Filing state never reads or writes work status and no payment record, EmaraTax automation or authority transmission exists.
 - Implemented and verified explicit audited workflow-version migration (`MigrateWorkItemWorkflowVersion`) for one open work item to a later published version of the same workflow key, with a required reason, rejection of completed or cancelled work, rejection of a target version defining no transition from the current status, preserved transition, assignment and checklist history, append-only `work_item.workflow_version_migrated` audit evidence and a Livewire "Migrate version" interface.
-- Implemented and verified the Stage 4 client, document and rule-governance foundation: client profiles and metadata-only expiry tracking remain firm-scoped and append-only; governed obligation rules use immutable templates, draft-only content editing, configured official HTTPS sources, registered PHP calculator review gates, separate preparation and verification, database-enforced draft to review to approved to published lifecycle, supersession and retirement. The sole registered manual-date passthrough explicitly performs no statutory calculation, and no governed rule generates an obligation yet.
+- Implemented and verified the Stage 4 client, document and governed-obligation foundation: source-linked rules have controlled publication and immutable history; published manual-date rules now create persisted previews and committed generation runs with explicit client, service, applicability and period inputs, complete input, parameter and result snapshots, human-readable explanations and deterministic keys. Same-input reruns return one obligation, changed inputs create a distinct obligation, superseded previews cannot commit, and database triggers prevent run or issued snapshot rewrites. No regulated VAT or Corporate Tax formula exists.

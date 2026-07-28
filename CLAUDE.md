@@ -19,7 +19,7 @@ Treat the master plan as canonical scope and `MEMORY.md` as the current implemen
 ## Current State
 
 - Stage 3 compliance walking skeleton is active.
-- Build Packet 39 is complete.
+- Build Packet 40 is complete.
 - Work assignment, append-only reassignment, immutable workflow versions, pinned checklists, checklist completion evidence, checklist-gated review submission, reviewer return and approval decisions and explicit audited workflow-version migration are implemented.
 - Every work item is pinned to a published firm-owned workflow definition and checklist version.
 - Moving from `in_preparation` to `under_review` requires retained completion evidence for every required item on the pinned checklist.
@@ -43,22 +43,23 @@ Treat the master plan as canonical scope and `MEMORY.md` as the current implemen
 - Client contacts retain an explicit purpose and preferred channel without copying personal details into audit payloads. Client and service status changes require a reason, create append-only history and audit evidence, and never occur from dates or other inferred state.
 - Document expiry uses immutable firm-owned type versions, metadata-only client records, renewal chains and idempotent firm-local reminder generation. It stores no client document file and derives no validity or compliance conclusion.
 - Obligation rule governance has stable immutable templates, draft-only content editing, source-linked versions, registered-calculator review gating, separate preparer and verifier identities, database-enforced lifecycle order and append-only events. The only registered calculator passes through a manually supplied date and explicitly performs no statutory calculation.
+- Governed obligation generation requires a persisted preview, published rule, explicit client, service, applicability date and compliance-period label or actual tax period. Preview and committed runs are immutable, deterministic reruns return the same obligation, changed inputs create a new obligation, and no issued obligation is overwritten.
 - Two operational notification templates exist, `work_item_high_risk` and `payment_overdue`, both fired only by an explicit recorded change and addressed to the current responsible manager.
 - Regulated-rule generation modules are not implemented.
 - The full current verification baseline is recorded in `MEMORY.md`.
 
 ## Next Safe Packet
 
-Add previewable and idempotent manual-date obligation generation from published governed rules.
+Add explicit, reason-required manual deadline overrides without rewriting calculated snapshots.
 
 Keep it bounded:
 
-- Add immutable generation runs with preview and committed states.
-- Require a published rule version, explicit client and supplied calculator inputs.
-- Persist validated input, parameter, result and explanation snapshots plus a deterministic generation key.
-- Make reruns return the same generated obligation rather than duplicate it.
-- Never overwrite or silently supersede an existing obligation.
-- Do not add VAT or Corporate Tax formulas.
+- Add append-only override records retaining old date, new date, actor, reason and timestamp.
+- Keep the original calculated or manually entered due date immutable in its source snapshot.
+- Expose effective due date separately from original due date.
+- Reject no-op, unauthorised and cross-firm overrides.
+- Do not silently regenerate, supersede or mutate an obligation.
+- Do not add VAT or Corporate Tax formulas without approved sourced golden cases.
 - Keep import processing gated until conflict, reversal and retention decisions are approved.
 
 ## Local Commands

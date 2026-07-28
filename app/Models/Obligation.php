@@ -21,6 +21,15 @@ use Illuminate\Support\Carbon;
  * @property string $id
  * @property string $firm_id
  * @property string $client_id
+ * @property string|null $client_service_enrollment_id
+ * @property string|null $tax_period_id
+ * @property string|null $obligation_rule_version_id
+ * @property string|null $generation_run_id
+ * @property string|null $generation_key
+ * @property array<string, mixed>|null $calculation_input_snapshot
+ * @property array<string, mixed>|null $calculation_parameter_snapshot
+ * @property array<string, mixed>|null $calculation_result_snapshot
+ * @property string|null $calculation_explanation
  * @property string $obligation_type
  * @property string|null $period_label
  * @property Carbon $statutory_due_date
@@ -39,6 +48,15 @@ use Illuminate\Support\Carbon;
  */
 #[Fillable([
     'client_id',
+    'client_service_enrollment_id',
+    'tax_period_id',
+    'obligation_rule_version_id',
+    'generation_run_id',
+    'generation_key',
+    'calculation_input_snapshot',
+    'calculation_parameter_snapshot',
+    'calculation_result_snapshot',
+    'calculation_explanation',
     'obligation_type',
     'period_label',
     'statutory_due_date',
@@ -55,12 +73,64 @@ final class Obligation extends Model
     /** @use HasFactory<ObligationFactory> */
     use BelongsToFirm, HasFactory, HasUlids;
 
+    /** @var list<string> */
+    private const GENERATED_SNAPSHOT_FIELDS = [
+        'client_id',
+        'client_service_enrollment_id',
+        'tax_period_id',
+        'obligation_rule_version_id',
+        'generation_run_id',
+        'generation_key',
+        'calculation_input_snapshot',
+        'calculation_parameter_snapshot',
+        'calculation_result_snapshot',
+        'calculation_explanation',
+        'statutory_due_date',
+        'internal_target_date',
+    ];
+
+    protected static function booted(): void
+    {
+        self::updating(function (self $obligation): void {
+            if (
+                $obligation->getRawOriginal('origin') === ObligationOrigin::GovernedRule->value
+                && $obligation->isDirty(self::GENERATED_SNAPSHOT_FIELDS)
+            ) {
+                throw new \LogicException('Generated obligation snapshots are immutable.');
+            }
+        });
+    }
+
     /**
      * @return BelongsTo<Client, $this>
      */
     public function client(): BelongsTo
     {
         return $this->belongsTo(Client::class);
+    }
+
+    /** @return BelongsTo<ClientServiceEnrollment, $this> */
+    public function serviceEnrollment(): BelongsTo
+    {
+        return $this->belongsTo(ClientServiceEnrollment::class, 'client_service_enrollment_id');
+    }
+
+    /** @return BelongsTo<TaxPeriod, $this> */
+    public function taxPeriod(): BelongsTo
+    {
+        return $this->belongsTo(TaxPeriod::class);
+    }
+
+    /** @return BelongsTo<ObligationRuleVersion, $this> */
+    public function ruleVersion(): BelongsTo
+    {
+        return $this->belongsTo(ObligationRuleVersion::class, 'obligation_rule_version_id');
+    }
+
+    /** @return BelongsTo<ObligationGenerationRun, $this> */
+    public function generationRun(): BelongsTo
+    {
+        return $this->belongsTo(ObligationGenerationRun::class, 'generation_run_id');
     }
 
     /**
@@ -138,6 +208,9 @@ final class Obligation extends Model
             'statutory_due_date' => 'date',
             'internal_target_date' => 'date',
             'last_verified_on' => 'date',
+            'calculation_input_snapshot' => 'array',
+            'calculation_parameter_snapshot' => 'array',
+            'calculation_result_snapshot' => 'array',
             'origin' => ObligationOrigin::class,
             'status' => ObligationStatus::class,
         ];

@@ -495,3 +495,16 @@ Rule governance records are firm-owned and do not alter existing obligations:
 - Lifecycle order is draft, under review, approved, published, then superseded or retired. Database triggers reject skipped states, post-review content rewrites, deletion and lifecycle-history mutation.
 - Publishing a later version supersedes the prior published version without changing either version's content or any existing obligation.
 - `manual_date_passthrough` is the only registered calculator. It validates and returns a human-supplied date with an explanation that no statutory calculation was performed.
+
+## Governed Obligation Generation
+
+Generation is a preview-first tenant-owned operation:
+
+- A preview requires a published rule version, client, service enrollment, explicit applicability date, explicit compliance-period label and optional actual tax period from the same firm.
+- The selected service and optional tax period must belong to the client and cover the supplied applicability date. The system never infers a client period or service.
+- The deterministic key covers firm, client, service, optional tax period, rule version, canonical input snapshot and validated parameter snapshot.
+- One deterministic input has one preview run, one committed run and one generated obligation. Repeating it returns the same records; changing an input produces a distinct key and record.
+- Preview and committed runs are immutable. A committed obligation retains the run, rule, service, period, input, parameter, result, explanation and due-date snapshots.
+- A preview cannot commit after its rule is superseded or retired. The operator must create a new preview.
+- Generated snapshot fields reject model and raw database mutation. Independent obligation workflow status may still change through its own controlled boundary.
+- Generation never modifies, replaces or silently supersedes another issued obligation.
