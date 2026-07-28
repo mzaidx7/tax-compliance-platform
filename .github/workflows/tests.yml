@@ -58,8 +58,14 @@ jobs:
       - name: Install frontend dependencies
         run: npm ci
 
-      - name: Run backend checks
-        run: composer ci:check
+      - name: Check PHP formatting
+        run: composer lint:check
+
+      - name: Run static analysis
+        run: composer types:check
+
+      - name: Run automated tests
+        run: php artisan test --compact
 
       - name: Build production assets
         run: npm run build
