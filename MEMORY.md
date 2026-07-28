@@ -9,13 +9,13 @@
 - Platform repository status: independent repository on `main`, remote `mzaidx7/tax-compliance-platform`
 - Parent repository status for this directory: separate nested repository, outside website delivery
 - Current phase: Stage 4, client and data foundation
-- Current milestone: Client service and tax profile packet completed
+- Current milestone: Client contacts and lifecycle packet completed
 
 ## Current Objective
 
 Create a UAE-focused compliance operations and e-invoicing readiness platform under a TBT subdomain while keeping its application, data, deployment and release lifecycle separate from the public TBT website.
 
-The immediate objective is a bounded client contacts and audited lifecycle-transition packet. Import processing remains gated on product-owner decisions for conflict handling, reversal and retention.
+The immediate objective is bounded client document metadata and expiry tracking with no sensitive identity-document scans. Import processing remains gated on product-owner decisions for conflict handling, reversal and retention.
 
 ## Canonical Files
 
@@ -177,7 +177,7 @@ The immediate objective is a bounded client contacts and audited lifecycle-trans
 - Laravel Pint check passed.
 - Larastan passed with zero errors.
 - Full workflow feature suite (`tests/Feature/Workflows`, including checklist, transition, reviewer-decision and workflow-version migration tests) passed with no failures.
-- PHPUnit passed 355 tests with 1,089 assertions after Build Packet 36.
+- PHPUnit passed 363 tests with 1,107 assertions after Build Packet 37.
 - Database triggers were verified to reject raw query-builder updates and deletes on `work_item_transitions`, which Eloquent model events alone do not cover.
 - Vite production build passed.
 - All 24 migrations and seven synthetic domain seeders passed in an isolated temporary database.
@@ -297,4 +297,4 @@ Start by reading `AGENTS.md` and the master plan. Reconcile this file against Gi
 - Implemented and verified payment records (`PaymentStatus`, `PaymentRecord`, `PaymentRecordTransition`, `CreatePaymentRecord`, `TransitionPaymentRecord`, `PaymentRecordPolicy`, named `manage_payments` permission) with one payment per obligation, opening states limited to not required, unknown or pending, a terminal paid state requiring a retained reference and settlement date, append-only transition history protected by Eloquent events and database triggers, `payment_record.created` and `payment_record.status_transitioned` audit evidence, and a Livewire payment interface. Payment state never reads or writes work or filing status, and no transfer is ever initiated, authorised or confirmed.
 - Implemented and verified filing records (`FilingStatus`, `FilingRecord`, `FilingRecordTransition`, `CreateFilingRecord`, `TransitionFilingRecord`, `FilingRecordPolicy`, named `manage_filings` permission) with one filing per obligation, opening states limited to not required or not filed, required filing reference and filed date before authority outcome states, append-only transition history protected by Eloquent events and database triggers, `filing_record.created` and `filing_record.status_transitioned` audit evidence, and a Livewire filing interface. Filing state never reads or writes work status and no payment record, EmaraTax automation or authority transmission exists.
 - Implemented and verified explicit audited workflow-version migration (`MigrateWorkItemWorkflowVersion`) for one open work item to a later published version of the same workflow key, with a required reason, rejection of completed or cancelled work, rejection of a target version defining no transition from the current status, preserved transition, assignment and checklist history, append-only `work_item.workflow_version_migrated` audit evidence and a Livewire "Migrate version" interface.
-- Implemented and verified the client service and tax profile foundation (`ClientServiceEnrollment`, `TaxRegistration`, `TaxPeriod`, their create actions and client-profile Livewire controls) with explicit responsible active members, retained registration facts, actual non-overlapping periods, strict firm scoping, permission checks and audit evidence. No service, registration or period is inferred, and registration identifiers are omitted from audit payloads.
+- Implemented and verified the Stage 4 client-master foundation: service enrollments with explicit responsible active members, retained tax registrations, actual non-overlapping periods, client contacts with explicit purpose and preferred channel, and reason-required client and service lifecycle transitions. Lifecycle histories are append-only at model and database layers; contact details and registration identifiers are omitted from audit payloads; no profile or status fact is inferred.

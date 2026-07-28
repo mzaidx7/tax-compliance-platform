@@ -184,6 +184,77 @@ FORM: Continuous identity ledger with a compact creation station.
             </div>
 
             @if ($this->selectedClient)
+                <section aria-labelledby="client-contacts-heading" class="grid gap-6 border-y border-white/8 py-6 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)]">
+                    <div>
+                        <div class="flex items-center justify-between gap-3">
+                            <div>
+                                <h3 id="client-contacts-heading" class="text-sm font-semibold text-zinc-100">{{ __('Contacts') }}</h3>
+                                <p class="mt-1 text-xs text-zinc-500">{{ __('Purpose and preferred channel are stored explicitly.') }}</p>
+                            </div>
+                            <span class="text-xs text-zinc-500">{{ $this->selectedClient->contacts->count() }} {{ __('recorded') }}</span>
+                        </div>
+
+                        <div class="mt-3 grid gap-2 sm:grid-cols-2">
+                            @forelse ($this->selectedClient->contacts as $contact)
+                                <div class="rounded-xl bg-white/[0.025] p-3 ring-1 ring-white/8">
+                                    <p class="text-sm font-medium text-zinc-200">{{ $contact->name }}</p>
+                                    <p class="mt-1 text-xs text-zinc-500">{{ $contact->purpose->label() }} / {{ $contact->preferred_channel->label() }}</p>
+                                    <p class="mt-2 text-xs text-zinc-400">
+                                        {{ $contact->preferred_channel->value === 'email' ? $contact->email : $contact->phone }}
+                                    </p>
+                                </div>
+                            @empty
+                                <p class="text-sm text-zinc-500">{{ __('No client contacts recorded.') }}</p>
+                            @endforelse
+                        </div>
+
+                        <form wire:submit="addContact" class="mt-5 grid gap-4 sm:grid-cols-2">
+                            <flux:input wire:model="contactName" :label="__('Contact name')" maxlength="255" required />
+                            <flux:input wire:model="contactPosition" :label="__('Position')" maxlength="100" />
+                            <flux:select wire:model="contactPurpose" :label="__('Purpose')" required>
+                                @foreach ($this->contactPurposes as $purpose)
+                                    <flux:select.option :value="$purpose->value">{{ $purpose->label() }}</flux:select.option>
+                                @endforeach
+                            </flux:select>
+                            <flux:select wire:model="contactPreferredChannel" :label="__('Preferred channel')" required>
+                                @foreach ($this->contactChannels as $channel)
+                                    <flux:select.option :value="$channel->value">{{ $channel->label() }}</flux:select.option>
+                                @endforeach
+                            </flux:select>
+                            <flux:input type="email" wire:model="contactEmail" :label="__('Email')" autocomplete="email" />
+                            <flux:input wire:model="contactPhone" :label="__('Phone')" autocomplete="tel" maxlength="32" />
+                            <flux:button type="submit" variant="filled" class="sm:col-span-2">{{ __('Add contact') }}</flux:button>
+                        </form>
+                    </div>
+
+                    <div>
+                        <h3 class="text-sm font-semibold text-zinc-100">{{ __('Client lifecycle') }}</h3>
+                        <p class="mt-1 text-xs text-zinc-500">{{ __('Every status change requires a reason and is retained.') }}</p>
+                        <form wire:submit="transitionClient" class="mt-4 space-y-4">
+                            <flux:select wire:model="clientStatus" :label="__('New client status')" required>
+                                @foreach ($this->clientStatuses as $status)
+                                    <flux:select.option :value="$status->value">{{ $status->label() }}</flux:select.option>
+                                @endforeach
+                            </flux:select>
+                            <flux:textarea wire:model="clientStatusReason" :label="__('Reason')" maxlength="500" required />
+                            <flux:button type="submit" variant="ghost" class="w-full">{{ __('Record status change') }}</flux:button>
+                        </form>
+
+                        <ol class="mt-5 space-y-2">
+                            @forelse ($this->selectedClient->statusChanges->sortByDesc('changed_at') as $change)
+                                <li class="text-xs leading-5 text-zinc-500">
+                                    <span class="text-zinc-300">{{ $change->previous_status->label() }}</span>
+                                    {{ __('to') }}
+                                    <span class="text-zinc-300">{{ $change->new_status->label() }}</span>
+                                    / {{ $change->actor->name }} / {{ $change->changed_at->format('d M Y') }}
+                                </li>
+                            @empty
+                                <li class="text-xs text-zinc-500">{{ __('No lifecycle changes recorded.') }}</li>
+                            @endforelse
+                        </ol>
+                    </div>
+                </section>
+
                 <div class="grid gap-8 lg:grid-cols-2">
                     <section aria-labelledby="service-enrollment-heading">
                         <h3 id="service-enrollment-heading" class="text-sm font-semibold text-zinc-100">{{ __('Service enrollments') }}</h3>
@@ -222,6 +293,27 @@ FORM: Continuous identity ledger with a compact creation station.
                             <flux:input type="date" wire:model="serviceEndsOn" :label="__('Ends on')" />
                             <flux:button type="submit" variant="filled" class="sm:col-span-2">{{ __('Add service enrollment') }}</flux:button>
                         </form>
+
+                        @if ($this->selectedClient->serviceEnrollments->where('status', '!=', \App\Enums\ServiceEnrollmentStatus::Ended)->isNotEmpty())
+                            <form wire:submit="transitionService" class="mt-6 grid gap-4 sm:grid-cols-2">
+                                <flux:select wire:model="serviceEnrollmentId" :label="__('Service enrollment')" required>
+                                    <flux:select.option value="">{{ __('Select service') }}</flux:select.option>
+                                    @foreach ($this->selectedClient->serviceEnrollments as $enrollment)
+                                        @if ($enrollment->status !== \App\Enums\ServiceEnrollmentStatus::Ended)
+                                            <flux:select.option :value="$enrollment->id">{{ $enrollment->service->label() }} / {{ $enrollment->status->label() }}</flux:select.option>
+                                        @endif
+                                    @endforeach
+                                </flux:select>
+                                <flux:select wire:model="serviceStatus" :label="__('New status')" required>
+                                    @foreach ($this->serviceStatuses as $status)
+                                        <flux:select.option :value="$status->value">{{ $status->label() }}</flux:select.option>
+                                    @endforeach
+                                </flux:select>
+                                <flux:input type="date" wire:model="serviceStatusEffectiveOn" :label="__('Effective on')" required />
+                                <flux:textarea wire:model="serviceStatusReason" :label="__('Reason')" maxlength="500" required />
+                                <flux:button type="submit" variant="ghost" class="sm:col-span-2">{{ __('Record service status') }}</flux:button>
+                            </form>
+                        @endif
                     </section>
 
                     <section aria-labelledby="tax-registration-heading">

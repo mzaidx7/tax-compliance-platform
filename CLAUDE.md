@@ -19,7 +19,7 @@ Treat the master plan as canonical scope and `MEMORY.md` as the current implemen
 ## Current State
 
 - Stage 3 compliance walking skeleton is active.
-- Build Packet 36 is complete.
+- Build Packet 37 is complete.
 - Work assignment, append-only reassignment, immutable workflow versions, pinned checklists, checklist completion evidence, checklist-gated review submission, reviewer return and approval decisions and explicit audited workflow-version migration are implemented.
 - Every work item is pinned to a published firm-owned workflow definition and checklist version.
 - Moving from `in_preparation` to `under_review` requires retained completion evidence for every required item on the pinned checklist.
@@ -40,20 +40,22 @@ Treat the master plan as canonical scope and `MEMORY.md` as the current implemen
 - The firm dashboard derives separate due-soon, overdue, high-risk and overdue-payment measures from stored firm-scoped records without calculating a compliance score.
 - Document evidence is immutable, firm-scoped, private and fail-closed: unconfigured scanning quarantines, infected payloads are removed, and only checksum-verified clean evidence can be downloaded.
 - Client profiles retain explicit service enrollments with a responsible active firm member, tax registrations and actual non-overlapping tax periods. These records are firm-scoped, permission-gated and audited, and no period or registration is inferred.
+- Client contacts retain an explicit purpose and preferred channel without copying personal details into audit payloads. Client and service status changes require a reason, create append-only history and audit evidence, and never occur from dates or other inferred state.
 - Two operational notification templates exist, `work_item_high_risk` and `payment_overdue`, both fired only by an explicit recorded change and addressed to the current responsible manager.
 - Regulated-rule generation modules are not implemented.
 - The full current verification baseline is recorded in `MEMORY.md`.
 
 ## Next Safe Packet
 
-Add client contacts and explicit audited client and service lifecycle transitions.
+Add configurable client document metadata and expiry tracking without storing sensitive identity-document scans.
 
 Keep it bounded:
 
-- Add firm-scoped client contacts without sensitive identity-document scans.
-- Add explicit client status and service-enrollment transition actions with retained reasons and history.
-- Keep tax registrations and periods as separately stored facts.
-- Do not infer status changes from dates or other records.
+- Add firm-scoped document types with explicit expiry behavior.
+- Add client document metadata with supplied issue and expiry dates only.
+- Add a read-only expiry register that distinguishes stored upcoming and overdue dates.
+- Do not upload passports, Emirates IDs or other sensitive identity-document scans.
+- Do not infer document validity or regulatory compliance.
 - Keep import processing gated until conflict, reversal and retention decisions are approved.
 
 ## Local Commands

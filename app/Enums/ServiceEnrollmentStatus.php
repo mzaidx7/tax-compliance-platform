@@ -14,4 +14,14 @@ enum ServiceEnrollmentStatus: string
     {
         return ucfirst($this->value);
     }
+
+    /** @return list<self> */
+    public function allowedTargets(): array
+    {
+        return match ($this) {
+            self::Active => [self::Paused, self::Ended],
+            self::Paused => [self::Active, self::Ended],
+            self::Ended => [],
+        };
+    }
 }

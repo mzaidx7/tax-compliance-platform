@@ -467,3 +467,6 @@ Client profile records are tenant-owned facts:
 - Creation requires trusted active firm context, the compliance-operations feature and authorization for the client.
 - Every create action writes append-only audit evidence. Registration identifiers are excluded from audit payloads.
 - Composite foreign keys and global firm scopes enforce the tenant boundary, with negative cross-firm tests.
+- Client contacts belong to the same firm and client, and retain an explicit purpose and preferred channel. Audit metadata records only the contact record id, purpose and channel, not the name, email or phone.
+- Client and service status changes are explicit reason-required actions. Their history tables reject update and deletion through both model guards and database triggers.
+- An ended service enrollment is terminal. Dates never pause, resume or end an enrollment automatically.

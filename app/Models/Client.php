@@ -58,6 +58,18 @@ final class Client extends Model
         return $this->hasMany(Obligation::class);
     }
 
+    /** @return HasMany<ClientContact, $this> */
+    public function contacts(): HasMany
+    {
+        return $this->hasMany(ClientContact::class);
+    }
+
+    /** @return HasMany<ClientStatusChange, $this> */
+    public function statusChanges(): HasMany
+    {
+        return $this->hasMany(ClientStatusChange::class);
+    }
+
     /** @return HasMany<ClientServiceEnrollment, $this> */
     public function serviceEnrollments(): HasMany
     {

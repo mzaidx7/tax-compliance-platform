@@ -4,13 +4,20 @@ declare(strict_types=1);
 
 namespace App\Livewire\Clients;
 
+use App\Actions\Clients\AddClientContact;
 use App\Actions\Clients\AddClientServiceEnrollment;
 use App\Actions\Clients\AddTaxPeriod;
 use App\Actions\Clients\AddTaxRegistration;
 use App\Actions\Clients\CreateClient;
+use App\Actions\Clients\TransitionClientServiceEnrollment;
+use App\Actions\Clients\TransitionClientStatus;
+use App\Enums\ClientContactPurpose;
 use App\Enums\ClientService;
+use App\Enums\ClientStatus;
 use App\Enums\Feature;
 use App\Enums\FirmMembershipStatus;
+use App\Enums\PreferredContactChannel;
+use App\Enums\ServiceEnrollmentStatus;
 use App\Enums\TaxRegistrationStatus;
 use App\Enums\TaxType;
 use App\Models\Client;
@@ -59,6 +66,30 @@ final class Index extends Component
     public string $serviceEndsOn = '';
 
     public string $responsibleMembershipId = '';
+
+    public string $contactName = '';
+
+    public string $contactPosition = '';
+
+    public string $contactPurpose = ClientContactPurpose::Primary->value;
+
+    public string $contactPreferredChannel = PreferredContactChannel::Email->value;
+
+    public string $contactEmail = '';
+
+    public string $contactPhone = '';
+
+    public string $clientStatus = ClientStatus::Active->value;
+
+    public string $clientStatusReason = '';
+
+    public string $serviceEnrollmentId = '';
+
+    public string $serviceStatus = ServiceEnrollmentStatus::Paused->value;
+
+    public string $serviceStatusEffectiveOn = '';
+
+    public string $serviceStatusReason = '';
 
     public string $taxType = TaxType::Vat->value;
 
@@ -122,6 +153,8 @@ final class Index extends Component
         $this->selectedClientLabel = "{$client->internal_code} · {$client->legal_name}";
         $this->serviceStartsOn = today()->toDateString();
         $this->registrationEffectiveFrom = today()->toDateString();
+        $this->serviceStatusEffectiveOn = today()->toDateString();
+        $this->clientStatus = $client->status->value;
         $this->showProfileModal = true;
         unset($this->selectedClient);
     }
@@ -138,6 +171,50 @@ final class Index extends Component
             $this->responsibleMembershipId,
         );
         $this->reset('serviceEndsOn');
+        unset($this->selectedClient, $this->clients);
+    }
+
+    public function addContact(AddClientContact $action): void
+    {
+        $action->handle(
+            $this->currentUser(),
+            $this->selectedClientOrFail(),
+            $this->contactName,
+            $this->optional($this->contactPosition),
+            ClientContactPurpose::from($this->contactPurpose),
+            PreferredContactChannel::from($this->contactPreferredChannel),
+            $this->optional($this->contactEmail),
+            $this->optional($this->contactPhone),
+        );
+        $this->reset('contactName', 'contactPosition', 'contactEmail', 'contactPhone');
+        unset($this->selectedClient, $this->clients);
+    }
+
+    public function transitionClient(TransitionClientStatus $action): void
+    {
+        $action->handle(
+            $this->currentUser(),
+            $this->selectedClientOrFail(),
+            ClientStatus::from($this->clientStatus),
+            $this->clientStatusReason,
+        );
+        $this->reset('clientStatusReason');
+        unset($this->selectedClient, $this->clients);
+    }
+
+    public function transitionService(TransitionClientServiceEnrollment $action): void
+    {
+        $enrollment = $this->selectedClientOrFail()
+            ->serviceEnrollments()
+            ->findOrFail($this->serviceEnrollmentId);
+        $action->handle(
+            $this->currentUser(),
+            $enrollment,
+            ServiceEnrollmentStatus::from($this->serviceStatus),
+            $this->serviceStatusEffectiveOn,
+            $this->serviceStatusReason,
+        );
+        $this->reset('serviceEnrollmentId', 'serviceStatusReason');
         unset($this->selectedClient, $this->clients);
     }
 
@@ -213,7 +290,10 @@ final class Index extends Component
 
         return Client::query()
             ->with([
+                'contacts',
+                'statusChanges.actor',
                 'serviceEnrollments.responsibleMembership.user',
+                'serviceEnrollments.statusChanges.actor',
                 'taxRegistrations.periods',
             ])
             ->find($this->selectedClientId);
@@ -238,6 +318,34 @@ final class Index extends Component
     public function registrationStatuses(): array
     {
         return TaxRegistrationStatus::cases();
+    }
+
+    /** @return list<ClientContactPurpose> */
+    #[Computed]
+    public function contactPurposes(): array
+    {
+        return ClientContactPurpose::cases();
+    }
+
+    /** @return list<PreferredContactChannel> */
+    #[Computed]
+    public function contactChannels(): array
+    {
+        return PreferredContactChannel::cases();
+    }
+
+    /** @return list<ClientStatus> */
+    #[Computed]
+    public function clientStatuses(): array
+    {
+        return ClientStatus::cases();
+    }
+
+    /** @return list<ServiceEnrollmentStatus> */
+    #[Computed]
+    public function serviceStatuses(): array
+    {
+        return ServiceEnrollmentStatus::cases();
     }
 
     /** @return Collection<int, FirmMembership> */
@@ -289,6 +397,14 @@ final class Index extends Component
             'selectedClientLabel',
             'serviceEndsOn',
             'responsibleMembershipId',
+            'contactName',
+            'contactPosition',
+            'contactEmail',
+            'contactPhone',
+            'clientStatusReason',
+            'serviceEnrollmentId',
+            'serviceStatusReason',
+            'serviceStatusEffectiveOn',
             'registrationNumber',
             'registrationEffectiveTo',
             'periodRegistrationId',
@@ -297,6 +413,10 @@ final class Index extends Component
             'periodEndsOn',
         );
         $this->service = ClientService::VatCompliance->value;
+        $this->contactPurpose = ClientContactPurpose::Primary->value;
+        $this->contactPreferredChannel = PreferredContactChannel::Email->value;
+        $this->clientStatus = ClientStatus::Active->value;
+        $this->serviceStatus = ServiceEnrollmentStatus::Paused->value;
         $this->taxType = TaxType::Vat->value;
         $this->registrationStatus = TaxRegistrationStatus::Active->value;
         $this->resetErrorBag();
