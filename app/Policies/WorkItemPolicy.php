@@ -16,7 +16,13 @@ final readonly class WorkItemPolicy
 
     public function viewAny(User $user): bool
     {
-        return $this->actorMembership($user)?->hasPermission(Permission::AssignWork) ?? false;
+        $membership = $this->actorMembership($user);
+
+        return $membership !== null && (
+            $membership->hasPermission(Permission::AssignWork)
+            || $membership->hasPermission(Permission::PrepareWork)
+            || $membership->hasPermission(Permission::ReviewWork)
+        );
     }
 
     public function view(User $user, WorkItem $workItem): bool

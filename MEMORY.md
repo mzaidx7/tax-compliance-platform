@@ -15,7 +15,7 @@
 
 Create a UAE-focused compliance operations and e-invoicing readiness platform under a TBT subdomain while keeping its application, data, deployment and release lifecycle separate from the public TBT website.
 
-The immediate objective is a follow-up aware work register that groups primary work and linked follow-ups.
+The immediate objective is a firm dashboard summarising due work, high risk and overdue payments.
 
 ## Canonical Files
 
@@ -251,9 +251,9 @@ No regulatory statement should be converted into a published calculator or custo
 
 ## Next Three Safe Actions
 
-1. Add a follow-up aware work register view that groups an obligation's primary work and its follow-ups.
-2. Add a firm dashboard summarising due work, high risk and overdue payments from existing records.
-3. Add retained document evidence with strict file validation and an approved malware-scanning boundary.
+1. Add a firm dashboard summarising due work, high risk and overdue payments from existing records.
+2. Add retained document evidence with strict file validation and an approved malware-scanning boundary.
+3. Add the first bounded import staging flow after conflict, reversal and retention policies are approved.
 
 ## Next Agent Handoff
 
@@ -293,7 +293,7 @@ Start by reading `AGENTS.md` and the master plan. Reconcile this file against Gi
 - Implemented and verified work item risk status (`RiskLevel`, `work_items.risk_status`, `WorkItemRiskChange`, `SetWorkItemRiskStatus`) as a stored field independent of work, filing, payment and tax state, opening `unassessed`, rejecting a no-op set to the same level, requiring a reason, append-only history protected by Eloquent events and database triggers, `work_item.risk_status_changed` audit evidence, and a Livewire risk interface reusing the existing `assign_work`-gated `update` ability. No automated risk inference exists.
 - Implemented and verified tax records (`TaxType`, `TaxRecordStatus`, `TaxRecord`, `TaxRecordAmendment`, `CreateTaxRecord`, `AmendTaxRecord`, `TaxRecordPolicy`, named `manage_tax_records` permission) as a fourth independent dimension with one record per obligation, retained tax type/period/currency/amounts (never inferred), a draft-then-final lifecycle where final is terminal, non-negative two-decimal amount validation, append-only amendment history protected by Eloquent events and database triggers, `tax_record.created`/`tax_record.amended` audit evidence, and a Livewire tax interface. Tax state never reads or writes work, filing or payment state and transmits nothing to any authority.
 - Implemented and verified firm-level feature-flag administration (`FeatureFlagOverride`, `SetFeatureFlagOverride`, `FeatureFlagOverridePolicy`, `App\Livewire\Settings\FeatureFlags`, `Feature::label()`/`description()`) restricted to the named `manage_firm_settings` permission. `FeatureFlags` now reads a firm-scoped stored override ahead of configuration, memoised per firm and flushed on change, and reads overrides by explicit firm id bypassing the global scope so queued work still resolves. Each change requires a reason and is recorded as `feature_flag.overridden` in append-only audit history. There is no deletion path, and a flag change never bypasses a policy.
-- Implemented and verified the read-only audit register (`App\Livewire\Audit\Index`, `AuditLogPolicy`, the `audit.index` route and a feature-flagged sidebar entry) behind the `audit_viewer` flag and the named `view_audit_log` permission, with action, search and date-range filters, page-scoped actor name resolution, cross-firm isolation through the global firm scope, redacted values that stay redacted, and every write ability denied. There is no export, download, retention or deletion path.
+- Implemented and verified the read-only follow-up-aware work register (`App\Livewire\WorkItems\Index`, `work-items.index`) grouping one primary work item with chronological corrective follow-ups, displaying independent status, risk, workflow version and owners, filtering by client or status, exposing all firm work only to managers while preparers and reviewers see groups where they are assigned, and preserving firm isolation and the completed original.
 - Implemented and verified payment records (`PaymentStatus`, `PaymentRecord`, `PaymentRecordTransition`, `CreatePaymentRecord`, `TransitionPaymentRecord`, `PaymentRecordPolicy`, named `manage_payments` permission) with one payment per obligation, opening states limited to not required, unknown or pending, a terminal paid state requiring a retained reference and settlement date, append-only transition history protected by Eloquent events and database triggers, `payment_record.created` and `payment_record.status_transitioned` audit evidence, and a Livewire payment interface. Payment state never reads or writes work or filing status, and no transfer is ever initiated, authorised or confirmed.
 - Implemented and verified filing records (`FilingStatus`, `FilingRecord`, `FilingRecordTransition`, `CreateFilingRecord`, `TransitionFilingRecord`, `FilingRecordPolicy`, named `manage_filings` permission) with one filing per obligation, opening states limited to not required or not filed, required filing reference and filed date before authority outcome states, append-only transition history protected by Eloquent events and database triggers, `filing_record.created` and `filing_record.status_transitioned` audit evidence, and a Livewire filing interface. Filing state never reads or writes work status and no payment record, EmaraTax automation or authority transmission exists.
 - Implemented and verified explicit audited workflow-version migration (`MigrateWorkItemWorkflowVersion`) for one open work item to a later published version of the same workflow key, with a required reason, rejection of completed or cancelled work, rejection of a target version defining no transition from the current status, preserved transition, assignment and checklist history, append-only `work_item.workflow_version_migrated` audit evidence and a Livewire "Migrate version" interface.

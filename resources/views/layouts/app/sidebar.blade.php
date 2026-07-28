@@ -57,6 +57,12 @@
                                     {{ __('Obligations') }}
                                 </flux:sidebar.item>
                             @endcan
+
+                            @can('viewAny', \App\Models\WorkItem::class)
+                                <flux:sidebar.item icon="queue-list" :href="route('work-items.index')" :current="request()->routeIs('work-items.*')" wire:navigate>
+                                    {{ __('Work register') }}
+                                </flux:sidebar.item>
+                            @endcan
                         @endif
 
                         @if (

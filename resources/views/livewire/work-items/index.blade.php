@@ -1,0 +1,141 @@
+<div class="mx-auto w-full max-w-7xl">
+    <header class="border-b border-white/8 pb-8">
+        <div class="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
+            <div>
+                <p class="mb-3 text-sm font-medium text-amber-300">
+                    {{ app(\App\Tenancy\FirmContext::class)->firm()->name }}
+                </p>
+                <h1 class="text-balance text-4xl font-semibold tracking-[-0.03em] text-white sm:text-5xl">
+                    {{ __('Work register') }}
+                </h1>
+                <p class="mt-4 max-w-3xl text-base leading-7 text-zinc-400">
+                    {{ __('Primary work and corrective follow-ups stay together. Completed originals remain unchanged while each follow-up keeps its own state, risk and accountable team.') }}
+                </p>
+            </div>
+
+            <flux:button :href="route('obligations.index')" variant="filled" icon="calendar-days" wire:navigate>
+                {{ __('Open obligations') }}
+            </flux:button>
+        </div>
+    </header>
+
+    <section class="mt-8" aria-labelledby="work-register-filters">
+        <h2 id="work-register-filters" class="sr-only">{{ __('Filter work') }}</h2>
+        <div class="grid gap-4 sm:grid-cols-[minmax(0,1fr)_16rem_auto] sm:items-end">
+            <flux:input
+                wire:model.live.debounce.300ms="search"
+                :label="__('Search work')"
+                :placeholder="__('Client, obligation or period')"
+                icon="magnifying-glass"
+            />
+
+            <flux:select wire:model.live="status" :label="__('Work status')">
+                <flux:select.option value="">{{ __('All statuses') }}</flux:select.option>
+                @foreach ($this->statuses as $workStatus)
+                    <flux:select.option :value="$workStatus->value">{{ $workStatus->label() }}</flux:select.option>
+                @endforeach
+            </flux:select>
+
+            <flux:button variant="ghost" wire:click="clearFilters">
+                {{ __('Clear filters') }}
+            </flux:button>
+        </div>
+    </section>
+
+    <section class="mt-7" aria-labelledby="work-register-results">
+        <div class="mb-3 flex items-center justify-between gap-4">
+            <h2 id="work-register-results" class="text-sm font-semibold text-zinc-200">
+                {{ trans_choice('{0} No work groups|{1} :count work group|[2,*] :count work groups', $this->workGroups->total(), ['count' => $this->workGroups->total()]) }}
+            </h2>
+            <p class="text-xs text-zinc-500">{{ __('Ordered by statutory due date') }}</p>
+        </div>
+
+        <div class="space-y-4">
+            @forelse ($this->workGroups as $primary)
+                @php
+                    $timeline = collect([$primary])->concat($primary->followUps);
+                @endphp
+
+                <article class="overflow-hidden rounded-2xl bg-zinc-900/70 ring-1 ring-white/8">
+                    <header class="flex flex-col gap-3 border-b border-white/8 px-5 py-4 md:flex-row md:items-center md:justify-between">
+                        <div class="min-w-0">
+                            <div class="flex flex-wrap items-center gap-2">
+                                <span class="font-semibold text-white">{{ $primary->obligation->client->internal_code }}</span>
+                                <span class="text-zinc-600" aria-hidden="true">/</span>
+                                <span class="truncate text-sm text-zinc-300">{{ $primary->obligation->obligation_type }}</span>
+                            </div>
+                            <p class="mt-1 text-xs text-zinc-500">
+                                {{ $primary->obligation->period_label ?: __('No period label') }}
+                                ·
+                                {{ __('Due :date', ['date' => $primary->obligation->statutory_due_date->format('d M Y')]) }}
+                            </p>
+                        </div>
+
+                        <div class="flex items-center gap-2">
+                            <flux:badge color="zinc">
+                                {{ trans_choice('{0} Original only|{1} 1 corrective follow-up|[2,*] :count corrective follow-ups', $primary->followUps->count(), ['count' => $primary->followUps->count()]) }}
+                            </flux:badge>
+                        </div>
+                    </header>
+
+                    <ol class="divide-y divide-white/8" aria-label="{{ __('Work history for :obligation', ['obligation' => $primary->obligation->obligation_type]) }}">
+                        @foreach ($timeline as $position => $workItem)
+                            @php
+                                $manager = $workItem->currentAssignment(\App\Enums\AssignmentRole::ResponsibleManager);
+                                $preparer = $workItem->currentAssignment(\App\Enums\AssignmentRole::Preparer);
+                                $reviewer = $workItem->currentAssignment(\App\Enums\AssignmentRole::Reviewer);
+                            @endphp
+
+                            <li class="grid gap-4 px-5 py-4 lg:grid-cols-[9rem_minmax(0,1fr)_auto] lg:items-center">
+                                <div>
+                                    <p class="text-sm font-medium {{ $position === 0 ? 'text-zinc-200' : 'text-amber-300' }}">
+                                        {{ $position === 0 ? __('Primary work') : __('Follow-up :number', ['number' => $position]) }}
+                                    </p>
+                                    <p class="mt-1 text-xs text-zinc-500">
+                                        {{ $workItem->created_at?->format('d M Y, H:i') }}
+                                    </p>
+                                </div>
+
+                                <div class="min-w-0">
+                                    <div class="flex flex-wrap items-center gap-2">
+                                        <flux:badge :color="$workItem->status->badgeColor()">{{ $workItem->status->label() }}</flux:badge>
+                                        <flux:badge :color="$workItem->risk_status->badgeColor()">{{ __('Risk: :risk', ['risk' => $workItem->risk_status->label()]) }}</flux:badge>
+                                        <span class="text-xs text-zinc-500">{{ __('Workflow v:version', ['version' => $workItem->workflowDefinition->version]) }}</span>
+                                    </div>
+                                    <p class="mt-2 truncate text-sm text-zinc-400">
+                                        {{ __('Preparer: :preparer · Reviewer: :reviewer · Manager: :manager', [
+                                            'preparer' => $preparer?->assignedMembership?->user?->name ?? __('Unassigned'),
+                                            'reviewer' => $reviewer?->assignedMembership?->user?->name ?? __('Unassigned'),
+                                            'manager' => $manager?->assignedMembership?->user?->name ?? __('Unassigned'),
+                                        ]) }}
+                                    </p>
+                                </div>
+
+                                <div class="text-left lg:text-right">
+                                    @if ($position === 0 && $primary->followUps->isNotEmpty())
+                                        <p class="text-xs font-medium text-green-300">{{ __('Original preserved') }}</p>
+                                    @elseif ($workItem->status->value === 'completed')
+                                        <p class="text-xs font-medium text-green-300">{{ __('Closed evidence') }}</p>
+                                    @else
+                                        <p class="text-xs text-zinc-500">{{ __('Active work record') }}</p>
+                                    @endif
+                                </div>
+                            </li>
+                        @endforeach
+                    </ol>
+                </article>
+            @empty
+                <div class="rounded-2xl bg-zinc-900/70 px-6 py-14 text-center ring-1 ring-white/8">
+                    <p class="text-sm font-medium text-zinc-200">{{ __('No work matches these filters') }}</p>
+                    <p class="mx-auto mt-2 max-w-md text-sm leading-6 text-zinc-500">
+                        {{ __('Clear the filters or open obligations to create and assign work.') }}
+                    </p>
+                </div>
+            @endforelse
+        </div>
+
+        @if ($this->workGroups->hasPages())
+            <div class="mt-6">{{ $this->workGroups->links() }}</div>
+        @endif
+    </section>
+</div>

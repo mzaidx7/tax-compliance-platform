@@ -1,0 +1,148 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Livewire\WorkItems;
+
+use App\Enums\Feature;
+use App\Enums\Permission;
+use App\Enums\WorkItemStatus;
+use App\Models\WorkItem;
+use App\Support\FeatureFlags;
+use App\Tenancy\FirmContext;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Contracts\View\View;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Gate;
+use Livewire\Attributes\Computed;
+use Livewire\Attributes\Title;
+use Livewire\Component;
+use Livewire\WithPagination;
+
+#[Title('Work register')]
+final class Index extends Component
+{
+    use WithPagination;
+
+    public string $search = '';
+
+    public string $status = '';
+
+    public function mount(FeatureFlags $featureFlags, FirmContext $firmContext): void
+    {
+        abort_unless(
+            $featureFlags->enabled(Feature::ComplianceOperations, $firmContext->firmId()),
+            404,
+        );
+
+        Gate::authorize('viewAny', WorkItem::class);
+    }
+
+    public function updatedSearch(): void
+    {
+        $this->resetPage();
+    }
+
+    public function updatedStatus(): void
+    {
+        $this->resetPage();
+    }
+
+    public function clearFilters(): void
+    {
+        $this->reset('search', 'status');
+        $this->resetPage();
+        unset($this->workGroups);
+    }
+
+    /**
+     * @return LengthAwarePaginator<int, WorkItem>
+     */
+    #[Computed]
+    public function workGroups(): LengthAwarePaginator
+    {
+        $search = trim($this->search);
+        $membership = app(FirmContext::class)->membership();
+        $canManageAll = $membership?->hasPermission(Permission::AssignWork) ?? false;
+        $membershipId = $membership?->id;
+        $status = $this->status;
+
+        return WorkItem::query()
+            ->whereNull('parent_work_item_id')
+            ->with([
+                'obligation.client',
+                'workflowDefinition',
+                'assignmentHistories.assignedMembership.user',
+                'followUps' => static fn ($query) => $query
+                    ->with([
+                        'workflowDefinition',
+                        'assignmentHistories.assignedMembership.user',
+                    ])
+                    ->orderBy('created_at')
+                    ->orderBy('id'),
+            ])
+            ->when(
+                ! $canManageAll,
+                static fn (Builder $query): Builder => $query->where(
+                    static fn (Builder $query): Builder => $query
+                        ->whereHas(
+                            'assignmentHistories',
+                            static fn (Builder $query): Builder => $query
+                                ->where('assigned_membership_id', $membershipId),
+                        )
+                        ->orWhereHas(
+                            'followUps.assignmentHistories',
+                            static fn (Builder $query): Builder => $query
+                                ->where('assigned_membership_id', $membershipId),
+                        ),
+                ),
+            )
+            ->when(
+                $status !== '',
+                static fn (Builder $query): Builder => $query->where(
+                    static fn (Builder $query): Builder => $query
+                        ->where('status', $status)
+                        ->orWhereHas(
+                            'followUps',
+                            static fn (Builder $query): Builder => $query->where('status', $status),
+                        ),
+                ),
+            )
+            ->when(
+                $search !== '',
+                static fn (Builder $query): Builder => $query->whereHas(
+                    'obligation',
+                    static fn (Builder $query): Builder => $query
+                        ->where('obligation_type', 'like', "%{$search}%")
+                        ->orWhere('period_label', 'like', "%{$search}%")
+                        ->orWhereHas(
+                            'client',
+                            static fn (Builder $query): Builder => $query
+                                ->where('internal_code', 'like', "%{$search}%")
+                                ->orWhere('legal_name', 'like', "%{$search}%"),
+                        ),
+                ),
+            )
+            ->orderBy(
+                WorkItem::query()
+                    ->select('statutory_due_date')
+                    ->from('obligations')
+                    ->whereColumn('obligations.id', 'work_items.obligation_id')
+                    ->limit(1),
+            )
+            ->orderBy('id')
+            ->paginate(20);
+    }
+
+    /** @return list<WorkItemStatus> */
+    #[Computed]
+    public function statuses(): array
+    {
+        return WorkItemStatus::cases();
+    }
+
+    public function render(): View
+    {
+        return view('livewire.work-items.index');
+    }
+}
