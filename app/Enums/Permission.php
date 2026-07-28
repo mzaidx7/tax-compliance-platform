@@ -18,4 +18,5 @@ enum Permission: string
     case ManagePayments = 'manage_payments';
     case ManageTaxRecords = 'manage_tax_records';
     case ManageImports = 'manage_imports';
+    case ManageReadinessRules = 'manage_readiness_rules';
 }

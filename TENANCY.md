@@ -557,3 +557,15 @@ Calculator assurance is firm-owned and versioned:
 - Regulatory rule approval requires the latest approved same-firm case set for that calculator and records the set identifier on the approved rule version.
 - Case, verification and approved-set evidence reject model and raw database mutation or deletion.
 - Golden cases do not authorise a regulated formula. Each future formula still requires approved official-source cases and product-owner approval.
+
+## E-Invoicing Data-Quality Rules
+
+Readiness rule governance is firm-owned and isolated from compliance obligations:
+
+- Access requires the `e_invoicing_readiness` feature and named `manage_readiness_rules` permission.
+- A stable immutable definition names one party-master or invoice-transaction field or scenario. The two domains never share an unexplained score or issue state.
+- A version retains applicability, severity, warning or blocking behavior, explanation, remediation guidance, official or internal source, formula-version effect, preparer and change summary.
+- Lifecycle order is draft, under review, approved, published, then superseded or retired. Approval requires a verifier different from the preparer and a source verification date.
+- Publishing a later version supersedes the prior published version without changing prior content.
+- Definitions and lifecycle events are append-only. Version content and lifecycle order are guarded at model and database layers.
+- This module currently evaluates no party or invoice data, imports no files, proposes no correction, merges no identity and calculates no readiness score.

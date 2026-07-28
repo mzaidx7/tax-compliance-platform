@@ -51,6 +51,19 @@
 
                         @if (
                             app(\App\Support\FeatureFlags::class)->enabled(
+                                \App\Enums\Feature::EInvoicingReadiness,
+                                $firmContext->firmId(),
+                            )
+                        )
+                            @can('viewAny', \App\Models\DataQualityRuleDefinition::class)
+                                <flux:sidebar.item icon="circle-stack" :href="route('readiness.rules.index')" :current="request()->routeIs('readiness.*')" wire:navigate>
+                                    {{ __('Readiness rules') }}
+                                </flux:sidebar.item>
+                            @endcan
+                        @endif
+
+                        @if (
+                            app(\App\Support\FeatureFlags::class)->enabled(
                                 \App\Enums\Feature::ComplianceOperations,
                                 $firmContext->firmId(),
                             )

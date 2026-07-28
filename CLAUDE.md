@@ -19,7 +19,7 @@ Treat the master plan as canonical scope and `MEMORY.md` as the current implemen
 ## Current State
 
 - Stage 3 compliance walking skeleton is active.
-- Build Packet 44 is complete.
+- Build Packet 45 is complete.
 - Work assignment, append-only reassignment, immutable workflow versions, pinned checklists, checklist completion evidence, checklist-gated review submission, reviewer return and approval decisions and explicit audited workflow-version migration are implemented.
 - Every work item is pinned to a published firm-owned workflow definition and checklist version.
 - Moving from `in_preparation` to `under_review` requires retained completion evidence for every required item on the pinned checklist.
@@ -48,21 +48,22 @@ Treat the master plan as canonical scope and `MEMORY.md` as the current implemen
 - Open obligations can be explicitly cancelled or superseded through an append-only disposition. Supersession requires a different open replacement obligation in the same firm; neither path modifies the retained obligation, dates, snapshots or linked evidence.
 - Changed-rule handling is preview-first. A proposal compares an open governed obligation with a later published version of the same template, retains old and proposed dates plus the immutable generation preview, and requires a separate approval that issues a deterministic replacement before superseding the original.
 - Calculator golden-case sets are versioned governance records with immutable sourced expectations, independent executable verification and approval. Calculators declare whether they are regulatory; regulatory rule approval requires and records the latest approved passing case set, while `manual_date_passthrough` remains explicitly non-regulatory.
+- Stage 5 readiness rule governance is active behind `e_invoicing_readiness`. Stable rule identities explicitly separate party-master and invoice-transaction domains; versions retain applicability, severity, warning or blocking behavior, explanation, remediation, source and formula effect through independent review and immutable publication.
 - Two operational notification templates exist, `work_item_high_risk` and `payment_overdue`, both fired only by an explicit recorded change and addressed to the current responsible manager.
 - Regulated-rule generation modules are not implemented.
 - The full current verification baseline is recorded in `MEMORY.md`.
 
 ## Next Safe Packet
 
-Begin Stage 5 with e-invoicing data-quality rule governance only, without imports, scoring or correction automation.
+Add manually recorded synthetic party-master records with field-level provenance, without file import or readiness scoring.
 
 Keep it bounded:
 
-- Add immutable readiness rule identities and versioned draft, review, approval, publication and supersession lifecycle.
-- Keep party-master and invoice-transaction rules explicitly separate.
-- Store field or scenario, applicability, severity, blocking or warning behavior, explanation, remediation guidance, source and formula-version effect.
-- Require separate preparer and verifier identities and retain append-only lifecycle history.
-- Do not build readiness scoring until the product owner approves the formula.
+- Add firm and client-owned party identities that can carry customer, supplier or both roles without duplicating legal identity.
+- Add explicit identifiers and structured addresses with verification state and provenance.
+- Record manual source references and field-level source events without storing an import file.
+- Preserve every canonical-field change through a proposal and human approval boundary.
+- Do not infer readiness status, run bulk imports, merge parties or calculate a score.
 - Do not add VAT or Corporate Tax formulas without approved sourced golden cases.
 - Keep import processing gated until conflict, reversal and retention decisions are approved.
 

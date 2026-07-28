@@ -40,10 +40,11 @@ enum FirmRole: string
                 Permission::ManageFilings,
                 Permission::ManagePayments,
                 Permission::ManageTaxRecords,
+                Permission::ManageReadinessRules,
             ],
             self::Preparer => [Permission::PrepareWork],
             self::Reviewer => [Permission::PrepareWork, Permission::ReviewWork],
-            self::DataCleanupOperator => [Permission::ManageImports],
+            self::DataCleanupOperator => [Permission::ManageImports, Permission::ManageReadinessRules],
             self::ReadOnly => [Permission::ViewReports],
         };
     }
