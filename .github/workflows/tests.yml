@@ -64,8 +64,33 @@ jobs:
       - name: Run static analysis
         run: composer types:check
 
-      - name: Run automated tests
-        run: php artisan test --compact
+      - name: Test application entry and accounts
+        id: test-entry
+        continue-on-error: true
+        run: php artisan test --compact tests/Feature/DashboardQueuesTest.php tests/Feature/DashboardTest.php tests/Feature/ExampleTest.php tests/Feature/OperationalFoundationTest.php tests/Feature/ReadinessComingSoonTest.php tests/Feature/Auth tests/Feature/Settings
+
+      - name: Test tenancy and platform boundaries
+        id: test-boundaries
+        continue-on-error: true
+        run: php artisan test --compact tests/Feature/Audit tests/Feature/Authorization tests/Feature/Exports tests/Feature/Feature tests/Feature/Livewire tests/Feature/Notifications tests/Feature/Operations tests/Feature/Tenancy
+
+      - name: Test compliance operations
+        id: test-compliance
+        continue-on-error: true
+        run: php artisan test --compact tests/Feature/Clients tests/Feature/Compliance tests/Feature/Documents tests/Feature/Filings tests/Feature/Generation tests/Feature/Payments tests/Feature/Reports tests/Feature/Rules tests/Feature/Schedule tests/Feature/Taxes
+
+      - name: Test workflows and future readiness foundation
+        id: test-workflows
+        continue-on-error: true
+        run: php artisan test --compact tests/Feature/Readiness tests/Feature/Workflows tests/Unit
+
+      - name: Enforce automated test results
+        if: always()
+        run: |
+          test "${{ steps.test-entry.outcome }}" = "success"
+          test "${{ steps.test-boundaries.outcome }}" = "success"
+          test "${{ steps.test-compliance.outcome }}" = "success"
+          test "${{ steps.test-workflows.outcome }}" = "success"
 
       - name: Build production assets
         run: npm run build
