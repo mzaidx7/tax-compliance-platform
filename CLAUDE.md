@@ -19,7 +19,7 @@ Treat the master plan as canonical scope and `MEMORY.md` as the current implemen
 ## Current State
 
 - Stage 3 compliance walking skeleton is active.
-- Build Packet 55 is complete and development is paused at the product owner's request.
+- Build Packet 55 is complete. Release 1 compliance operations hardening is now the only active delivery track.
 - Work assignment, append-only reassignment, immutable workflow versions, pinned checklists, checklist completion evidence, checklist-gated review submission, reviewer return and approval decisions and explicit audited workflow-version migration are implemented.
 - Every work item is pinned to a published firm-owned workflow definition and checklist version.
 - Moving from `in_preparation` to `under_review` requires retained completion evidence for every required item on the pinned checklist.
@@ -65,14 +65,14 @@ Treat the master plan as canonical scope and `MEMORY.md` as the current implemen
 
 ## Next Safe Packet
 
-No packet is currently authorised. Resume by closing product decisions before implementing Stage 4 client import or regulated calculators.
+Build the shortest release-critical path for the internal Compliance Operations MVP.
 
 Keep it bounded:
 
-- Approve import conflict, reversal and raw-file retention behavior before C2.
-- Approve official-source VAT and Corporate Tax golden cases, formulas, ownership and review before C3.
-- Decide whether the immediate product target is the bounded internal compliance MVP or the full ten-stage programme.
-- Keep duplicate merge, scoring, clean export and operational pilot work behind their recorded gates.
+- Add bounded CSV client onboarding with validation preview, reconciliation, error reporting and safe commit behavior.
+- Replace operational access to e-invoicing readiness with an accessible coming-soon surface while preserving its feature-gated implementation.
+- Complete frontend consistency, responsive behavior, accessibility and release-state UX.
+- Add CI and production-readiness checks, then verify the actual deployment environment before publishing.
 - Continue to keep imports, merge, scoring and regulated formulas behind their recorded decision gates.
 - Do not add VAT or Corporate Tax formulas without approved sourced golden cases.
 - Keep import processing gated until conflict, reversal and retention decisions are approved.

@@ -14,7 +14,7 @@ web
 
 ## Product Purpose
 
-The platform coordinates compliance operations and e-invoicing readiness work under a TBT subdomain. Success means each authenticated user can enter the correct firm context, see only that firm's records and complete assigned operational work with clear accountability.
+Release 1 coordinates internal compliance operations under a TBT subdomain. Success means each authenticated user can enter the correct firm context, see only that firm's records and complete assigned operational work with clear accountability. E-invoicing readiness is a separately gated future release and appears only as coming soon until its own acceptance gate passes.
 
 ## Positioning
 

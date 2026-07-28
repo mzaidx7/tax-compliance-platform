@@ -13,6 +13,59 @@
 
 ---
 
+## Release Strategy Amendment: Compliance Operations First
+
+**Approved:** 28 July 2026
+
+The master plan remains the long-term roadmap, but it no longer defines one continuous launch scope.
+
+### Release 1: Internal Compliance Operations MVP
+
+Release 1 is the immediate build and publishing target. It includes:
+
+- Secure firm tenancy, authentication, roles, permissions and audit evidence
+- Client master, contacts, services, tax registrations and actual tax periods
+- Manual and governed source-linked obligations
+- Assignment, workflow, checklist, review, filing, payment and tax-record operations
+- Document metadata and expiry tracking
+- Dashboard queues, schedule, client timeline, notifications, reports and safe exports
+- Bounded CSV client onboarding with validation, preview, reconciliation and error reporting
+- Responsive, accessible and coherent production frontend
+- CI, production configuration, queue and scheduler instructions, backup proof, deployment runbook and post-deployment smoke checks
+
+Release 1 explicitly excludes:
+
+- Automated VAT or Corporate Tax statutory calculations
+- Claims that a stored or manually entered date is legally correct
+- E-invoicing readiness assessment, scoring, cleanup, merge or export
+- E-invoice transmission, EmaraTax automation, OCR and accounting integrations
+- Billing, public self-service onboarding and dedicated-edition automation
+
+VAT and Corporate Tax dates in Release 1 remain manually supplied or governed through source-linked rules with human verification. Automated regulatory calculators remain blocked until official-source golden cases, formulas, ownership and review are approved.
+
+### E-Invoicing Readiness: Separate Future Release
+
+Existing readiness code and data structures remain preserved behind the `e_invoicing_readiness` feature flag. Until its own release gate passes:
+
+- Navigation exposes only a non-operational "Coming soon" page.
+- Readiness work is not included in Release 1 acceptance or deployment claims.
+- Its backlog, decisions, tests and progress remain tracked separately from Compliance Operations.
+- Development may continue incrementally after Release 1 without delaying the compliance launch.
+
+### Release 1 Completion Gate
+
+Release 1 is publishable only when:
+
+1. The release-critical frontend has completed desktop, tablet and mobile review.
+2. Client onboarding reconciles at least 200 synthetic records without cross-tenant leakage.
+3. Compliance workflows, schedules, notifications, reports and exports pass automated acceptance tests.
+4. Formatting, static analysis, dependency review, production asset build and the full automated suite pass.
+5. Production environment, queue, scheduler, mail, storage, backup, restore and rollback procedures are documented and verified to the extent possible before host access.
+6. No known critical or high-severity release defect remains.
+7. The deployed application passes authentication, tenant-isolation and core-workflow smoke checks.
+
+Stages 5 through 10 remain future roadmap stages. They must not expand or delay the Release 1 critical path.
+
 ## 1. Instructions for Codex and Developers
 
 Treat this document as the current source of truth for the product unless the product owner gives a newer instruction.

@@ -5,12 +5,12 @@
 - Last updated: 2026-07-28
 - Updated by: Codex GPT-5.6
 - Platform repository status: independent repository on `main`, remote `mzaidx7/tax-compliance-platform`
-- Current milestone: Deterministic 200-client compliance MVP acceptance fixture completed
+- Current milestone: Release 1 compliance operations scope approved and release hardening started
 
 ## Current Objective
 Create a UAE-focused compliance operations and e-invoicing readiness platform under a TBT subdomain while keeping its application, data, deployment and release lifecycle separate from the public TBT website.
 
-Development is paused after Build Packet 55. Stage 4 client import and regulated VAT and Corporate Tax calculators remain decision-gated; later readiness, pilot and commercial stages remain incomplete.
+The immediate objective is to finish and publish Release 1 as an internal Compliance Operations MVP. Build bounded CSV client onboarding, finish frontend and production hardening, deploy, and keep e-invoicing readiness preserved behind a coming-soon boundary. Automated regulated calculators remain decision-gated.
 
 ## Canonical Files
 
@@ -51,7 +51,7 @@ Development is paused after Build Packet 55. Stage 4 client import and regulated
 - Work, filing, payment and risk states remain separate.
 - Compliance calculations use named PHP calculators and immutable rule versions.
 - Imports use staging, preview, approval, idempotency and row reconciliation.
-- The compliance operations MVP precedes the e-invoicing readiness MVP.
+- Release 1 is the internal Compliance Operations MVP. E-invoicing readiness is a separately tracked future release and must not delay publishing Release 1.
 - The calendar is secondary to operational queues.
 - The MVP stores document metadata only.
 - Email is the only required external notification channel for the MVP.
