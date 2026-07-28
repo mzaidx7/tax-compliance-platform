@@ -7,10 +7,12 @@ namespace App\Actions\Rules;
 use App\Actions\Audit\RecordAudit;
 use App\Enums\Feature;
 use App\Enums\RuleVersionStatus;
+use App\Models\CalculatorGoldenCaseSet;
 use App\Models\Obligation;
 use App\Models\ObligationRuleVersion;
 use App\Models\ObligationRuleVersionEvent;
 use App\Models\User;
+use App\Support\CalculatorRegistry;
 use App\Support\FeatureFlags;
 use App\Tenancy\FirmContext;
 use Illuminate\Auth\Access\AuthorizationException;
@@ -24,6 +26,7 @@ final readonly class ApproveRuleVersion
     public function __construct(
         private FirmContext $firmContext,
         private FeatureFlags $featureFlags,
+        private CalculatorRegistry $calculatorRegistry,
         private RecordAudit $recordAudit,
     ) {}
 
@@ -60,6 +63,21 @@ final readonly class ApproveRuleVersion
                 ]);
             }
 
+            $calculator = $this->calculatorRegistry->get($locked->calculator_key);
+            $goldenCaseSet = null;
+            if ($calculator->isRegulatory()) {
+                $goldenCaseSet = CalculatorGoldenCaseSet::query()
+                    ->where('calculator_key', $locked->calculator_key)
+                    ->where('status', 'approved')
+                    ->orderByDesc('version')
+                    ->first();
+                if ($goldenCaseSet === null) {
+                    throw ValidationException::withMessages([
+                        'calculatorKey' => 'A regulatory calculator requires an approved golden-case set before rule approval.',
+                    ]);
+                }
+            }
+
             $now = now('UTC');
             $locked->update([
                 'status' => RuleVersionStatus::Approved,
@@ -67,6 +85,7 @@ final readonly class ApproveRuleVersion
                 'verified_by' => $actor->id,
                 'verified_at' => $now,
                 'approved_at' => $now,
+                'calculator_golden_case_set_id' => $goldenCaseSet?->id,
             ]);
             $event = ObligationRuleVersionEvent::query()->create([
                 'obligation_rule_version_id' => $locked->id,
@@ -85,6 +104,7 @@ final readonly class ApproveRuleVersion
                     'status' => RuleVersionStatus::Approved->value,
                     'source_last_verified_on' => $validated['source_last_verified_on'],
                     'verified_by' => $actor->id,
+                    'calculator_golden_case_set_id' => $goldenCaseSet?->id,
                 ],
                 reason: trim($validated['reason']),
             );

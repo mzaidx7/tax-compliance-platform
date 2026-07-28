@@ -117,4 +117,103 @@
             </section>
         </aside>
     </div>
+
+    <section aria-labelledby="golden-case-heading" class="mt-12 border-t border-white/8 pt-10">
+        <div class="max-w-3xl">
+            <p class="text-sm font-medium text-amber-300">{{ __('Calculator assurance') }}</p>
+            <h2 id="golden-case-heading" class="mt-2 text-2xl font-semibold tracking-tight text-white">{{ __('Golden-case evidence') }}</h2>
+            <p class="mt-2 text-sm leading-6 text-zinc-500">{{ __('Prepare immutable sourced expectations, run the registered calculator, and require independent passing verification before approving a regulatory calculator case set.') }}</p>
+        </div>
+
+        <div class="mt-6 grid gap-8 xl:grid-cols-[minmax(0,1fr)_24rem]">
+            <div class="space-y-5">
+                @forelse ($this->goldenCaseSets as $set)
+                    <article class="rounded-2xl bg-zinc-900/50 p-5 ring-1 ring-white/8">
+                        <div class="flex flex-wrap items-start justify-between gap-3">
+                            <div>
+                                <p class="text-sm font-semibold text-zinc-100">{{ $set->name }}</p>
+                                <p class="mt-1 text-xs text-zinc-500">{{ $set->calculator_key }} / v{{ $set->version }} / Prepared by {{ $set->preparer->name }}</p>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <flux:badge :color="$set->status === 'approved' ? 'green' : 'amber'">{{ ucfirst($set->status) }}</flux:badge>
+                                <flux:button size="sm" variant="ghost" wire:click="$set('goldenCaseSetId', '{{ $set->id }}')">{{ __('Select') }}</flux:button>
+                            </div>
+                        </div>
+                        <div class="mt-5 divide-y divide-white/8 border-y border-white/8">
+                            @forelse ($set->cases as $case)
+                                @php($latestVerification = $case->verifications->sortByDesc('verified_at')->first())
+                                <div class="grid gap-3 py-4 sm:grid-cols-[minmax(0,1fr)_8rem_6rem] sm:items-center">
+                                    <div>
+                                        <a href="{{ $case->official_source_url }}" target="_blank" rel="noopener noreferrer" class="text-sm font-medium text-amber-300 hover:text-amber-200">{{ $case->name }}</a>
+                                        <p class="mt-1 text-xs text-zinc-500">{{ __('Expected :date / Source verified :verified', ['date' => $case->expected_result_snapshot['statutory_due_date'], 'verified' => $case->source_verified_on->format('d M Y')]) }}</p>
+                                    </div>
+                                    <flux:badge :color="$latestVerification?->passed ? 'green' : ($latestVerification ? 'red' : 'zinc')">
+                                        {{ $latestVerification ? ($latestVerification->passed ? __('Passed') : __('Failed')) : __('Unverified') }}
+                                    </flux:badge>
+                                    @if ($set->status === 'draft')
+                                        <flux:button size="sm" variant="ghost" wire:click="$set('verificationCaseId', '{{ $case->id }}')">{{ __('Select') }}</flux:button>
+                                    @endif
+                                </div>
+                            @empty
+                                <p class="py-5 text-sm text-zinc-500">{{ __('No cases recorded.') }}</p>
+                            @endforelse
+                        </div>
+                    </article>
+                @empty
+                    <div class="border-y border-white/8 px-6 py-14 text-center">
+                        <p class="text-sm font-medium text-zinc-200">{{ __('No golden-case sets recorded') }}</p>
+                        <p class="mx-auto mt-2 max-w-md text-sm leading-6 text-zinc-500">{{ __('Create a versioned set before recording sourced expectations.') }}</p>
+                    </div>
+                @endforelse
+            </div>
+
+            <aside class="space-y-6">
+                <form wire:submit="createGoldenCaseSet" class="space-y-4 rounded-2xl bg-zinc-900/70 p-6 ring-1 ring-white/8">
+                    <h3 class="text-lg font-semibold text-zinc-100">{{ __('Create case set') }}</h3>
+                    <flux:select wire:model="caseSetCalculatorKey" :label="__('Registered calculator')" required>
+                        @foreach ($this->calculators as $calculator)
+                            <flux:select.option :value="$calculator->key()">
+                                {{ $calculator->key() }} / {{ $calculator->isRegulatory() ? __('Regulatory') : __('Non-regulatory') }}
+                            </flux:select.option>
+                        @endforeach
+                    </flux:select>
+                    <flux:input wire:model="caseSetName" :label="__('Set name')" maxlength="150" required />
+                    <flux:button type="submit" variant="filled" class="w-full">{{ __('Create draft set') }}</flux:button>
+                </form>
+
+                <form wire:submit="addGoldenCase" class="space-y-4 rounded-2xl bg-zinc-900/70 p-6 ring-1 ring-white/8">
+                    <h3 class="text-lg font-semibold text-zinc-100">{{ __('Add immutable case') }}</h3>
+                    <flux:select wire:model="goldenCaseSetId" :label="__('Draft case set')" required>
+                        <flux:select.option value="">{{ __('Select set') }}</flux:select.option>
+                        @foreach ($this->goldenCaseSets->where('status', 'draft') as $set)
+                            <flux:select.option :value="$set->id">{{ $set->calculator_key }} / v{{ $set->version }}</flux:select.option>
+                        @endforeach
+                    </flux:select>
+                    <flux:input wire:model="goldenCaseName" :label="__('Case name')" required />
+                    <flux:textarea wire:model="goldenCaseInputsJson" :label="__('Inputs JSON object')" required />
+                    <flux:textarea wire:model="goldenCaseParametersJson" :label="__('Parameters JSON object')" required />
+                    <flux:input wire:model="goldenCaseExpectedDate" type="date" :label="__('Expected statutory date')" required />
+                    <flux:input wire:model="goldenCaseSourceTitle" :label="__('Official source title')" required />
+                    <flux:input wire:model="goldenCaseSourceUrl" type="url" :label="__('Official source HTTPS URL')" required />
+                    <flux:input wire:model="goldenCaseSourceVerifiedOn" type="date" :label="__('Source verified on')" required />
+                    <flux:button type="submit" variant="primary" class="w-full">{{ __('Record immutable case') }}</flux:button>
+                </form>
+
+                <section class="space-y-4 rounded-2xl bg-zinc-900/70 p-6 ring-1 ring-white/8">
+                    <h3 class="text-lg font-semibold text-zinc-100">{{ __('Verify and approve') }}</h3>
+                    <flux:select wire:model="verificationCaseId" :label="__('Case to verify')">
+                        <flux:select.option value="">{{ __('Select case') }}</flux:select.option>
+                        @foreach ($this->goldenCaseSets->where('status', 'draft') as $set)
+                            @foreach ($set->cases as $case)
+                                <flux:select.option :value="$case->id">{{ $set->calculator_key }} / {{ $case->name }}</flux:select.option>
+                            @endforeach
+                        @endforeach
+                    </flux:select>
+                    <flux:button wire:click="verifyGoldenCase" variant="ghost" class="w-full">{{ __('Run verification') }}</flux:button>
+                    <flux:textarea wire:model="caseSetApprovalReason" :label="__('Set approval reason')" maxlength="500" />
+                    <flux:button wire:click="approveGoldenCaseSet" variant="filled" class="w-full">{{ __('Approve selected set') }}</flux:button>
+                </section>
+            </aside>
+        </div>
+    </section>
 </div>

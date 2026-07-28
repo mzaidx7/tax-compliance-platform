@@ -545,3 +545,15 @@ Rule changes affecting issued governed obligations are preview-first:
 - `rule_change_proposal_decisions` retains the approval, replacement obligation, actor, reason and timestamp. A proposal accepts only one decision.
 - Proposal and decision records reject model and raw database update or deletion.
 - The original obligation, rule snapshot and calculation snapshots remain unchanged and linked to the separately issued replacement.
+
+## Calculator Golden Cases
+
+Calculator assurance is firm-owned and versioned:
+
+- Every calculator declares whether it is regulatory. `manual_date_passthrough` is explicitly non-regulatory and continues to perform no statutory calculation.
+- A draft case set identifies one registered calculator and version. Its cases retain named inputs, validated parameters, expected statutory result, official UAE source, source verification date and preparer.
+- A verifier different from the case preparer executes the registered calculator. The observed result, explanation, pass or fail outcome, verifier and timestamp are append-only.
+- A case-set approver different from the set preparer may approve only when the set contains at least one case and every case's latest verification passes.
+- Regulatory rule approval requires the latest approved same-firm case set for that calculator and records the set identifier on the approved rule version.
+- Case, verification and approved-set evidence reject model and raw database mutation or deletion.
+- Golden cases do not authorise a regulated formula. Each future formula still requires approved official-source cases and product-owner approval.

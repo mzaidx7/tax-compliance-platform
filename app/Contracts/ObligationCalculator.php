@@ -10,6 +10,8 @@ interface ObligationCalculator
 {
     public function key(): string;
 
+    public function isRegulatory(): bool;
+
     /** @return list<string> */
     public function acceptedInputs(): array;
 

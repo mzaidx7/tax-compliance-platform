@@ -15,6 +15,11 @@ final class ManualDatePassthroughCalculator implements ObligationCalculator
         return 'manual_date_passthrough';
     }
 
+    public function isRegulatory(): bool
+    {
+        return false;
+    }
+
     public function acceptedInputs(): array
     {
         return ['statutory_due_date'];

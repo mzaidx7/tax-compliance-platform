@@ -24,6 +24,7 @@ use LogicException;
  * @property Carbon|null $effective_to
  * @property string $applicability_criteria
  * @property string $calculator_key
+ * @property string|null $calculator_golden_case_set_id
  * @property array<string, mixed> $parameters
  * @property string $official_source_title
  * @property string $official_source_url
@@ -45,6 +46,7 @@ use LogicException;
     'effective_to',
     'applicability_criteria',
     'calculator_key',
+    'calculator_golden_case_set_id',
     'parameters',
     'official_source_title',
     'official_source_url',
@@ -96,6 +98,12 @@ final class ObligationRuleVersion extends Model
     public function template(): BelongsTo
     {
         return $this->belongsTo(ObligationRuleTemplate::class, 'obligation_rule_template_id');
+    }
+
+    /** @return BelongsTo<CalculatorGoldenCaseSet, $this> */
+    public function goldenCaseSet(): BelongsTo
+    {
+        return $this->belongsTo(CalculatorGoldenCaseSet::class, 'calculator_golden_case_set_id');
     }
 
     /** @return BelongsTo<User, $this> */

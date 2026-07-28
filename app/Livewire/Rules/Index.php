@@ -4,14 +4,20 @@ declare(strict_types=1);
 
 namespace App\Livewire\Rules;
 
+use App\Actions\Rules\AddGoldenCase;
+use App\Actions\Rules\ApproveGoldenCaseSet;
 use App\Actions\Rules\ApproveRuleVersion;
+use App\Actions\Rules\CreateGoldenCaseSet;
 use App\Actions\Rules\CreateRuleTemplate;
 use App\Actions\Rules\DraftRuleVersion;
 use App\Actions\Rules\PublishRuleVersion;
 use App\Actions\Rules\RetireRuleVersion;
 use App\Actions\Rules\SubmitRuleVersionForReview;
+use App\Actions\Rules\VerifyGoldenCase;
 use App\Contracts\ObligationCalculator;
 use App\Enums\Feature;
+use App\Models\CalculatorGoldenCase;
+use App\Models\CalculatorGoldenCaseSet;
 use App\Models\Obligation;
 use App\Models\ObligationRuleTemplate;
 use App\Models\ObligationRuleVersion;
@@ -69,6 +75,30 @@ final class Index extends Component
 
     public string $sourceLastVerifiedOn = '';
 
+    public string $caseSetCalculatorKey = 'manual_date_passthrough';
+
+    public string $caseSetName = '';
+
+    public string $goldenCaseSetId = '';
+
+    public string $goldenCaseName = '';
+
+    public string $goldenCaseInputsJson = '{}';
+
+    public string $goldenCaseParametersJson = '{}';
+
+    public string $goldenCaseExpectedDate = '';
+
+    public string $goldenCaseSourceTitle = '';
+
+    public string $goldenCaseSourceUrl = '';
+
+    public string $goldenCaseSourceVerifiedOn = '';
+
+    public string $verificationCaseId = '';
+
+    public string $caseSetApprovalReason = '';
+
     public function mount(FeatureFlags $featureFlags, FirmContext $firmContext): void
     {
         abort_unless(
@@ -78,6 +108,7 @@ final class Index extends Component
         Gate::authorize('viewAny', Obligation::class);
         $this->effectiveFrom = today()->toDateString();
         $this->sourceLastVerifiedOn = today()->toDateString();
+        $this->goldenCaseSourceVerifiedOn = today()->toDateString();
     }
 
     public function createTemplate(CreateRuleTemplate $action): void
@@ -155,6 +186,61 @@ final class Index extends Component
         $this->afterLifecycle('Rule retired.');
     }
 
+    public function createGoldenCaseSet(CreateGoldenCaseSet $action): void
+    {
+        $set = $action->handle($this->currentUser(), $this->caseSetCalculatorKey, $this->caseSetName);
+        $this->goldenCaseSetId = $set->id;
+        $this->caseSetName = '';
+        unset($this->goldenCaseSets);
+        Flux::toast(variant: 'success', text: __('Golden-case set created.'));
+    }
+
+    public function addGoldenCase(AddGoldenCase $action): void
+    {
+        $case = $action->handle(
+            $this->currentUser(),
+            CalculatorGoldenCaseSet::query()->findOrFail($this->goldenCaseSetId),
+            $this->goldenCaseName,
+            $this->jsonObject('goldenCaseInputsJson', $this->goldenCaseInputsJson),
+            $this->jsonObject('goldenCaseParametersJson', $this->goldenCaseParametersJson),
+            $this->goldenCaseExpectedDate,
+            $this->goldenCaseSourceTitle,
+            $this->goldenCaseSourceUrl,
+            $this->goldenCaseSourceVerifiedOn,
+        );
+        $this->verificationCaseId = $case->id;
+        $this->reset('goldenCaseName', 'goldenCaseExpectedDate', 'goldenCaseSourceTitle', 'goldenCaseSourceUrl');
+        $this->goldenCaseInputsJson = '{}';
+        $this->goldenCaseParametersJson = '{}';
+        unset($this->goldenCaseSets);
+        Flux::toast(variant: 'success', text: __('Immutable golden case recorded.'));
+    }
+
+    public function verifyGoldenCase(VerifyGoldenCase $action): void
+    {
+        $verification = $action->handle(
+            $this->currentUser(),
+            CalculatorGoldenCase::query()->findOrFail($this->verificationCaseId),
+        );
+        unset($this->goldenCaseSets);
+        Flux::toast(
+            variant: $verification->passed ? 'success' : 'danger',
+            text: $verification->passed ? __('Golden case passed.') : __('Golden case failed.'),
+        );
+    }
+
+    public function approveGoldenCaseSet(ApproveGoldenCaseSet $action): void
+    {
+        $action->handle(
+            $this->currentUser(),
+            CalculatorGoldenCaseSet::query()->findOrFail($this->goldenCaseSetId),
+            $this->caseSetApprovalReason,
+        );
+        $this->caseSetApprovalReason = '';
+        unset($this->goldenCaseSets);
+        Flux::toast(variant: 'success', text: __('Golden-case set approved.'));
+    }
+
     /** @return Collection<int, ObligationRuleTemplate> */
     #[Computed]
     public function templates(): Collection
@@ -170,6 +256,17 @@ final class Index extends Component
     public function calculators(): array
     {
         return app(CalculatorRegistry::class)->all();
+    }
+
+    /** @return Collection<int, CalculatorGoldenCaseSet> */
+    #[Computed]
+    public function goldenCaseSets(): Collection
+    {
+        return CalculatorGoldenCaseSet::query()
+            ->with(['preparer', 'approver', 'cases.verifications.verifier'])
+            ->orderBy('calculator_key')
+            ->orderByDesc('version')
+            ->get();
     }
 
     public function render(): View
@@ -192,6 +289,22 @@ final class Index extends Component
         }
 
         return $parameters;
+    }
+
+    /** @return array<string, mixed> */
+    private function jsonObject(string $field, string $json): array
+    {
+        try {
+            $object = json_decode($json, false, 32, JSON_THROW_ON_ERROR);
+            $values = json_decode($json, true, 32, JSON_THROW_ON_ERROR);
+        } catch (JsonException) {
+            throw ValidationException::withMessages([$field => 'Value must be a valid JSON object.']);
+        }
+        if (! is_object($object) || ! is_array($values)) {
+            throw ValidationException::withMessages([$field => 'Value must be a JSON object.']);
+        }
+
+        return $values;
     }
 
     private function selectedVersion(): ObligationRuleVersion
