@@ -37,10 +37,13 @@ final class Index extends Component
 
         return [
             'due_soon' => (clone $obligations)
-                ->whereBetween('statutory_due_date', [today(), today()->addDays(30)])
+                ->whereRaw(
+                    'coalesce(effective_due_date, statutory_due_date) between ? and ?',
+                    [today()->toDateString(), today()->addDays(30)->toDateString()],
+                )
                 ->count(),
             'overdue' => (clone $obligations)
-                ->whereDate('statutory_due_date', '<', today())
+                ->whereRaw('coalesce(effective_due_date, statutory_due_date) < ?', [today()->toDateString()])
                 ->count(),
             'high_risk' => (clone $workItems)
                 ->where('risk_status', RiskLevel::High)
@@ -60,8 +63,8 @@ final class Index extends Component
         return $this->visibleObligations()
             ->with(['client', 'workItems' => static fn ($query) => $query->orderBy('created_at')])
             ->where('status', ObligationStatus::Open)
-            ->whereDate('statutory_due_date', '<=', today()->addDays(30))
-            ->orderBy('statutory_due_date')
+            ->whereRaw('coalesce(effective_due_date, statutory_due_date) <= ?', [today()->addDays(30)->toDateString()])
+            ->orderByRaw('coalesce(effective_due_date, statutory_due_date)')
             ->orderBy('id')
             ->limit(8)
             ->get();

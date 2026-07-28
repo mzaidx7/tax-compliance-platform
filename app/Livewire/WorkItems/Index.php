@@ -147,7 +147,7 @@ final class Index extends Component
             )
             ->orderBy(
                 WorkItem::query()
-                    ->select('statutory_due_date')
+                    ->selectRaw('coalesce(effective_due_date, statutory_due_date)')
                     ->from('obligations')
                     ->whereColumn('obligations.id', 'work_items.obligation_id')
                     ->limit(1),

@@ -81,7 +81,8 @@
             <div class="divide-y divide-white/8 border-y border-white/8">
                 @forelse ($this->priorityObligations as $obligation)
                     @php
-                        $days = today()->diffInDays($obligation->statutory_due_date, false);
+                        $effectiveDueDate = $obligation->effectiveDueDate();
+                        $days = today()->diffInDays($effectiveDueDate, false);
                     @endphp
                     <div class="grid gap-3 py-4 sm:grid-cols-[minmax(0,1fr)_9rem] sm:items-center">
                         <div class="min-w-0">
@@ -96,8 +97,13 @@
                         </div>
                         <div class="sm:text-right">
                             <p class="text-sm font-medium {{ $days < 0 ? 'text-red-300' : 'text-zinc-200' }}">
-                                {{ $obligation->statutory_due_date->format('d M Y') }}
+                                {{ $effectiveDueDate->format('d M Y') }}
                             </p>
+                            @if (! $effectiveDueDate->isSameDay($obligation->statutory_due_date))
+                                <p class="mt-1 text-xs text-amber-300">
+                                    {{ __('Effective override · Statutory :date', ['date' => $obligation->statutory_due_date->format('d M Y')]) }}
+                                </p>
+                            @endif
                             <p class="mt-1 text-xs text-zinc-500">
                                 {{ $days < 0
                                     ? trans_choice('{1} 1 day overdue|[2,*] :count days overdue', abs($days), ['count' => abs($days)])
@@ -142,7 +148,7 @@
                             <p class="truncate text-sm font-medium text-zinc-200">
                                 {{ $payment->obligation->client->internal_code }} · {{ $payment->obligation->obligation_type }}
                             </p>
-                            <p class="mt-2 text-xs text-zinc-500">{{ __('Recorded overdue · Due :date', ['date' => $payment->obligation->statutory_due_date->format('d M Y')]) }}</p>
+                            <p class="mt-2 text-xs text-zinc-500">{{ __('Recorded overdue · Effective due :date', ['date' => $payment->obligation->effectiveDueDate()->format('d M Y')]) }}</p>
                         </div>
                     @empty
                         <p class="text-sm leading-6 text-zinc-500">{{ __('No visible payment record is marked overdue.') }}</p>

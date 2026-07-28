@@ -50,7 +50,7 @@ FORM: Deadline review rail, grounded structure seven, seed 75cba0e2.
                     <span>{{ __('Client and obligation') }}</span>
                     <span>{{ __('Period and origin') }}</span>
                     <span>{{ __('Internal target') }}</span>
-                    <span>{{ __('Statutory due') }}</span>
+                    <span>{{ __('Effective due') }}</span>
                     <span class="text-right">{{ __('Work ownership') }}</span>
                 </div>
 
@@ -81,10 +81,15 @@ FORM: Deadline review rail, grounded structure seven, seed 75cba0e2.
                                 </time>
                             </div>
                             <div>
-                                <span class="mb-1 block text-xs text-zinc-500 lg:hidden">{{ __('Statutory due') }}</span>
-                                <time class="text-sm font-medium text-zinc-100" datetime="{{ $obligation->statutory_due_date->toDateString() }}">
-                                    {{ $obligation->statutory_due_date->format('j M Y') }}
+                                <span class="mb-1 block text-xs text-zinc-500 lg:hidden">{{ __('Effective due') }}</span>
+                                <time class="text-sm font-medium text-zinc-100" datetime="{{ $obligation->effectiveDueDate()->toDateString() }}">
+                                    {{ $obligation->effectiveDueDate()->format('j M Y') }}
                                 </time>
+                                @if (! $obligation->effectiveDueDate()->isSameDay($obligation->statutory_due_date))
+                                    <p class="mt-1 text-xs text-amber-300">
+                                        {{ __('Statutory :date', ['date' => $obligation->statutory_due_date->format('j M Y')]) }}
+                                    </p>
+                                @endif
                             </div>
                             <div class="lg:text-right">
                                 <span class="mb-1 block text-xs text-zinc-500 lg:hidden">{{ __('Work ownership') }}</span>
@@ -93,6 +98,17 @@ FORM: Deadline review rail, grounded structure seven, seed 75cba0e2.
                                         {{ __('Deadline: :state', ['state' => $obligation->status->label()]) }}
                                     </flux:badge>
                                 </div>
+                                @can('update', $obligation)
+                                    <flux:button
+                                        class="mb-2"
+                                        size="sm"
+                                        variant="ghost"
+                                        icon="calendar-days"
+                                        wire:click="openDeadlineOverride('{{ $obligation->id }}')"
+                                    >
+                                        {{ __('Override deadline') }}
+                                    </flux:button>
+                                @endcan
                                 @if ($obligation->workItem)
                                     @php
                                         $preparer = $obligation->workItem->currentAssignment(\App\Enums\AssignmentRole::Preparer);
@@ -392,6 +408,29 @@ FORM: Deadline review rail, grounded structure seven, seed 75cba0e2.
         </aside>
         @endcan
     </div>
+
+    <flux:modal
+        name="deadline-override"
+        wire:model="showDeadlineOverrideModal"
+        @close="closeDeadlineOverrideModal"
+        class="max-w-lg"
+    >
+        <form wire:submit="overrideDeadline" class="space-y-6">
+            <div>
+                <flux:heading size="lg">{{ __('Override effective deadline') }}</flux:heading>
+                <flux:text class="mt-2">{{ $deadlineOverrideLabel }}</flux:text>
+                <flux:text class="mt-2 text-zinc-500">
+                    {{ __('The original statutory date is preserved. This change affects operational urgency and ordering only.') }}
+                </flux:text>
+            </div>
+            <flux:input wire:model="deadlineOverrideDate" type="date" :label="__('New effective due date')" required />
+            <flux:textarea wire:model="deadlineOverrideReason" :label="__('Reason')" rows="4" maxlength="500" required />
+            <div class="flex justify-end gap-2">
+                <flux:button type="button" variant="ghost" wire:click="closeDeadlineOverrideModal">{{ __('Cancel') }}</flux:button>
+                <flux:button type="submit" variant="primary">{{ __('Record override') }}</flux:button>
+            </div>
+        </form>
+    </flux:modal>
 
     <flux:modal
         name="assign-primary-work"

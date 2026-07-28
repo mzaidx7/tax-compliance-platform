@@ -81,6 +81,7 @@ final readonly class CommitGeneratedObligation
                     'parameter_snapshot' => $lockedPreview->parameter_snapshot,
                     'result_snapshot' => $lockedPreview->result_snapshot,
                     'statutory_due_date' => $lockedPreview->statutory_due_date,
+                    'effective_due_date' => $lockedPreview->statutory_due_date,
                     'internal_target_date' => $lockedPreview->internal_target_date,
                     'calculation_explanation' => $lockedPreview->calculation_explanation,
                     'created_by' => $actor->id,

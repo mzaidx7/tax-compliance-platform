@@ -9,13 +9,13 @@
 - Platform repository status: independent repository on `main`, remote `mzaidx7/tax-compliance-platform`
 - Parent repository status for this directory: separate nested repository, outside website delivery
 - Current phase: Stage 4, client and data foundation
-- Current milestone: Governed obligation generation packet completed
+- Current milestone: Append-only effective deadline override packet completed
 
 ## Current Objective
 
 Create a UAE-focused compliance operations and e-invoicing readiness platform under a TBT subdomain while keeping its application, data, deployment and release lifecycle separate from the public TBT website.
 
-The immediate objective is explicit append-only deadline overrides that preserve original generated or manual dates. Import processing remains gated on product-owner decisions for conflict handling, reversal and retention.
+The immediate objective is explicit append-only obligation cancellation and supersession with a required replacement link for supersession. Import processing remains gated on product-owner decisions for conflict handling, reversal and retention.
 
 ## Canonical Files
 
@@ -118,7 +118,7 @@ The immediate objective is explicit append-only deadline overrides that preserve
 - Scheduler and queue-worker heartbeat probes run every minute with overlap and single-server protection.
 - `platform:operations-status` reports scheduler and worker freshness in human-readable or JSON form.
 - The dashboard and authenticated shell now use the platform-owned dark ink, silver and restrained gold operational design.
-- Client, obligation, work item, assignment, reassignment, workflow-version, checklist-gated transition, versioned evidence, reviewer return/approval decision, explicit workflow-version migration, filing-record and payment-record schemas are implemented; tax records and rule generation remain pending.
+- Client, obligation, work item, assignment, reassignment, workflow-version, checklist-gated transition, versioned evidence, reviewer return/approval decision, explicit workflow-version migration, filing, payment, tax, governed generation and deadline override schemas are implemented.
 - Filing state uses its own record, lifecycle and append-only history, gated by the named `manage_filings` permission, and never reads or writes work status.
 - Payment state uses its own record, lifecycle and append-only history, gated by the named `manage_payments` permission, and never reads or writes work or filing status. `paid` is terminal and requires a reference and settlement date.
 - Append-only history is enforced at two layers: Eloquent model events and database triggers on `work_item_transitions`, `filing_record_transitions`, `payment_record_transitions` and `audit_logs`.
@@ -177,10 +177,10 @@ The immediate objective is explicit append-only deadline overrides that preserve
 - Laravel Pint check passed.
 - Larastan passed with zero errors.
 - Full workflow feature suite (`tests/Feature/Workflows`, including checklist, transition, reviewer-decision and workflow-version migration tests) passed with no failures.
-- PHPUnit passed 394 tests with 1,189 assertions after Build Packet 40.
+- PHPUnit passed 400 tests with 1,208 assertions after Build Packet 41.
 - Database triggers were verified to reject raw query-builder updates and deletes on `work_item_transitions`, which Eloquent model events alone do not cover.
 - Vite production build passed.
-- All 24 migrations and seven synthetic domain seeders passed in an isolated temporary database.
+- All migrations, including append-only deadline overrides, and seven synthetic domain seeders passed from a fresh database.
 - The local database includes immutable workflow definitions, transition steps and non-null work-item version pins.
 - Composer schema and lock validation passed.
 - Composer audit reported no known vulnerability advisories.
@@ -298,3 +298,4 @@ Start by reading `AGENTS.md` and the master plan. Reconcile this file against Gi
 - Implemented and verified filing records (`FilingStatus`, `FilingRecord`, `FilingRecordTransition`, `CreateFilingRecord`, `TransitionFilingRecord`, `FilingRecordPolicy`, named `manage_filings` permission) with one filing per obligation, opening states limited to not required or not filed, required filing reference and filed date before authority outcome states, append-only transition history protected by Eloquent events and database triggers, `filing_record.created` and `filing_record.status_transitioned` audit evidence, and a Livewire filing interface. Filing state never reads or writes work status and no payment record, EmaraTax automation or authority transmission exists.
 - Implemented and verified explicit audited workflow-version migration (`MigrateWorkItemWorkflowVersion`) for one open work item to a later published version of the same workflow key, with a required reason, rejection of completed or cancelled work, rejection of a target version defining no transition from the current status, preserved transition, assignment and checklist history, append-only `work_item.workflow_version_migrated` audit evidence and a Livewire "Migrate version" interface.
 - Implemented and verified the Stage 4 client, document and governed-obligation foundation: source-linked rules have controlled publication and immutable history; published manual-date rules now create persisted previews and committed generation runs with explicit client, service, applicability and period inputs, complete input, parameter and result snapshots, human-readable explanations and deterministic keys. Same-input reruns return one obligation, changed inputs create a distinct obligation, superseded previews cannot commit, and database triggers prevent run or issued snapshot rewrites. No regulated VAT or Corporate Tax formula exists.
+- Implemented and verified append-only deadline overrides (`effective_due_date`, `ObligationDeadlineOverride`, `OverrideObligationDeadline`) for open obligations. Each reason-required event retains the prior and new effective date, actor and timestamp; model guards and database triggers reject history mutation; the original statutory date and governed snapshots remain unchanged; dashboard, obligation and work registers sort and measure by the effective date while continuing to show the statutory date when different; no-op, internally inconsistent, unauthorised and cross-firm changes are rejected.

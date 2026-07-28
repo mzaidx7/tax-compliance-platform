@@ -7,8 +7,10 @@ namespace App\Models;
 use App\Enums\ObligationOrigin;
 use App\Enums\ObligationStatus;
 use App\Models\Concerns\BelongsToFirm;
+use Carbon\CarbonInterface;
 use Database\Factories\ObligationFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -33,6 +35,7 @@ use Illuminate\Support\Carbon;
  * @property string $obligation_type
  * @property string|null $period_label
  * @property Carbon $statutory_due_date
+ * @property Carbon|null $effective_due_date
  * @property Carbon|null $internal_target_date
  * @property ObligationOrigin $origin
  * @property ObligationStatus $status
@@ -45,6 +48,7 @@ use Illuminate\Support\Carbon;
  * @property-read FilingRecord|null $filingRecord
  * @property-read PaymentRecord|null $paymentRecord
  * @property-read TaxRecord|null $taxRecord
+ * @property-read Collection<int, ObligationDeadlineOverride> $deadlineOverrides
  */
 #[Fillable([
     'client_id',
@@ -60,6 +64,7 @@ use Illuminate\Support\Carbon;
     'obligation_type',
     'period_label',
     'statutory_due_date',
+    'effective_due_date',
     'internal_target_date',
     'origin',
     'status',
@@ -131,6 +136,17 @@ final class Obligation extends Model
     public function generationRun(): BelongsTo
     {
         return $this->belongsTo(ObligationGenerationRun::class, 'generation_run_id');
+    }
+
+    /** @return HasMany<ObligationDeadlineOverride, $this> */
+    public function deadlineOverrides(): HasMany
+    {
+        return $this->hasMany(ObligationDeadlineOverride::class);
+    }
+
+    public function effectiveDueDate(): CarbonInterface
+    {
+        return $this->effective_due_date ?? $this->statutory_due_date;
     }
 
     /**
@@ -206,6 +222,7 @@ final class Obligation extends Model
     {
         return [
             'statutory_due_date' => 'date',
+            'effective_due_date' => 'date',
             'internal_target_date' => 'date',
             'last_verified_on' => 'date',
             'calculation_input_snapshot' => 'array',

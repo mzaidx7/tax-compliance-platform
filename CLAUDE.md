@@ -19,7 +19,7 @@ Treat the master plan as canonical scope and `MEMORY.md` as the current implemen
 ## Current State
 
 - Stage 3 compliance walking skeleton is active.
-- Build Packet 40 is complete.
+- Build Packet 41 is complete.
 - Work assignment, append-only reassignment, immutable workflow versions, pinned checklists, checklist completion evidence, checklist-gated review submission, reviewer return and approval decisions and explicit audited workflow-version migration are implemented.
 - Every work item is pinned to a published firm-owned workflow definition and checklist version.
 - Moving from `in_preparation` to `under_review` requires retained completion evidence for every required item on the pinned checklist.
@@ -44,21 +44,22 @@ Treat the master plan as canonical scope and `MEMORY.md` as the current implemen
 - Document expiry uses immutable firm-owned type versions, metadata-only client records, renewal chains and idempotent firm-local reminder generation. It stores no client document file and derives no validity or compliance conclusion.
 - Obligation rule governance has stable immutable templates, draft-only content editing, source-linked versions, registered-calculator review gating, separate preparer and verifier identities, database-enforced lifecycle order and append-only events. The only registered calculator passes through a manually supplied date and explicitly performs no statutory calculation.
 - Governed obligation generation requires a persisted preview, published rule, explicit client, service, applicability date and compliance-period label or actual tax period. Preview and committed runs are immutable, deterministic reruns return the same obligation, changed inputs create a new obligation, and no issued obligation is overwritten.
+- Open obligations support explicit reason-required effective deadline overrides. The original statutory date and generated snapshots remain unchanged, each override is append-only, and operational queues use the effective date while displaying the original when different.
 - Two operational notification templates exist, `work_item_high_risk` and `payment_overdue`, both fired only by an explicit recorded change and addressed to the current responsible manager.
 - Regulated-rule generation modules are not implemented.
 - The full current verification baseline is recorded in `MEMORY.md`.
 
 ## Next Safe Packet
 
-Add explicit, reason-required manual deadline overrides without rewriting calculated snapshots.
+Add explicit, reason-required obligation disposition records for cancellation or supersession without deletion.
 
 Keep it bounded:
 
-- Add append-only override records retaining old date, new date, actor, reason and timestamp.
-- Keep the original calculated or manually entered due date immutable in its source snapshot.
-- Expose effective due date separately from original due date.
-- Reject no-op, unauthorised and cross-firm overrides.
-- Do not silently regenerate, supersede or mutate an obligation.
+- Add append-only disposition records retaining old status, new status, actor, reason and timestamp.
+- Permit only explicit open-to-cancelled or open-to-superseded transitions.
+- Require an explicitly selected replacement obligation before superseding.
+- Preserve the original obligation, dates, snapshots and all linked work evidence.
+- Reject no-op, unauthorised, cross-firm and circular replacement links.
 - Do not add VAT or Corporate Tax formulas without approved sourced golden cases.
 - Keep import processing gated until conflict, reversal and retention decisions are approved.
 

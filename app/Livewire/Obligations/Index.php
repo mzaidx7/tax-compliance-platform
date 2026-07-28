@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Livewire\Obligations;
 
 use App\Actions\Compliance\CreateManualObligation;
+use App\Actions\Compliance\OverrideObligationDeadline;
 use App\Actions\Filings\CreateFilingRecord;
 use App\Actions\Filings\TransitionFilingRecord;
 use App\Actions\Payments\CreatePaymentRecord;
@@ -78,6 +79,17 @@ final class Index extends Component
     public string $sourceReference = '';
 
     public string $lastVerifiedOn = '';
+
+    public bool $showDeadlineOverrideModal = false;
+
+    #[Locked]
+    public string $deadlineOverrideObligationId = '';
+
+    public string $deadlineOverrideLabel = '';
+
+    public string $deadlineOverrideDate = '';
+
+    public string $deadlineOverrideReason = '';
 
     public bool $showAssignmentModal = false;
 
@@ -290,6 +302,47 @@ final class Index extends Component
             variant: 'success',
             text: "Manual obligation created for {$obligation->client->legal_name}.",
         );
+    }
+
+    public function openDeadlineOverride(string $obligationId): void
+    {
+        $obligation = Obligation::query()->findOrFail($obligationId);
+        Gate::authorize('update', $obligation);
+
+        $this->resetValidation();
+        $this->deadlineOverrideObligationId = $obligation->id;
+        $this->deadlineOverrideLabel = "{$obligation->client->internal_code} · {$obligation->obligation_type}";
+        $this->deadlineOverrideDate = $obligation->effectiveDueDate()->toDateString();
+        $this->deadlineOverrideReason = '';
+        $this->showDeadlineOverrideModal = true;
+    }
+
+    public function overrideDeadline(OverrideObligationDeadline $overrideObligationDeadline): void
+    {
+        $obligation = Obligation::query()->findOrFail($this->deadlineOverrideObligationId);
+        $overrideObligationDeadline->handle($this->currentUser(), $obligation, [
+            'effectiveDueDate' => $this->deadlineOverrideDate,
+            'reason' => $this->deadlineOverrideReason,
+        ]);
+
+        $this->closeDeadlineOverrideModal();
+        unset($this->obligations);
+        Flux::toast(
+            variant: 'success',
+            text: __('Effective deadline updated. The statutory date remains unchanged.'),
+        );
+    }
+
+    public function closeDeadlineOverrideModal(): void
+    {
+        $this->reset(
+            'showDeadlineOverrideModal',
+            'deadlineOverrideObligationId',
+            'deadlineOverrideLabel',
+            'deadlineOverrideDate',
+            'deadlineOverrideReason',
+        );
+        $this->resetValidation();
     }
 
     public function openAssignment(string $obligationId): void
@@ -1003,7 +1056,7 @@ final class Index extends Component
                     });
                 },
             )
-            ->orderBy('statutory_due_date')
+            ->orderByRaw('coalesce(effective_due_date, statutory_due_date)')
             ->orderBy('id')
             ->paginate(25);
     }

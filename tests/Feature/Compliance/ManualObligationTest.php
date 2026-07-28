@@ -72,6 +72,7 @@ final class ManualObligationTest extends TestCase
         $this->assertSame('Manual VAT review', $obligation->obligation_type);
         $this->assertSame('Synthetic Q2 2026', $obligation->period_label);
         $this->assertSame('2026-09-28', $obligation->statutory_due_date->toDateString());
+        $this->assertSame('2026-09-28', $obligation->effectiveDueDate()->toDateString());
         $this->assertSame('2026-09-21', $obligation->internal_target_date?->toDateString());
         $this->assertSame(ObligationOrigin::Manual, $obligation->origin);
         $this->assertSame(ObligationStatus::Open, $obligation->status);

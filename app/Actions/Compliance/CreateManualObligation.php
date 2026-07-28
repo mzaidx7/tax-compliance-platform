@@ -88,6 +88,7 @@ final readonly class CreateManualObligation
                 'obligation_type' => trim($validated['obligationType']),
                 'period_label' => $this->optionalText($validated['periodLabel']),
                 'statutory_due_date' => $validated['statutoryDueDate'],
+                'effective_due_date' => $validated['statutoryDueDate'],
                 'internal_target_date' => $validated['internalTargetDate'],
                 'origin' => ObligationOrigin::Manual,
                 'status' => ObligationStatus::Open,

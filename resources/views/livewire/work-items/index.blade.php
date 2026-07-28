@@ -67,7 +67,10 @@
                             <p class="mt-1 text-xs text-zinc-500">
                                 {{ $primary->obligation->period_label ?: __('No period label') }}
                                 ·
-                                {{ __('Due :date', ['date' => $primary->obligation->statutory_due_date->format('d M Y')]) }}
+                                {{ __('Effective due :date', ['date' => $primary->obligation->effectiveDueDate()->format('d M Y')]) }}
+                                @if (! $primary->obligation->effectiveDueDate()->isSameDay($primary->obligation->statutory_due_date))
+                                    · {{ __('Statutory :date', ['date' => $primary->obligation->statutory_due_date->format('d M Y')]) }}
+                                @endif
                             </p>
                         </div>
 

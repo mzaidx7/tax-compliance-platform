@@ -508,3 +508,16 @@ Generation is a preview-first tenant-owned operation:
 - A preview cannot commit after its rule is superseded or retired. The operator must create a new preview.
 - Generated snapshot fields reject model and raw database mutation. Independent obligation workflow status may still change through its own controlled boundary.
 - Generation never modifies, replaces or silently supersedes another issued obligation.
+
+## Obligation Deadline Overrides
+
+Deadline correction is an explicit tenant-owned operation:
+
+- `statutory_due_date` remains the original manually entered or governed-generation date and is never rewritten by an override.
+- `effective_due_date` is the operational date used for urgency filters and ordering, with a fallback to the statutory date for earlier records.
+- Only an authorised manager in the active firm may override an open obligation, and every override requires a different date and a reason.
+- An effective date cannot precede the retained internal target date.
+- Each event retains the prior date, new date, actor, reason and timestamp in `obligation_deadline_overrides`.
+- Model guards and database triggers reject update or deletion of override history.
+- Dashboards and work registers show the original statutory date whenever it differs from the effective date.
+- An override never changes a generated input, parameter, result or explanation snapshot and never regenerates or supersedes an obligation.

@@ -33,6 +33,7 @@ class ObligationFactory extends Factory
             ]),
             'period_label' => fake()->optional()->bothify('Period ####-##'),
             'statutory_due_date' => fake()->dateTimeBetween('+30 days', '+180 days'),
+            'effective_due_date' => null,
             'internal_target_date' => fake()->dateTimeBetween('+7 days', '+29 days'),
             'origin' => ObligationOrigin::Manual,
             'status' => ObligationStatus::Open,
