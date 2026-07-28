@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\DocumentEvidenceDownloadController;
 use App\Http\Controllers\ExportDownloadController;
 use App\Http\Controllers\FirmSelectionController;
 use App\Http\Controllers\FirmSwitchController;
@@ -36,6 +37,8 @@ Route::middleware(['auth', 'verified', 'firm.context'])->group(function () {
     Route::livewire('audit', AuditIndex::class)->name('audit.index');
     Route::get('exports/{exportAuditLog}/download', ExportDownloadController::class)
         ->name('exports.download');
+    Route::get('documents/{documentEvidence}/download', DocumentEvidenceDownloadController::class)
+        ->name('documents.download');
     Route::livewire('settings/features', SettingsFeatureFlags::class)->name('settings.features');
 });
 

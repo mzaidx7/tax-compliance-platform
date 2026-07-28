@@ -407,6 +407,25 @@ The caller-provided idempotency key identifies one business occurrence, such as 
 
 Provider references remain null until a mail adapter exposes a stable non-sensitive identifier. Failure evidence stores a bounded exception category, never the provider response or exception message. Notification requests cannot be deleted until the retention policy is approved.
 
+## Retained Document Evidence
+
+Use `App\Actions\Documents\StoreDocumentEvidence` to attach a document to open work and `documents.download` to retrieve a clean retained payload.
+
+The boundary:
+
+- Requires trusted active firm context, enabled compliance operations and the dedicated `evidence` work-item policy ability.
+- Allows responsible managers and currently assigned preparers or reviewers. Other same-firm members and every foreign firm are denied.
+- Accepts only PDF, PNG and JPEG files within the configured size limit, and requires the detected MIME type to match the extension.
+- Stores the payload only on tenant-private non-serving storage under a generated logical path.
+- Retains immutable document metadata including purpose, original name, detected type, checksum, byte count, uploader and upload time.
+- Appends an immutable scan event. The default production adapter returns `unavailable`, so an unconfigured scanner quarantines rather than approves every upload.
+- Deletes an infected payload while retaining its evidence and scan history.
+- Permits download only when the latest scan event is clean and the stored checksum and byte count still match.
+- Records upload, scan and successful download as distinct append-only audit events.
+- Rejects model, query-builder and raw SQL mutation of document and scan history through model guards and database triggers.
+
+Development and tests use synthetic files only. The application does not claim that malware scanning is operational until a real `MalwareScanner` adapter is configured and verified in the target environment.
+
 ## Operational Notification Triggers
 
 Two operational templates exist, both dispatched through `DispatchFirmNotification` and never through a second path:

@@ -94,6 +94,12 @@ final class WorkItem extends Model
         return $this->hasMany(WorkItemRiskChange::class);
     }
 
+    /** @return HasMany<DocumentEvidence, $this> */
+    public function documentEvidence(): HasMany
+    {
+        return $this->hasMany(DocumentEvidence::class);
+    }
+
     /**
      * The completed work item this follow-up corrects, when this is a follow-up.
      *

@@ -109,15 +109,44 @@
                                             'manager' => $manager?->assignedMembership?->user?->name ?? __('Unassigned'),
                                         ]) }}
                                     </p>
+
+                                    @if ($workItem->documentEvidence->isNotEmpty())
+                                        <ul class="mt-3 space-y-2" aria-label="{{ __('Retained document evidence') }}">
+                                            @foreach ($workItem->documentEvidence->sortBy('uploaded_at') as $evidence)
+                                                @php($scan = $evidence->latestScan())
+                                                <li class="flex flex-wrap items-center gap-2 text-xs">
+                                                    <span class="max-w-56 truncate text-zinc-300">{{ $evidence->original_name }}</span>
+                                                    <flux:badge :color="$scan?->verdict === \App\Enums\MalwareScanVerdict::Clean ? 'green' : ($scan?->verdict === \App\Enums\MalwareScanVerdict::Infected ? 'red' : 'amber')">
+                                                        {{ $scan?->verdict->label() ?? __('Quarantined') }}
+                                                    </flux:badge>
+                                                    <span class="text-zinc-500">{{ $evidence->purpose->label() }}</span>
+                                                    @if ($scan?->verdict === \App\Enums\MalwareScanVerdict::Clean)
+                                                        <a
+                                                            href="{{ route('documents.download', $evidence) }}"
+                                                            class="font-medium text-amber-300 underline decoration-amber-300/40 underline-offset-4 hover:text-amber-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-300"
+                                                        >
+                                                            {{ __('Download') }}
+                                                        </a>
+                                                    @endif
+                                                </li>
+                                            @endforeach
+                                        </ul>
+                                    @endif
                                 </div>
 
-                                <div class="text-left lg:text-right">
+                                <div class="flex flex-col items-start gap-2 lg:items-end">
                                     @if ($position === 0 && $primary->followUps->isNotEmpty())
                                         <p class="text-xs font-medium text-green-300">{{ __('Original preserved') }}</p>
                                     @elseif ($workItem->status->value === 'completed')
                                         <p class="text-xs font-medium text-green-300">{{ __('Closed evidence') }}</p>
                                     @else
                                         <p class="text-xs text-zinc-500">{{ __('Active work record') }}</p>
+                                    @endif
+
+                                    @if (! in_array($workItem->status, [\App\Enums\WorkItemStatus::Completed, \App\Enums\WorkItemStatus::Cancelled], true) && Gate::allows('evidence', $workItem))
+                                        <flux:button size="sm" variant="ghost" icon="paper-clip" wire:click="openEvidence('{{ $workItem->id }}')">
+                                            {{ __('Add evidence') }}
+                                        </flux:button>
                                     @endif
                                 </div>
                             </li>
@@ -138,4 +167,41 @@
             <div class="mt-6">{{ $this->workGroups->links() }}</div>
         @endif
     </section>
+
+    <flux:modal wire:model.self="showEvidenceModal" class="md:w-[34rem]">
+        <form wire:submit="saveEvidence" class="space-y-6">
+            <div>
+                <flux:heading size="lg">{{ __('Add document evidence') }}</flux:heading>
+                <flux:text class="mt-2">
+                    {{ __('Attach evidence to :work. Files stay private and quarantined unless the configured malware scanner returns a clean result.', ['work' => $evidenceWorkItemLabel]) }}
+                </flux:text>
+            </div>
+
+            <flux:select wire:model="evidencePurpose" :label="__('Document purpose')" required>
+                @foreach ($this->evidencePurposes as $purpose)
+                    <flux:select.option :value="$purpose->value">{{ $purpose->label() }}</flux:select.option>
+                @endforeach
+            </flux:select>
+
+            <flux:input
+                type="file"
+                wire:model="documentUpload"
+                :label="__('Document')"
+                accept=".pdf,.png,.jpg,.jpeg,application/pdf,image/png,image/jpeg"
+                required
+            />
+            <flux:error name="documentUpload" />
+            <p class="text-xs leading-5 text-zinc-500">
+                {{ __('PDF, PNG or JPEG. Maximum 10 MB. The detected file type must match its extension.') }}
+            </p>
+
+            <div class="flex justify-end gap-3">
+                <flux:button type="button" variant="ghost" wire:click="closeEvidence">{{ __('Cancel') }}</flux:button>
+                <flux:button type="submit" variant="filled" wire:loading.attr="disabled" wire:target="documentUpload,saveEvidence">
+                    <span wire:loading.remove wire:target="saveEvidence">{{ __('Store and scan') }}</span>
+                    <span wire:loading wire:target="saveEvidence">{{ __('Scanning...') }}</span>
+                </flux:button>
+            </div>
+        </form>
+    </flux:modal>
 </div>

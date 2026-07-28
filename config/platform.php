@@ -47,6 +47,16 @@ return [
         'temporary_memory_bytes' => (int) env('EXPORT_TEMPORARY_MEMORY_BYTES', 1048576),
     ],
 
+    'documents' => [
+        'max_bytes' => (int) env('DOCUMENT_MAX_BYTES', 10485760),
+        'allowed_types' => [
+            'pdf' => ['application/pdf'],
+            'png' => ['image/png'],
+            'jpg' => ['image/jpeg'],
+            'jpeg' => ['image/jpeg'],
+        ],
+    ],
+
     'operations' => [
         'heartbeat_fresh_for_seconds' => (int) env('PLATFORM_HEARTBEAT_FRESH_FOR_SECONDS', 300),
         'scheduled_firm_batch_size' => (int) env('PLATFORM_SCHEDULED_FIRM_BATCH_SIZE', 100),

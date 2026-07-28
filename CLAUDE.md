@@ -19,7 +19,7 @@ Treat the master plan as canonical scope and `MEMORY.md` as the current implemen
 ## Current State
 
 - Stage 3 compliance walking skeleton is active.
-- Build Packet 34 is complete.
+- Build Packet 35 is complete.
 - Work assignment, append-only reassignment, immutable workflow versions, pinned checklists, checklist completion evidence, checklist-gated review submission, reviewer return and approval decisions and explicit audited workflow-version migration are implemented.
 - Every work item is pinned to a published firm-owned workflow definition and checklist version.
 - Moving from `in_preparation` to `under_review` requires retained completion evidence for every required item on the pinned checklist.
@@ -38,23 +38,24 @@ Treat the master plan as canonical scope and `MEMORY.md` as the current implemen
 - Completed work can be corrected through `ReopenWorkItem`, which creates a linked follow-up and never changes the original. An obligation keeps one primary work item plus any number of follow-ups.
 - The read-only work register groups each preserved primary work item with chronological corrective follow-ups and exposes each record's independent status, risk, workflow version and current owners.
 - The firm dashboard derives separate due-soon, overdue, high-risk and overdue-payment measures from stored firm-scoped records without calculating a compliance score.
+- Document evidence is immutable, firm-scoped, private and fail-closed: unconfigured scanning quarantines, infected payloads are removed, and only checksum-verified clean evidence can be downloaded.
 - Two operational notification templates exist, `work_item_high_risk` and `payment_overdue`, both fired only by an explicit recorded change and addressed to the current responsible manager.
 - Regulated-rule generation modules are not implemented.
 - The full current verification baseline is recorded in `MEMORY.md`.
 
 ## Next Safe Packet
 
-Add retained document evidence with strict validation and an explicit malware-scanning boundary.
+Record product-owner decisions for import conflict handling, reversal and retention before import processing begins.
 
 Keep it bounded:
 
-- Store only synthetic test files during development.
-- Validate file size, extension, detected MIME type and allowed document purpose.
-- Keep new uploads quarantined until a scanner adapter returns a clean result; do not pretend a scanner exists when it is not configured.
-- Link retained evidence to one firm-scoped work item and preserve an immutable upload record.
-- Add authorization, tenant-isolation, unsafe-file, quarantine and download tests.
+- Choose whether an import creates proposals only or may create new records directly.
+- Define duplicate-key and conflicting-value behavior.
+- Define reversal rules after an approved import is applied.
+- Define retention for source files, staging rows, rejected rows and processing evidence.
+- Do not infer these governance decisions in code.
 
-After that packet, stop before import processing unless conflict, reversal and retention policies have been approved.
+After approval, build the first bounded import staging packet without applying changes to canonical records.
 
 ## Local Commands
 

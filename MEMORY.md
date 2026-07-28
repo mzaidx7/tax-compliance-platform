@@ -15,7 +15,7 @@
 
 Create a UAE-focused compliance operations and e-invoicing readiness platform under a TBT subdomain while keeping its application, data, deployment and release lifecycle separate from the public TBT website.
 
-The immediate objective is retained document evidence with strict validation and an explicit malware-scanning boundary.
+The immediate objective is approval of import conflict, reversal and retention policies before import processing.
 
 ## Canonical Files
 
@@ -251,9 +251,9 @@ No regulatory statement should be converted into a published calculator or custo
 
 ## Next Three Safe Actions
 
-1. Add retained document evidence with strict file validation and an explicit malware-scanning boundary.
-2. Approve import conflict, reversal and retention policies before building import processing.
-3. Verify the exact Hostinger capability matrix and production PHP, Laravel and MySQL baseline.
+1. Approve import conflict, reversal and retention policies before building import processing.
+2. Verify the exact Hostinger capability matrix and production PHP, Laravel and MySQL baseline.
+3. Configure and verify a real `MalwareScanner` adapter before any production document is treated as clean.
 
 ## Next Agent Handoff
 
@@ -297,4 +297,4 @@ Start by reading `AGENTS.md` and the master plan. Reconcile this file against Gi
 - Implemented and verified payment records (`PaymentStatus`, `PaymentRecord`, `PaymentRecordTransition`, `CreatePaymentRecord`, `TransitionPaymentRecord`, `PaymentRecordPolicy`, named `manage_payments` permission) with one payment per obligation, opening states limited to not required, unknown or pending, a terminal paid state requiring a retained reference and settlement date, append-only transition history protected by Eloquent events and database triggers, `payment_record.created` and `payment_record.status_transitioned` audit evidence, and a Livewire payment interface. Payment state never reads or writes work or filing status, and no transfer is ever initiated, authorised or confirmed.
 - Implemented and verified filing records (`FilingStatus`, `FilingRecord`, `FilingRecordTransition`, `CreateFilingRecord`, `TransitionFilingRecord`, `FilingRecordPolicy`, named `manage_filings` permission) with one filing per obligation, opening states limited to not required or not filed, required filing reference and filed date before authority outcome states, append-only transition history protected by Eloquent events and database triggers, `filing_record.created` and `filing_record.status_transitioned` audit evidence, and a Livewire filing interface. Filing state never reads or writes work status and no payment record, EmaraTax automation or authority transmission exists.
 - Implemented and verified explicit audited workflow-version migration (`MigrateWorkItemWorkflowVersion`) for one open work item to a later published version of the same workflow key, with a required reason, rejection of completed or cancelled work, rejection of a target version defining no transition from the current status, preserved transition, assignment and checklist history, append-only `work_item.workflow_version_migrated` audit evidence and a Livewire "Migrate version" interface.
-- Remediated the packet review findings: filing, payment and tax creation now reject foreign-firm obligations with `AuthorizationException`; assignment and checklist completion evidence have database-level append-only triggers with raw-query regression tests; and controlled-reopen rollback stops before destructive schema changes when follow-up work exists, directing operators to a forward recovery migration.
+- Implemented and verified retained document evidence (`DocumentEvidence`, `DocumentScanEvent`, `StoreDocumentEvidence`, `documents.download`) with immutable firm-scoped metadata and scan history, strict size, extension and detected-MIME validation, generated tenant-private paths, an assignment-aware `evidence` ability, quarantine when scanning is unavailable, infected-payload removal, clean-only checksum-verified downloads, distinct upload, scan and download audit events, and Livewire controls in the work register. The default scanner is explicitly unavailable and never marks a production upload clean.

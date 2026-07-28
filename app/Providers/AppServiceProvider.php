@@ -2,8 +2,10 @@
 
 namespace App\Providers;
 
+use App\Contracts\MalwareScanner;
 use App\Support\FeatureFlags;
 use App\Support\OperationalHealth;
+use App\Support\UnavailableMalwareScanner;
 use App\Tenancy\FirmContext;
 use App\Tenancy\TenantCache;
 use App\Tenancy\TenantNamespace;
@@ -27,6 +29,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->scoped(TenantStorage::class);
         $this->app->singleton(FeatureFlags::class);
         $this->app->singleton(OperationalHealth::class);
+        $this->app->bind(MalwareScanner::class, UnavailableMalwareScanner::class);
     }
 
     /**

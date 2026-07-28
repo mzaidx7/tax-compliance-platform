@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Policies;
 
+use App\Enums\AssignmentRole;
 use App\Enums\Permission;
 use App\Models\FirmMembership;
 use App\Models\User;
@@ -60,6 +61,27 @@ final readonly class WorkItemPolicy
         return $membership !== null
             && $workItem->firm_id === $membership->firm_id
             && $membership->hasPermission(Permission::ReviewWork);
+    }
+
+    public function evidence(User $user, WorkItem $workItem): bool
+    {
+        $membership = $this->actorMembership($user);
+
+        if ($membership === null || $workItem->firm_id !== $membership->firm_id) {
+            return false;
+        }
+
+        if ($membership->hasPermission(Permission::AssignWork)) {
+            return true;
+        }
+
+        foreach (AssignmentRole::cases() as $role) {
+            if ($workItem->currentAssignment($role)?->assigned_membership_id === $membership->id) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public function delete(User $user, WorkItem $workItem): bool
