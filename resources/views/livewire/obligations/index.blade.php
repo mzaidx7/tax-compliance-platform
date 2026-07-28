@@ -26,7 +26,7 @@ FORM: Deadline review rail, grounded structure seven, seed 75cba0e2.
 
     <div @class([
         'mt-9 grid gap-10',
-        'xl:grid-cols-[minmax(0,1fr)_23rem]' => Gate::allows('create', \App\Models\Obligation::class),
+        '2xl:grid-cols-[minmax(0,1fr)_23rem]' => Gate::allows('create', \App\Models\Obligation::class),
     ])>
         <section aria-labelledby="obligation-register-heading">
             <div class="mb-5 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
@@ -46,7 +46,7 @@ FORM: Deadline review rail, grounded structure seven, seed 75cba0e2.
             </div>
 
             <div class="overflow-hidden border-y border-white/8">
-                <div class="hidden grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)_8rem_8rem_9rem] gap-4 border-b border-white/8 px-4 py-3 text-xs font-medium text-zinc-500 lg:grid">
+                <div class="hidden grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)_7.5rem_7.5rem_14rem] gap-4 border-b border-white/8 px-4 py-3 text-xs font-medium text-zinc-500 lg:grid">
                     <span>{{ __('Client and obligation') }}</span>
                     <span>{{ __('Period and origin') }}</span>
                     <span>{{ __('Internal target') }}</span>
@@ -58,7 +58,7 @@ FORM: Deadline review rail, grounded structure seven, seed 75cba0e2.
                     @forelse ($this->obligations as $obligation)
                         <article
                             wire:key="obligation-{{ $obligation->id }}"
-                            class="grid gap-4 px-4 py-5 transition-colors duration-150 hover:bg-white/[0.025] lg:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)_8rem_8rem_9rem] lg:items-center"
+                            class="grid gap-4 px-4 py-5 transition-colors duration-150 hover:bg-white/[0.025] lg:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)_7.5rem_7.5rem_14rem] lg:items-start"
                         >
                             <div class="min-w-0">
                                 <span class="mb-1 block text-xs text-zinc-500 lg:hidden">{{ __('Client and obligation') }}</span>
@@ -319,7 +319,7 @@ FORM: Deadline review rail, grounded structure seven, seed 75cba0e2.
         </section>
 
         @can('create', \App\Models\Obligation::class)
-        <aside aria-labelledby="create-obligation-heading" class="xl:sticky xl:top-8 xl:self-start">
+        <aside aria-labelledby="create-obligation-heading" class="2xl:sticky 2xl:top-8 2xl:self-start">
             <div class="rounded-2xl bg-zinc-900/70 p-6 ring-1 ring-white/8">
                 <div class="mb-6">
                     <span class="mb-4 grid size-10 place-items-center rounded-xl bg-amber-400 text-black">
@@ -366,7 +366,7 @@ FORM: Deadline review rail, grounded structure seven, seed 75cba0e2.
                             maxlength="100"
                         />
 
-                        <div class="grid gap-5 sm:grid-cols-2 xl:grid-cols-1">
+                        <div class="grid gap-5 sm:grid-cols-2 2xl:grid-cols-1">
                             <flux:input
                                 wire:model="statutoryDueDate"
                                 type="date"
