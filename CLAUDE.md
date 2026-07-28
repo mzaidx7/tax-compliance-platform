@@ -111,5 +111,5 @@ Do not launch `php artisan serve` through a persistent foreground shell. Check p
 
 - Browser inspection is pending because port 8010 has had no listener and prior persistent server attempts blocked shell execution.
 - Xdebug and PCOV are not installed, so code coverage has not been measured.
-- CI and deployment pipelines are not implemented.
+- GitHub CI is green for release head `32c7f1b`. Production deployment has not been executed because the target host, subdomain, secrets, worker, cron, mail and backup controls still require owner access and direct verification.
 - Production hosting, legal seller, retention, recovery objectives, regulated-rule ownership and pilot approvals remain product-owner decisions listed in `MEMORY.md`.

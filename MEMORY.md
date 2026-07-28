@@ -171,7 +171,7 @@ The immediate objective is to configure the real production host, pass `platform
 - Laravel Pint check passed.
 - Larastan passed with zero errors.
 - Full workflow feature suite (`tests/Feature/Workflows`, including checklist, transition, reviewer-decision and workflow-version migration tests) passed with no failures.
-- PHPUnit passed 471 tests with 1,493 assertions for the Compliance Operations V1 release candidate.
+- PHPUnit passed 471 tests with 1,493 assertions; GitHub Actions run `30360819994` passed the exact `32c7f1b` release head across assets, formatting, static analysis, domain tests and dependency audits.
 - Database triggers were verified to reject raw query-builder updates and deletes on `work_item_transitions`, which Eloquent model events alone do not cover.
 - Vite production build passed.
 - All migrations, including append-only deadline overrides, and seven synthetic domain seeders passed from a fresh database.
