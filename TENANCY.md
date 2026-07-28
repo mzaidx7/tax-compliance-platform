@@ -583,3 +583,14 @@ Synthetic party records are client-owned readiness evidence:
 - Party, field, proposal and decision evidence reject model and raw database mutation or deletion.
 - Audit metadata records identifiers, field keys and outcomes but excludes field values, source references and evidence notes.
 - No party readiness status, duplicate match, merge, bulk import or readiness score is inferred.
+
+## Readiness Party Issues
+
+Party issues are retained explainable evidence, not an inferred readiness result:
+
+- An issue belongs to one firm-owned party and one published party-master rule version in the same firm. An optional field reference must be the party's current field version when recorded.
+- The issue snapshots severity, behavior, explanation and remediation so later rule publication cannot rewrite existing evidence.
+- Recording requires party update authority. Resolution or not-applicable decisions require readiness-rule authority and a different actor.
+- One issue accepts one terminal decision. The issue and decision reject model and raw database update or deletion.
+- Audit metadata records identifiers and outcomes but excludes evidence notes.
+- No automated evaluation, bulk import, duplicate matching, merge or readiness score is performed.

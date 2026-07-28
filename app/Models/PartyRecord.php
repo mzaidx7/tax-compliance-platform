@@ -43,6 +43,12 @@ final class PartyRecord extends Model
         return $this->hasMany(PartyCorrectionProposal::class);
     }
 
+    /** @return HasMany<PartyIssue, $this> */
+    public function issues(): HasMany
+    {
+        return $this->hasMany(PartyIssue::class);
+    }
+
     public function currentField(string $fieldKey): ?PartyFieldVersion
     {
         return $this->fieldVersions()->where('field_key', $fieldKey)->latest('recorded_at')->latest('id')->first();

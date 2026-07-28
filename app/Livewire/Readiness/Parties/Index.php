@@ -8,13 +8,19 @@ use App\Actions\Readiness\AddInitialPartyField;
 use App\Actions\Readiness\CreatePartyRecord;
 use App\Actions\Readiness\DecidePartyFieldCorrection;
 use App\Actions\Readiness\ProposePartyFieldCorrection;
+use App\Actions\Readiness\RecordPartyIssue;
+use App\Actions\Readiness\ResolvePartyIssue;
 use App\Enums\ClientStatus;
 use App\Enums\Feature;
 use App\Enums\PartyFieldKey;
 use App\Enums\PartyFieldVerificationState;
+use App\Enums\ReadinessDataDomain;
+use App\Enums\RuleVersionStatus;
 use App\Models\Client;
+use App\Models\DataQualityRuleVersion;
 use App\Models\PartyCorrectionProposal;
 use App\Models\PartyFieldVersion;
+use App\Models\PartyIssue;
 use App\Models\PartyRecord;
 use App\Models\User;
 use App\Support\FeatureFlags;
@@ -62,6 +68,20 @@ final class Index extends Component
     public string $decision = '';
 
     public string $decisionReason = '';
+
+    public string $issuePartyId = '';
+
+    public string $issueFieldVersionId = '';
+
+    public string $issueRuleVersionId = '';
+
+    public string $issueEvidenceNote = '';
+
+    public string $resolutionIssueId = '';
+
+    public string $resolutionOutcome = '';
+
+    public string $resolutionReason = '';
 
     public function mount(FeatureFlags $flags, FirmContext $context): void
     {
@@ -117,6 +137,32 @@ final class Index extends Component
         Flux::toast(variant: 'success', text: __('Correction decision retained.'));
     }
 
+    public function recordIssue(RecordPartyIssue $action): void
+    {
+        $issue = $action->handle(
+            $this->user(),
+            PartyRecord::query()->findOrFail($this->issuePartyId),
+            $this->issueFieldVersionId === '' ? null : PartyFieldVersion::query()->findOrFail($this->issueFieldVersionId),
+            DataQualityRuleVersion::query()->findOrFail($this->issueRuleVersionId),
+            $this->issueEvidenceNote,
+        );
+        $this->resolutionIssueId = $issue->id;
+        $this->reset('issueEvidenceNote');
+        unset($this->parties);
+        Flux::toast(variant: 'success', text: __('Explainable party issue recorded.'));
+    }
+
+    public function resolveIssue(ResolvePartyIssue $action): void
+    {
+        $action->handle(
+            $this->user(), PartyIssue::query()->findOrFail($this->resolutionIssueId),
+            $this->resolutionOutcome, $this->resolutionReason,
+        );
+        $this->reset('resolutionOutcome', 'resolutionReason');
+        unset($this->parties);
+        Flux::toast(variant: 'success', text: __('Party issue decision retained.'));
+    }
+
     /** @return Collection<int, Client> */
     #[Computed]
     public function clients(): Collection
@@ -133,8 +179,21 @@ final class Index extends Component
                 'client',
                 'fieldVersions' => static fn ($query) => $query->orderBy('recorded_at')->orderBy('id'),
                 'correctionProposals' => static fn ($query) => $query->with(['currentFieldVersion', 'decision'])->orderByDesc('proposed_at'),
+                'issues' => static fn ($query) => $query->with(['ruleVersion.definition', 'resolution'])->orderByDesc('recorded_at'),
             ])
             ->orderBy('reference')->get();
+    }
+
+    /** @return Collection<int, DataQualityRuleVersion> */
+    #[Computed]
+    public function publishedPartyRules(): Collection
+    {
+        return DataQualityRuleVersion::query()
+            ->with('definition')
+            ->where('status', RuleVersionStatus::Published)
+            ->whereHas('definition', fn ($query) => $query->where('data_domain', ReadinessDataDomain::PartyMaster))
+            ->orderBy('data_quality_rule_definition_id')
+            ->get();
     }
 
     /** @return list<PartyFieldKey> */

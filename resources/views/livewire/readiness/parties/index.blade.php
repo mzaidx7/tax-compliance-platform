@@ -56,6 +56,31 @@
                                 @endforeach
                             </div>
                         @endif
+                        @if ($party->issues->isNotEmpty())
+                            <div class="mt-5 space-y-3">
+                                <p class="text-xs font-medium uppercase tracking-wider text-zinc-500">{{ __('Explainable issues') }}</p>
+                                @foreach ($party->issues as $issue)
+                                    <div class="rounded-xl bg-zinc-950/60 px-4 py-3 ring-1 ring-white/8">
+                                        <div class="flex flex-wrap items-start justify-between gap-3">
+                                            <div>
+                                                <p class="text-sm font-medium text-zinc-200">{{ $issue->ruleVersion->definition->name }}</p>
+                                                <p class="mt-1 text-xs leading-5 text-zinc-500">{{ $issue->explanation_snapshot }}</p>
+                                                <p class="mt-1 text-xs leading-5 text-zinc-500">{{ __('Remediation: :guidance', ['guidance' => $issue->remediation_snapshot]) }}</p>
+                                            </div>
+                                            <div class="flex items-center gap-2">
+                                                <flux:badge :color="$issue->behavior_snapshot->value === 'blocking' ? 'red' : 'amber'">{{ $issue->severity_snapshot->label() }} / {{ $issue->behavior_snapshot->label() }}</flux:badge>
+                                                <flux:badge :color="$issue->resolution ? 'green' : 'zinc'">{{ $issue->resolution ? str($issue->resolution->outcome)->replace('_', ' ')->title() : __('Open') }}</flux:badge>
+                                            </div>
+                                        </div>
+                                        @can('approveCorrection', $party)
+                                            @if (! $issue->resolution)
+                                                <flux:button class="mt-3" size="sm" variant="ghost" wire:click="$set('resolutionIssueId', '{{ $issue->id }}')">{{ __('Resolve issue') }}</flux:button>
+                                            @endif
+                                        @endcan
+                                    </div>
+                                @endforeach
+                            </div>
+                        @endif
                     </article>
                 @empty
                     <div class="border-y border-white/8 px-6 py-14 text-center"><p class="text-sm font-medium text-zinc-200">{{ __('No party records') }}</p><p class="mt-2 text-sm text-zinc-500">{{ __('Record a synthetic party manually to begin.') }}</p></div>
@@ -92,6 +117,15 @@
                     <flux:textarea wire:model="evidenceNote" :label="__('Evidence note')" required />
                     <flux:button type="submit" variant="filled" class="w-full">{{ __('Record proposal') }}</flux:button>
                 </form>
+
+                <form wire:submit="recordIssue" class="space-y-4 rounded-2xl bg-zinc-900/70 p-6 ring-1 ring-white/8">
+                    <h2 class="text-lg font-semibold text-zinc-100">{{ __('Record party issue') }}</h2>
+                    <flux:select wire:model="issuePartyId" :label="__('Party')" required><flux:select.option value="">{{ __('Select party') }}</flux:select.option>@foreach ($this->parties as $party)<flux:select.option :value="$party->id">{{ $party->reference }}</flux:select.option>@endforeach</flux:select>
+                    <flux:select wire:model="issueFieldVersionId" :label="__('Current field, if applicable')"><flux:select.option value="">{{ __('Party-level issue') }}</flux:select.option>@foreach ($this->parties as $party)@foreach ($party->fieldVersions->groupBy(fn ($field) => $field->field_key->value) as $versions)@php($current = $versions->last())<flux:select.option :value="$current->id">{{ $party->reference }} / {{ $current->field_key->label() }}</flux:select.option>@endforeach @endforeach</flux:select>
+                    <flux:select wire:model="issueRuleVersionId" :label="__('Published party rule')" required><flux:select.option value="">{{ __('Select rule') }}</flux:select.option>@foreach ($this->publishedPartyRules as $rule)<flux:select.option :value="$rule->id">{{ $rule->definition->name }} / v{{ $rule->version }}</flux:select.option>@endforeach</flux:select>
+                    <flux:textarea wire:model="issueEvidenceNote" :label="__('Manual issue evidence')" required />
+                    <flux:button type="submit" variant="primary" class="w-full">{{ __('Record explainable issue') }}</flux:button>
+                </form>
             @endcan
 
             @if ($decisionProposalId !== '')
@@ -100,6 +134,15 @@
                     <flux:select wire:model="decision" :label="__('Decision')" required><flux:select.option value="">{{ __('Select decision') }}</flux:select.option><flux:select.option value="approved">{{ __('Approve') }}</flux:select.option><flux:select.option value="rejected">{{ __('Reject') }}</flux:select.option></flux:select>
                     <flux:textarea wire:model="decisionReason" :label="__('Decision reason')" required />
                     <flux:button type="submit" variant="filled" class="w-full">{{ __('Record decision') }}</flux:button>
+                </form>
+            @endif
+
+            @if ($resolutionIssueId !== '')
+                <form wire:submit="resolveIssue" class="space-y-4 rounded-2xl bg-zinc-900/70 p-6 ring-1 ring-white/8">
+                    <h2 class="text-lg font-semibold text-zinc-100">{{ __('Resolve party issue') }}</h2>
+                    <flux:select wire:model="resolutionOutcome" :label="__('Outcome')" required><flux:select.option value="">{{ __('Select outcome') }}</flux:select.option><flux:select.option value="resolved">{{ __('Resolved') }}</flux:select.option><flux:select.option value="not_applicable">{{ __('Not applicable') }}</flux:select.option></flux:select>
+                    <flux:textarea wire:model="resolutionReason" :label="__('Resolution reason')" required />
+                    <flux:button type="submit" variant="filled" class="w-full">{{ __('Record issue decision') }}</flux:button>
                 </form>
             @endif
         </aside>

@@ -9,13 +9,13 @@
 - Platform repository status: independent repository on `main`, remote `mzaidx7/tax-compliance-platform`
 - Parent repository status for this directory: separate nested repository, outside website delivery
 - Current phase: Stage 4, client and data foundation
-- Current milestone: Synthetic party master and correction governance packet completed
+- Current milestone: Explainable party issue and resolution governance packet completed
 
 ## Current Objective
 
 Create a UAE-focused compliance operations and e-invoicing readiness platform under a TBT subdomain while keeping its application, data, deployment and release lifecycle separate from the public TBT website.
 
-The immediate objective is explainable manually recorded party issues linked to published readiness rules with append-only resolution evidence, without automated evaluation or scoring. Import processing remains gated on product-owner decisions for conflict handling, reversal and retention.
+The immediate objective is deterministic, explainable duplicate candidate signals between synthetic party records with independent human decisions, without automatic discovery, merge execution or scoring. Import processing remains gated on product-owner decisions for conflict handling, reversal and retention.
 
 ## Canonical Files
 
@@ -119,11 +119,11 @@ The immediate objective is explainable manually recorded party issues linked to 
 - `platform:operations-status` reports scheduler and worker freshness in human-readable or JSON form.
 - The dashboard and authenticated shell now use the platform-owned dark ink, silver and restrained gold operational design.
 - Client, obligation, work item, assignment, reassignment, workflow-version, checklist-gated transition, versioned evidence, reviewer return/approval decision, explicit workflow-version migration, filing, payment, tax, governed generation and deadline override schemas are implemented.
+- Published party-master readiness rules can support manually recorded explainable issues. Each issue retains immutable rule snapshots and optional current-field context, while an independent authorised resolution or not-applicable decision is appended separately.
 - Filing state uses its own record, lifecycle and append-only history, gated by the named `manage_filings` permission, and never reads or writes work status.
 - Payment state uses its own record, lifecycle and append-only history, gated by the named `manage_payments` permission, and never reads or writes work or filing status. `paid` is terminal and requires a reference and settlement date.
 - Append-only history is enforced at two layers: Eloquent model events and database triggers on `work_item_transitions`, `filing_record_transitions`, `payment_record_transitions` and `audit_logs`.
 - Newly published core workflow versions define two reviewer edges from `under_review`. Earlier immutable versions may retain an inert `under_review` to `ready_to_file` step that no interface exposes.
-- CI and deployment pipelines do not exist yet.
 - Local PHP and Composer tooling is stored in ignored `.tools/` for reproducibility on this Windows environment.
 
 ## Work Completed in This Session
@@ -165,19 +165,13 @@ The immediate objective is explainable manually recorded party issues linked to 
 
 ## Verification Performed
 
-- Confirmed the platform folder is currently isolated from `v2/`.
-- Confirmed no `.openai/hosting.json` exists in the workspace.
-- Confirmed all current platform Markdown files contain no em dash characters after the Version 2.0 edits.
-- Confirmed the parent Git branch is `main` at `1071185`.
-- Confirmed the platform folder is untracked in the parent repository.
-- Verified the master plan is marked Version 2.0 and contains Sections 1 through 55.
-- Verified no em or en dash characters and no obvious encoding-corruption markers appear in current platform Markdown.
+- Confirmed the platform is isolated from the website, has no Sites hosting manifest, and the Version 2.0 master plan contains Sections 1 through 55.
 - Verified `MEMORY.md` remains at the 300-line handoff limit.
 - Verified the application reports Laravel 13.22.0 on PHP 8.3.32 with timezone `Asia/Dubai`.
 - Laravel Pint check passed.
 - Larastan passed with zero errors.
 - Full workflow feature suite (`tests/Feature/Workflows`, including checklist, transition, reviewer-decision and workflow-version migration tests) passed with no failures.
-- PHPUnit passed 428 tests with 1,296 assertions after Build Packet 46.
+- PHPUnit passed 432 tests with 1,310 assertions after Build Packet 47.
 - Database triggers were verified to reject raw query-builder updates and deletes on `work_item_transitions`, which Eloquent model events alone do not cover.
 - Vite production build passed.
 - All migrations, including append-only deadline overrides, and seven synthetic domain seeders passed from a fresh database.
