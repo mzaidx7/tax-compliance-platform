@@ -101,4 +101,80 @@
             @endif
         </section>
     </div>
+
+    <section aria-labelledby="rule-change-heading" class="mt-12 border-t border-white/8 pt-10">
+        <div class="max-w-3xl">
+            <p class="text-sm font-medium text-amber-300">{{ __('Changed-rule control') }}</p>
+            <h2 id="rule-change-heading" class="mt-2 text-2xl font-semibold tracking-tight text-white">{{ __('Compare before superseding') }}</h2>
+            <p class="mt-2 text-sm leading-6 text-zinc-500">{{ __('A proposal preserves the issued obligation and records the old and proposed dates. Approval is a separate action that issues a deterministic replacement and retains the original as superseded.') }}</p>
+        </div>
+
+        <div class="mt-6 grid gap-8 lg:grid-cols-[23rem_minmax(0,1fr)]">
+            <form wire:submit="proposeRuleChange" class="space-y-4 rounded-2xl bg-zinc-900/70 p-6 ring-1 ring-white/8">
+                <flux:select wire:model="proposalOriginalObligationId" :label="__('Issued governed obligation')" required>
+                    <flux:select.option value="">{{ __('Select issued obligation') }}</flux:select.option>
+                    @foreach ($this->issuedGovernedObligations as $issued)
+                        <flux:select.option :value="$issued->id">
+                            {{ $issued->client->internal_code }} / {{ $issued->ruleVersion->template->name }} v{{ $issued->ruleVersion->version }} / {{ $issued->statutory_due_date->format('d M Y') }}
+                        </flux:select.option>
+                    @endforeach
+                </flux:select>
+                <flux:select wire:model="proposalRuleVersionId" :label="__('Later published rule')" required>
+                    <flux:select.option value="">{{ __('Select later rule') }}</flux:select.option>
+                    @foreach ($this->publishedRules as $rule)
+                        <flux:select.option :value="$rule->id">{{ $rule->template->name }} v{{ $rule->version }}</flux:select.option>
+                    @endforeach
+                </flux:select>
+                <flux:input wire:model="proposalStatutoryDueDate" type="date" :label="__('Proposed statutory due date')" required />
+                <flux:input wire:model="proposalInternalTargetDate" type="date" :label="__('Proposed internal target')" />
+                <flux:textarea wire:model="proposalReason" :label="__('Proposal reason')" rows="4" maxlength="500" required />
+                <flux:button type="submit" variant="primary" class="w-full">{{ __('Record comparison proposal') }}</flux:button>
+            </form>
+
+            <div>
+                @if ($this->activeProposal)
+                    <div class="rounded-2xl bg-zinc-900/50 p-6 ring-1 ring-white/8">
+                        <div class="flex flex-wrap items-start justify-between gap-3">
+                            <div>
+                                <p class="text-sm font-semibold text-zinc-100">{{ $this->activeProposal->originalObligation->client->legal_name }}</p>
+                                <p class="mt-1 text-xs text-zinc-500">{{ $this->activeProposal->proposedRuleVersion->template->name }} v{{ $this->activeProposal->proposedRuleVersion->version }}</p>
+                            </div>
+                            <flux:badge :color="$this->activeProposal->decision ? 'green' : 'amber'">
+                                {{ $this->activeProposal->decision ? __('Approved') : __('Awaiting approval') }}
+                            </flux:badge>
+                        </div>
+                        <dl class="mt-6 grid gap-5 sm:grid-cols-2">
+                            <div>
+                                <dt class="text-xs text-zinc-500">{{ __('Issued date') }}</dt>
+                                <dd class="mt-1 text-lg font-semibold text-zinc-300">{{ $this->activeProposal->original_statutory_due_date->format('d M Y') }}</dd>
+                            </div>
+                            <div>
+                                <dt class="text-xs text-zinc-500">{{ __('Proposed date') }}</dt>
+                                <dd class="mt-1 text-lg font-semibold text-amber-300">{{ $this->activeProposal->proposed_statutory_due_date->format('d M Y') }}</dd>
+                            </div>
+                            <div class="sm:col-span-2">
+                                <dt class="text-xs text-zinc-500">{{ __('Calculation explanation') }}</dt>
+                                <dd class="mt-1 text-sm leading-6 text-zinc-300">{{ $this->activeProposal->previewRun->calculation_explanation }}</dd>
+                            </div>
+                        </dl>
+                        @if (! $this->activeProposal->decision)
+                            <form wire:submit="approveRuleChange" class="mt-6 space-y-4 border-t border-white/8 pt-5">
+                                <flux:textarea wire:model="approvalReason" :label="__('Approval reason')" rows="3" maxlength="500" required />
+                                <flux:button type="submit" variant="filled" class="w-full">{{ __('Approve and issue replacement') }}</flux:button>
+                            </form>
+                        @else
+                            <flux:callout class="mt-6" variant="success" icon="check-circle" heading="{{ __('Replacement issued') }}">
+                                {{ __('Replacement obligation :id is retained separately.', ['id' => $this->activeProposal->decision->replacement_obligation_id]) }}
+                            </flux:callout>
+                        @endif
+                    </div>
+                @else
+                    <div class="border-y border-white/8 px-6 py-16 text-center">
+                        <p class="text-sm font-medium text-zinc-200">{{ __('No changed-rule proposal selected') }}</p>
+                        <p class="mx-auto mt-2 max-w-md text-sm leading-6 text-zinc-500">{{ __('Record a comparison before any issued obligation can be superseded.') }}</p>
+                    </div>
+                @endif
+            </div>
+        </div>
+    </section>
 </div>

@@ -7,8 +7,10 @@ namespace Tests\Feature\Generation;
 use App\Actions\Clients\AddClientServiceEnrollment;
 use App\Actions\Clients\AddTaxPeriod;
 use App\Actions\Clients\AddTaxRegistration;
+use App\Actions\Generation\ApproveRuleChange;
 use App\Actions\Generation\CommitGeneratedObligation;
 use App\Actions\Generation\PreviewGeneratedObligation;
+use App\Actions\Generation\ProposeRuleChange;
 use App\Actions\Rules\ApproveRuleVersion;
 use App\Actions\Rules\CreateRuleTemplate;
 use App\Actions\Rules\DraftRuleVersion;
@@ -30,6 +32,7 @@ use App\Models\Obligation;
 use App\Models\ObligationGenerationRun;
 use App\Models\ObligationRuleTemplate;
 use App\Models\ObligationRuleVersion;
+use App\Models\RuleChangeProposal;
 use App\Models\TaxPeriod;
 use App\Models\User;
 use Illuminate\Auth\Access\AuthorizationException;
@@ -211,6 +214,105 @@ final class ObligationGenerationTest extends TestCase
             ->call('commit')
             ->assertHasNoErrors()
             ->assertSee('Obligation committed');
+    }
+
+    public function test_changed_rule_proposal_requires_separate_approval_and_preserves_original_snapshots(): void
+    {
+        $fixture = $this->fixture();
+        $original = app(CommitGeneratedObligation::class)->handle($fixture['verifier'], $this->preview($fixture));
+        $originalSnapshot = $original->calculation_result_snapshot;
+        $nextRule = $this->publishRule($fixture, $this->draftRule($fixture, $fixture['template']));
+        $this->activateFirmMembership($fixture['verifierMembership']);
+
+        $proposal = app(ProposeRuleChange::class)->handle($fixture['verifier'], $original, $nextRule, [
+            'statutoryDueDate' => '2026-10-15',
+            'internalTargetDate' => '2026-10-10',
+            'reason' => 'Synthetic changed-rule impact.',
+        ]);
+
+        $this->assertSame('2026-09-30', $proposal->original_statutory_due_date->toDateString());
+        $this->assertSame('2026-10-15', $proposal->proposed_statutory_due_date->toDateString());
+        $this->assertSame(ObligationStatus::Open, $original->refresh()->status);
+        $this->assertNull($proposal->decision);
+
+        $decision = app(ApproveRuleChange::class)->handle($fixture['verifier'], $proposal, 'Synthetic authorised approval.');
+        $replacement = Obligation::query()->findOrFail($decision->replacement_obligation_id);
+
+        $this->assertSame(ObligationStatus::Superseded, $original->refresh()->status);
+        $this->assertSame($originalSnapshot, $original->calculation_result_snapshot);
+        $this->assertSame('2026-09-30', $original->statutory_due_date->toDateString());
+        $this->assertSame('2026-10-15', $replacement->statutory_due_date->toDateString());
+        $this->assertSame($nextRule->id, $replacement->obligation_rule_version_id);
+        $this->assertDatabaseHas('obligation_dispositions', [
+            'obligation_id' => $original->id,
+            'replacement_obligation_id' => $replacement->id,
+        ]);
+    }
+
+    public function test_changed_rule_proposal_rejects_same_date_same_version_and_repeat_decision(): void
+    {
+        $fixture = $this->fixture();
+        $original = app(CommitGeneratedObligation::class)->handle($fixture['verifier'], $this->preview($fixture));
+
+        try {
+            app(ProposeRuleChange::class)->handle($fixture['verifier'], $original, $fixture['rule'], [
+                'statutoryDueDate' => '2026-09-30',
+                'reason' => 'Synthetic no change.',
+            ]);
+            $this->fail('A no-change proposal should fail.');
+        } catch (ValidationException) {
+            $this->assertTrue(true);
+        }
+
+        $nextRule = $this->publishRule($fixture, $this->draftRule($fixture, $fixture['template']));
+        $this->activateFirmMembership($fixture['verifierMembership']);
+        $proposal = app(ProposeRuleChange::class)->handle($fixture['verifier'], $original, $nextRule, [
+            'statutoryDueDate' => '2026-10-15',
+            'reason' => 'Synthetic changed rule.',
+        ]);
+        app(ApproveRuleChange::class)->handle($fixture['verifier'], $proposal, 'Synthetic approval.');
+
+        $this->expectException(ValidationException::class);
+        app(ApproveRuleChange::class)->handle($fixture['verifier'], $proposal, 'Synthetic repeated approval.');
+    }
+
+    public function test_rule_change_proposal_evidence_rejects_raw_mutation(): void
+    {
+        $fixture = $this->fixture();
+        $original = app(CommitGeneratedObligation::class)->handle($fixture['verifier'], $this->preview($fixture));
+        $nextRule = $this->publishRule($fixture, $this->draftRule($fixture, $fixture['template']));
+        $this->activateFirmMembership($fixture['verifierMembership']);
+        $proposal = app(ProposeRuleChange::class)->handle($fixture['verifier'], $original, $nextRule, [
+            'statutoryDueDate' => '2026-10-15',
+            'reason' => 'Synthetic retained proposal.',
+        ]);
+
+        $this->expectException(QueryException::class);
+        RuleChangeProposal::withoutGlobalScopes()->whereKey($proposal->id)->update(['reason' => 'Changed']);
+    }
+
+    public function test_livewire_changed_rule_flow_shows_comparison_before_approval(): void
+    {
+        $fixture = $this->fixture();
+        $original = app(CommitGeneratedObligation::class)->handle($fixture['verifier'], $this->preview($fixture));
+        $nextRule = $this->publishRule($fixture, $this->draftRule($fixture, $fixture['template']));
+        $this->activateFirmMembership($fixture['verifierMembership']);
+
+        Livewire::actingAs($fixture['verifier'])->test(Index::class)
+            ->set('proposalOriginalObligationId', $original->id)
+            ->set('proposalRuleVersionId', $nextRule->id)
+            ->set('proposalStatutoryDueDate', '2026-10-15')
+            ->set('proposalInternalTargetDate', '2026-10-10')
+            ->set('proposalReason', 'Synthetic UI proposal.')
+            ->call('proposeRuleChange')
+            ->assertHasNoErrors()
+            ->assertSee('30 Sep 2026')
+            ->assertSee('15 Oct 2026')
+            ->assertSee('Awaiting approval')
+            ->set('approvalReason', 'Synthetic UI approval.')
+            ->call('approveRuleChange')
+            ->assertHasNoErrors()
+            ->assertSee('Replacement issued');
     }
 
     /**

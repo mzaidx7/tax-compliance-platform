@@ -4,15 +4,20 @@ declare(strict_types=1);
 
 namespace App\Livewire\Generation;
 
+use App\Actions\Generation\ApproveRuleChange;
 use App\Actions\Generation\CommitGeneratedObligation;
 use App\Actions\Generation\PreviewGeneratedObligation;
+use App\Actions\Generation\ProposeRuleChange;
 use App\Enums\Feature;
+use App\Enums\ObligationOrigin;
+use App\Enums\ObligationStatus;
 use App\Enums\RuleVersionStatus;
 use App\Models\Client;
 use App\Models\ClientServiceEnrollment;
 use App\Models\Obligation;
 use App\Models\ObligationGenerationRun;
 use App\Models\ObligationRuleVersion;
+use App\Models\RuleChangeProposal;
 use App\Models\TaxPeriod;
 use App\Models\User;
 use App\Support\FeatureFlags;
@@ -48,6 +53,20 @@ final class Index extends Component
     public ?string $previewRunId = null;
 
     public ?string $committedObligationId = null;
+
+    public string $proposalOriginalObligationId = '';
+
+    public string $proposalRuleVersionId = '';
+
+    public string $proposalStatutoryDueDate = '';
+
+    public string $proposalInternalTargetDate = '';
+
+    public string $proposalReason = '';
+
+    public ?string $activeProposalId = null;
+
+    public string $approvalReason = '';
 
     public function mount(FeatureFlags $featureFlags, FirmContext $firmContext): void
     {
@@ -88,6 +107,32 @@ final class Index extends Component
         Flux::toast(variant: 'success', text: "Obligation {$obligation->id} committed.");
     }
 
+    public function proposeRuleChange(ProposeRuleChange $action): void
+    {
+        $proposal = $action->handle(
+            $this->currentUser(),
+            Obligation::query()->findOrFail($this->proposalOriginalObligationId),
+            ObligationRuleVersion::query()->findOrFail($this->proposalRuleVersionId),
+            [
+                'statutoryDueDate' => $this->proposalStatutoryDueDate,
+                'internalTargetDate' => $this->optional($this->proposalInternalTargetDate),
+                'reason' => $this->proposalReason,
+            ],
+        );
+        $this->activeProposalId = $proposal->id;
+        $this->approvalReason = '';
+        unset($this->activeProposal);
+        Flux::toast(variant: 'success', text: __('Changed-rule proposal recorded.'));
+    }
+
+    public function approveRuleChange(ApproveRuleChange $action): void
+    {
+        $proposal = RuleChangeProposal::query()->findOrFail($this->activeProposalId);
+        $action->handle($this->currentUser(), $proposal, $this->approvalReason);
+        unset($this->activeProposal, $this->issuedGovernedObligations);
+        Flux::toast(variant: 'success', text: __('Changed-rule proposal approved and replacement issued.'));
+    }
+
     /** @return Collection<int, Client> */
     #[Computed]
     public function clients(): Collection
@@ -118,6 +163,30 @@ final class Index extends Component
             ->where('status', RuleVersionStatus::Published)
             ->orderBy('effective_from')
             ->get();
+    }
+
+    /** @return Collection<int, Obligation> */
+    #[Computed]
+    public function issuedGovernedObligations(): Collection
+    {
+        return Obligation::query()
+            ->with(['client', 'ruleVersion.template'])
+            ->where('origin', ObligationOrigin::GovernedRule)
+            ->where('status', ObligationStatus::Open)
+            ->orderByRaw('coalesce(effective_due_date, statutory_due_date)')
+            ->get();
+    }
+
+    #[Computed]
+    public function activeProposal(): ?RuleChangeProposal
+    {
+        if ($this->activeProposalId === null) {
+            return null;
+        }
+
+        return RuleChangeProposal::query()
+            ->with(['originalObligation.client', 'proposedRuleVersion.template', 'previewRun', 'decision.replacementObligation'])
+            ->find($this->activeProposalId);
     }
 
     #[Computed]

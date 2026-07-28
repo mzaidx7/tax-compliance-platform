@@ -19,7 +19,7 @@ Treat the master plan as canonical scope and `MEMORY.md` as the current implemen
 ## Current State
 
 - Stage 3 compliance walking skeleton is active.
-- Build Packet 42 is complete.
+- Build Packet 43 is complete.
 - Work assignment, append-only reassignment, immutable workflow versions, pinned checklists, checklist completion evidence, checklist-gated review submission, reviewer return and approval decisions and explicit audited workflow-version migration are implemented.
 - Every work item is pinned to a published firm-owned workflow definition and checklist version.
 - Moving from `in_preparation` to `under_review` requires retained completion evidence for every required item on the pinned checklist.
@@ -46,21 +46,22 @@ Treat the master plan as canonical scope and `MEMORY.md` as the current implemen
 - Governed obligation generation requires a persisted preview, published rule, explicit client, service, applicability date and compliance-period label or actual tax period. Preview and committed runs are immutable, deterministic reruns return the same obligation, changed inputs create a new obligation, and no issued obligation is overwritten.
 - Open obligations support explicit reason-required effective deadline overrides. The original statutory date and generated snapshots remain unchanged, each override is append-only, and operational queues use the effective date while displaying the original when different.
 - Open obligations can be explicitly cancelled or superseded through an append-only disposition. Supersession requires a different open replacement obligation in the same firm; neither path modifies the retained obligation, dates, snapshots or linked evidence.
+- Changed-rule handling is preview-first. A proposal compares an open governed obligation with a later published version of the same template, retains old and proposed dates plus the immutable generation preview, and requires a separate approval that issues a deterministic replacement before superseding the original.
 - Two operational notification templates exist, `work_item_high_risk` and `payment_overdue`, both fired only by an explicit recorded change and addressed to the current responsible manager.
 - Regulated-rule generation modules are not implemented.
 - The full current verification baseline is recorded in `MEMORY.md`.
 
 ## Next Safe Packet
 
-Add preview-first changed-rule impact proposals and authorised approval without silently changing issued obligations.
+Add governed calculator golden cases and require verified cases before a regulated calculator can support rule publication.
 
 Keep it bounded:
 
-- Compare one issued governed obligation against one later published version of the same rule template.
-- Persist the old and proposed dates, calculation snapshots, explanation and proposal reason before approval.
-- Require a separate authorised approval step to issue the replacement and supersede the original.
-- Reuse deterministic generation and disposition boundaries instead of duplicating or rewriting records.
-- Reject same-version, stale, unauthorised, cross-firm and already-resolved proposals.
+- Add immutable calculator case sets with named inputs, expected results, official source, verification date and verifier.
+- Execute cases through the registered calculator and retain the observed result without hard-coding regulatory formulas.
+- Require all cases in the approved set to pass before a non-passthrough calculator can support rule approval or publication.
+- Keep `manual_date_passthrough` explicitly classified as non-regulatory and preserve its no-calculation explanation.
+- Reject unregistered calculators, altered expected results, unauthorised verification and cross-firm case reuse.
 - Do not add VAT or Corporate Tax formulas without approved sourced golden cases.
 - Keep import processing gated until conflict, reversal and retention decisions are approved.
 

@@ -9,13 +9,13 @@
 - Platform repository status: independent repository on `main`, remote `mzaidx7/tax-compliance-platform`
 - Parent repository status for this directory: separate nested repository, outside website delivery
 - Current phase: Stage 4, client and data foundation
-- Current milestone: Append-only obligation disposition packet completed
+- Current milestone: Preview-first changed-rule proposal and approval packet completed
 
 ## Current Objective
 
 Create a UAE-focused compliance operations and e-invoicing readiness platform under a TBT subdomain while keeping its application, data, deployment and release lifecycle separate from the public TBT website.
 
-The immediate objective is preview-first changed-rule impact proposals with separate authorised approval, retained comparisons and no silent issued-obligation mutation. Import processing remains gated on product-owner decisions for conflict handling, reversal and retention.
+The immediate objective is governed calculator golden-case evidence and publication gating for future regulated calculators, without adding VAT or Corporate Tax formulas. Import processing remains gated on product-owner decisions for conflict handling, reversal and retention.
 
 ## Canonical Files
 
@@ -177,7 +177,7 @@ The immediate objective is preview-first changed-rule impact proposals with sepa
 - Laravel Pint check passed.
 - Larastan passed with zero errors.
 - Full workflow feature suite (`tests/Feature/Workflows`, including checklist, transition, reviewer-decision and workflow-version migration tests) passed with no failures.
-- PHPUnit passed 406 tests with 1,225 assertions after Build Packet 42.
+- PHPUnit passed 410 tests with 1,244 assertions after Build Packet 43.
 - Database triggers were verified to reject raw query-builder updates and deletes on `work_item_transitions`, which Eloquent model events alone do not cover.
 - Vite production build passed.
 - All migrations, including append-only deadline overrides, and seven synthetic domain seeders passed from a fresh database.
@@ -300,3 +300,4 @@ Start by reading `AGENTS.md` and the master plan. Reconcile this file against Gi
 - Implemented and verified the Stage 4 client, document and governed-obligation foundation: source-linked rules have controlled publication and immutable history; published manual-date rules now create persisted previews and committed generation runs with explicit client, service, applicability and period inputs, complete input, parameter and result snapshots, human-readable explanations and deterministic keys. Same-input reruns return one obligation, changed inputs create a distinct obligation, superseded previews cannot commit, and database triggers prevent run or issued snapshot rewrites. No regulated VAT or Corporate Tax formula exists.
 - Implemented and verified append-only deadline overrides (`effective_due_date`, `ObligationDeadlineOverride`, `OverrideObligationDeadline`) for open obligations. Each reason-required event retains the prior and new effective date, actor and timestamp; model guards and database triggers reject history mutation; the original statutory date and governed snapshots remain unchanged; dashboard, obligation and work registers sort and measure by the effective date while continuing to show the statutory date when different; no-op, internally inconsistent, unauthorised and cross-firm changes are rejected.
 - Implemented and verified explicit obligation dispositions (`ObligationDisposition`, `DisposeObligation`) for open-to-cancelled and open-to-superseded changes. Each event retains prior and new status, actor, reason and timestamp; supersession requires a separately issued, different open same-firm replacement; cancellation cannot name a replacement; model guards and database triggers reject history mutation; the original dates, generated snapshots, replacement and linked evidence remain unchanged.
+- Implemented and verified changed-rule proposals (`RuleChangeProposal`, immutable preview linkage, `ProposeRuleChange`) and append-only approvals (`RuleChangeProposalDecision`, `ApproveRuleChange`). A proposal accepts only an open governed obligation and later published version of the same template, retains issued and proposed dates, reason and exact generation preview, and changes no issued record. Approval is separate, idempotently commits the preview, uses `DisposeObligation` to link and supersede the original, retains both obligations and snapshots, rejects stale or repeated decisions, and exposes the comparison and approval sequence in the generation interface.

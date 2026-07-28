@@ -533,3 +533,15 @@ Cancellation and supersession are explicit tenant-owned status changes:
 - Model guards and database triggers reject update or deletion of disposition history.
 - Repeat disposition, self-replacement, closed replacement, cross-firm and unauthorised attempts fail closed.
 - Disposition creates no replacement automatically and performs no changed-rule calculation.
+
+## Changed-Rule Proposals
+
+Rule changes affecting issued governed obligations are preview-first:
+
+- A proposal requires an authorised manager, an open governed obligation with complete generation snapshots and a later published version of the same rule template in the active firm.
+- The proposed date must differ from the issued statutory date. The normal generation boundary validates service, period, applicability, calculator and internal target inputs and creates the immutable deterministic preview.
+- `rule_change_proposals` retains the original and proposed dates, original obligation, proposed rule, preview run, actor, reason and timestamp without changing the issued obligation.
+- Approval is a separate explicit action. It locks the unresolved proposal, commits the exact preview through the normal generation boundary, then supersedes the original through the normal disposition boundary.
+- `rule_change_proposal_decisions` retains the approval, replacement obligation, actor, reason and timestamp. A proposal accepts only one decision.
+- Proposal and decision records reject model and raw database update or deletion.
+- The original obligation, rule snapshot and calculation snapshots remain unchanged and linked to the separately issued replacement.
