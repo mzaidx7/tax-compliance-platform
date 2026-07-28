@@ -101,6 +101,11 @@
                                     {{ __('Work register') }}
                                 </flux:sidebar.item>
                             @endcan
+                            @if ($firmContext->membership()?->hasPermission(\App\Enums\Permission::ViewReports))
+                                <flux:sidebar.item icon="chart-bar-square" :href="route('reports.index')" :current="request()->routeIs('reports.*')" wire:navigate>
+                                    {{ __('Reports') }}
+                                </flux:sidebar.item>
+                            @endif
                         @endif
 
                         @if (

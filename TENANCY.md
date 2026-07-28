@@ -651,3 +651,15 @@ The notification centre is a recipient-owned projection over existing delivery e
 - A report-authorised member may explicitly select an active manager and generate one deterministic summary request per recipient and firm-local date.
 - Summary counts derive from stored open deadlines, explicit high-risk work and explicit overdue-payment state. No compliance state is inferred.
 - The summary notification payload is encrypted in the queue and stores no counts or message content in the notification request or audit log.
+
+## Operational Reports And Exports
+
+Operational reports are permission-gated tenant projections:
+
+- Access requires the named `view_reports` permission in the active firm.
+- Monthly schedule, tax-period, expiring-document and workload/completion previews use the same row definitions as their exports.
+- Every query remains under the firm global scope and is bounded by month or current firm workload.
+- Exports reuse the spreadsheet-safe tenant-private storage and immutable audited-artifact boundary.
+- A report owner with `view_reports` may download their own recognised operational-report artifact after checksum and byte verification. Audit-register exports retain their stricter audit permission.
+- Reports exclude contact details, document references, reasons, tax registration identifiers and audit contents.
+- No statutory date, tax, risk or compliance value is calculated.

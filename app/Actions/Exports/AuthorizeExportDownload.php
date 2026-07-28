@@ -7,6 +7,7 @@ namespace App\Actions\Exports;
 use App\Actions\Audit\RecordAudit;
 use App\Data\DownloadableExport;
 use App\Enums\Feature;
+use App\Enums\Permission;
 use App\Models\AuditLog;
 use App\Models\User;
 use App\Support\FeatureFlags;
@@ -31,12 +32,6 @@ final readonly class AuthorizeExportDownload
     {
         $firmId = $this->firmContext->firm()->id;
 
-        if (! $this->featureFlags->enabled(Feature::AuditViewer, $firmId)) {
-            throw new AuthorizationException('The audit viewer is not enabled for this firm.');
-        }
-
-        Gate::forUser($actor)->authorize('view', $exportAuditLog);
-
         if ($exportAuditLog->action !== 'firm.export.created') {
             throw new NotFoundHttpException('The requested export artifact does not exist.');
         }
@@ -50,6 +45,12 @@ final readonly class AuthorizeExportDownload
 
         if (! is_string($fileName) || preg_match('/\A[a-z0-9][a-z0-9-]{0,79}-[0-9a-z]{26}\.csv\z/', $fileName) !== 1) {
             throw new NotFoundHttpException('The export file name is invalid.');
+        }
+        if (! $this->canDownloadOperationalReport($actor, $exportAuditLog, $fileName)) {
+            if (! $this->featureFlags->enabled(Feature::AuditViewer, $firmId)) {
+                throw new AuthorizationException('The audit viewer is not enabled for this firm.');
+            }
+            Gate::forUser($actor)->authorize('view', $exportAuditLog);
         }
 
         $expectedLogicalPath = "exports/{$fileName}";
@@ -107,5 +108,20 @@ final readonly class AuthorizeExportDownload
         } finally {
             fclose($stream);
         }
+    }
+
+    private function canDownloadOperationalReport(User $actor, AuditLog $exportAuditLog, string $fileName): bool
+    {
+        $isOperationalReport = preg_match(
+            '/\A(monthly-schedule|tax-periods|expiring-documents|workload-completion)-\d{4}-\d{2}-/',
+            $fileName,
+        ) === 1;
+        $membership = $this->firmContext->membership();
+
+        return $isOperationalReport
+            && $membership?->user_id === $actor->id
+            && $membership->hasPermission(Permission::ViewReports)
+            && $exportAuditLog->actor_type === $actor->getMorphClass()
+            && (string) $exportAuditLog->actor_id === (string) $actor->id;
     }
 }

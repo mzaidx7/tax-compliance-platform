@@ -19,7 +19,7 @@ Treat the master plan as canonical scope and `MEMORY.md` as the current implemen
 ## Current State
 
 - Stage 3 compliance walking skeleton is active.
-- Build Packet 52 is complete.
+- Build Packet 53 is complete.
 - Work assignment, append-only reassignment, immutable workflow versions, pinned checklists, checklist completion evidence, checklist-gated review submission, reviewer return and approval decisions and explicit audited workflow-version migration are implemented.
 - Every work item is pinned to a published firm-owned workflow definition and checklist version.
 - Moving from `in_preparation` to `under_review` requires retained completion evidence for every required item on the pinned checklist.
@@ -56,21 +56,22 @@ Treat the master plan as canonical scope and `MEMORY.md` as the current implemen
 - The compliance schedule provides accessible month, week and list views of firm-scoped effective deadlines plus an optional client timeline built from retained client, obligation, work, filing and payment history. It calculates no statutory date.
 - Dashboard and work-register filters can be saved by their owner within one firm, reapplied through the existing authorised queries and explicitly deleted only by that owner. Filter names and values are excluded from audit payloads.
 - The in-app notification centre shows only the signed-in recipient's active-firm request and attempt states, with append-only read receipts. Explicit daily manager summaries snapshot stored operational counts through the existing encrypted, idempotent email boundary.
+- Operational reports cover monthly schedules, overlapping tax periods, current expiring-document metadata and workload/completion state. Preview and spreadsheet-safe export share one definition, and report owners can download their own integrity-checked artifact without audit-register permission.
 - Two operational notification templates exist, `work_item_high_risk` and `payment_overdue`, both fired only by an explicit recorded change and addressed to the current responsible manager.
 - Regulated-rule generation modules are not implemented.
 - The full current verification baseline is recorded in `MEMORY.md`.
 
 ## Next Safe Packet
 
-Add the Stage 4 operational reports register with monthly schedules, tax-period lists, expiring-document queues, workload and completion views plus spreadsheet-safe exports.
+Complete the remaining Stage 4 dashboard queues for awaiting-client, under-review and unassigned work, with workload visibility and existing saved filters.
 
 Keep it bounded:
 
-- Gate reports behind the named `view_reports` permission and existing firm scope.
-- Build each report from stored state without statutory, readiness or risk inference.
-- Reuse the audited spreadsheet-safe tenant export boundary.
-- Keep report filters bounded and make exported columns match the visible report definition.
-- Exclude sensitive contact details, document references, reasons and tax registration identifiers.
+- Derive queue membership only from stored work status and current append-only assignment history.
+- Preserve manager-wide versus assigned-member visibility.
+- Keep each queue distinct and link users to the existing work register for action.
+- Treat missing assignments as explicit unassigned state, never as an inferred owner.
+- Reuse dashboard client, horizon and owner-only saved filters where relevant.
 - Continue to keep imports, merge, scoring and regulated formulas behind their recorded decision gates.
 - Do not add VAT or Corporate Tax formulas without approved sourced golden cases.
 - Keep import processing gated until conflict, reversal and retention decisions are approved.

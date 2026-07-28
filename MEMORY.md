@@ -5,13 +5,13 @@
 - Last updated: 2026-07-28
 - Updated by: Codex GPT-5.6
 - Platform repository status: independent repository on `main`, remote `mzaidx7/tax-compliance-platform`
-- Current milestone: In-app notification centre and manager summaries packet completed
+- Current milestone: Operational reports and spreadsheet-safe exports packet completed
 
 ## Current Objective
 
 Create a UAE-focused compliance operations and e-invoicing readiness platform under a TBT subdomain while keeping its application, data, deployment and release lifecycle separate from the public TBT website.
 
-The immediate objective is Stage 4 operational reports and spreadsheet-safe exports for monthly schedules, tax periods, expiring documents, workload and completion. Imports, duplicate merge, readiness scoring and clean export remain decision-gated.
+The immediate objective is the remaining Stage 4 dashboard queues for awaiting-client, under-review, unassigned and workload state. Imports, regulated calculators, duplicate merge and readiness scoring remain decision-gated.
 
 ## Canonical Files
 
@@ -120,6 +120,7 @@ The immediate objective is Stage 4 operational reports and spreadsheet-safe expo
 - An accessible compliance schedule exposes month, week and list views of stored effective deadlines plus a selected client's retained operational timeline. It remains firm-scoped and performs no statutory calculation.
 - Dashboard and work-register filters can be retained, applied and explicitly deleted only by their owner in the active firm. Applying a filter reuses existing authorized queries, and audit metadata excludes names and values.
 - The notification centre exposes only a recipient's active-firm request and delivery states, with append-only read evidence. Explicit daily manager summaries use encrypted idempotent delivery and stored operational counts without inferring compliance.
+- Operational reports provide monthly schedules, tax-period lists, current expiring-document metadata and workload/completion rows. Preview and audited spreadsheet-safe export share one definition and exclude sensitive identifiers and reasons.
 - Filing state uses its own record, lifecycle and append-only history, gated by the named `manage_filings` permission, and never reads or writes work status.
 - Payment state uses its own record, lifecycle and append-only history, gated by the named `manage_payments` permission, and never reads or writes work or filing status. `paid` is terminal and requires a reference and settlement date.
 - Append-only history is enforced at two layers: Eloquent model events and database triggers on `work_item_transitions`, `filing_record_transitions`, `payment_record_transitions` and `audit_logs`.
@@ -137,7 +138,6 @@ The immediate objective is Stage 4 operational reports and spreadsheet-safe expo
 - Created platform-local `AGENTS.md`.
 - Created platform-local `CLAUDE.md`.
 - Created this `MEMORY.md`.
-- Installed the official PHP 8.3.32 Windows build and Composer 2.10.2 in ignored local tooling.
 - Scaffolded the Laravel 13 Livewire starter application into the platform root.
 - Installed Laravel Boost guidance and Codex configuration.
 - Configured the platform name, Dubai timezone and MySQL deployment example.
@@ -171,7 +171,7 @@ The immediate objective is Stage 4 operational reports and spreadsheet-safe expo
 - Laravel Pint check passed.
 - Larastan passed with zero errors.
 - Full workflow feature suite (`tests/Feature/Workflows`, including checklist, transition, reviewer-decision and workflow-version migration tests) passed with no failures.
-- PHPUnit passed 453 tests with 1,387 assertions after Build Packet 52.
+- PHPUnit passed 457 tests with 1,410 assertions after Build Packet 53.
 - Database triggers were verified to reject raw query-builder updates and deletes on `work_item_transitions`, which Eloquent model events alone do not cover.
 - Vite production build passed.
 - All migrations, including append-only deadline overrides, and seven synthetic domain seeders passed from a fresh database.

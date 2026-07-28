@@ -16,6 +16,7 @@ use App\Livewire\Obligations\Index as ObligationsIndex;
 use App\Livewire\Readiness\Invoices\Index as ReadinessInvoicesIndex;
 use App\Livewire\Readiness\Parties\Index as ReadinessPartiesIndex;
 use App\Livewire\Readiness\Rules\Index as ReadinessRulesIndex;
+use App\Livewire\Reports\Index as ReportsIndex;
 use App\Livewire\Rules\Index as RulesIndex;
 use App\Livewire\Schedule\Index as ScheduleIndex;
 use App\Livewire\Settings\FeatureFlags as SettingsFeatureFlags;
@@ -49,6 +50,7 @@ Route::middleware(['auth', 'verified', 'firm.context'])->group(function () {
     Route::livewire('readiness/rules', ReadinessRulesIndex::class)->name('readiness.rules.index');
     Route::livewire('readiness/parties', ReadinessPartiesIndex::class)->name('readiness.parties.index');
     Route::livewire('readiness/invoices', ReadinessInvoicesIndex::class)->name('readiness.invoices.index');
+    Route::livewire('reports', ReportsIndex::class)->name('reports.index');
     Route::livewire('work', WorkItemsIndex::class)->name('work-items.index');
     Route::livewire('audit', AuditIndex::class)->name('audit.index');
     Route::get('exports/{exportAuditLog}/download', ExportDownloadController::class)
