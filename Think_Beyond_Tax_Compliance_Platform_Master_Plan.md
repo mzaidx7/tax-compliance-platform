@@ -3615,6 +3615,7 @@ Product owner direction confirmed 29 July 2026:
 - Sensitive passport, Emirates ID and trade licence numbers are encrypted at rest. Full assigned-staff exports require recent password confirmation and create audit evidence.
 - The schedule is calculated ahead for planning but the dashboard only promotes VAT work when the Tax Period is ending or the filing period is active. Documents appear when their configured reminder window begins.
 - Deadline source and generation controls are administrator-only tools. Ordinary accountants work from Tax Returns and Deadlines, Work Tracker, Clients, Documents and Calendar.
+- Advanced deadline tools are off by default for each firm. A firm administrator can enable them from Feature administration, with the decision recorded in Activity History.
 - The application keeps the TBT dark and gold identity and adds Light, Dark and System appearance choices with accessible contrast and reduced-motion support.
 
 This revision supersedes the earlier assumption that all VAT and Corporate Tax dates must be entered manually or maintained through visible rule-governance screens. The source-linked rule and override history remain in the data model for exceptional FTA dates and future review.

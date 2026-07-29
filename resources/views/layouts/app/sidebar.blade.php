@@ -65,7 +65,10 @@
                                 <flux:sidebar.item icon="calendar" :href="route('schedule.index')" :current="request()->routeIs('schedule.*')" wire:navigate>
                                     {{ __('Calendar') }}
                                 </flux:sidebar.item>
-                                @if ($firmContext->membership()?->hasPermission(\App\Enums\Permission::ManageFirmSettings))
+                                @if (
+                                    $firmContext->membership()?->hasPermission(\App\Enums\Permission::ManageFirmSettings)
+                                    && app(\App\Support\FeatureFlags::class)->enabled(\App\Enums\Feature::AdminTools, $firmContext->firmId())
+                                )
                                     <flux:sidebar.item icon="book-open" :href="route('rules.index')" :current="request()->routeIs('rules.*')" wire:navigate>
                                         {{ __('Admin tools: Deadline sources') }}
                                     </flux:sidebar.item>

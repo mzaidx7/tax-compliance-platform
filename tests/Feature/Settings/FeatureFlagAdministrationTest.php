@@ -70,6 +70,21 @@ final class FeatureFlagAdministrationTest extends TestCase
         $this->assertTrue(app(FeatureFlags::class)->enabled(Feature::Imports, $fixture['firm']->id));
     }
 
+    public function test_administrator_can_enable_the_advanced_deadline_tools_switch(): void
+    {
+        $fixture = $this->fixture();
+        config(['platform.features.admin_tools.enabled' => false, 'platform.features.admin_tools.firm_ids' => []]);
+
+        app(SetFeatureFlagOverride::class)->handle(
+            $fixture['admin'],
+            Feature::AdminTools,
+            true,
+            'Show advanced deadline tools for this firm.',
+        );
+
+        $this->assertTrue(app(FeatureFlags::class)->enabled(Feature::AdminTools, $fixture['firm']->id));
+    }
+
     public function test_one_firms_override_never_affects_another_firm(): void
     {
         $fixture = $this->fixture();

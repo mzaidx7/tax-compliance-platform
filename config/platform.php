@@ -32,6 +32,10 @@ return [
             'enabled' => (bool) env('FEATURE_AUDIT_VIEWER', false),
             'firm_ids' => $firmIds((string) env('FEATURE_AUDIT_VIEWER_FIRM_IDS', '')),
         ],
+        'admin_tools' => [
+            'enabled' => (bool) env('FEATURE_ADMIN_TOOLS', false),
+            'firm_ids' => $firmIds((string) env('FEATURE_ADMIN_TOOLS_FIRM_IDS', '')),
+        ],
     ],
 
     'queue' => [

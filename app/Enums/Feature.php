@@ -11,6 +11,7 @@ enum Feature: string
     case Imports = 'imports';
     case EInvoicingReadiness = 'e_invoicing_readiness';
     case AuditViewer = 'audit_viewer';
+    case AdminTools = 'admin_tools';
 
     public function label(): string
     {
@@ -20,6 +21,7 @@ enum Feature: string
             self::Imports => 'Imports',
             self::EInvoicingReadiness => 'E-invoicing readiness',
             self::AuditViewer => 'Audit register',
+            self::AdminTools => 'Advanced deadline tools',
         };
     }
 
@@ -31,6 +33,7 @@ enum Feature: string
             self::Imports => 'Bulk import and reconciliation tooling for this firm.',
             self::EInvoicingReadiness => 'E-invoicing data-quality readiness checks for this firm.',
             self::AuditViewer => 'The read-only audit register for this firm.',
+            self::AdminTools => 'Show deadline-source and deadline-review tools to firm administrators.',
         };
     }
 }
