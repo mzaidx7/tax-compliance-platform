@@ -5,11 +5,15 @@ declare(strict_types=1);
 namespace Tests\Feature\Clients;
 
 use App\Actions\Clients\PreviewClientCsvImport;
+use App\Actions\Exports\ExportClientMasterData;
 use App\Enums\FirmRole;
 use App\Livewire\Clients\Index;
 use App\Models\AuditLog;
 use App\Models\Client;
 use App\Models\Firm;
+use App\Models\FirmMembership;
+use App\Models\Obligation;
+use App\Models\TaxPeriod;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
@@ -112,6 +116,54 @@ final class ClientCsvImportTest extends TestCase
             ->assertHasErrors('clientImportFile');
     }
 
+    public function test_master_import_stores_sensitive_details_and_generates_tax_schedule(): void
+    {
+        [$administrator] = $this->administratorContext();
+        $file = UploadedFile::fake()->createWithContent('client-master.csv', implode("\n", [
+            'internal_code,legal_name,email,mobile,vat_trn,ct_trn,vat_frequency,vat_period_start,vat_period_end,ct_period_start,ct_period_end,trade_license_number,trade_license_authority,trade_license_expiry_date,passport_number,passport_expiry_date,emirates_id_number,emirates_id_expiry_date',
+            'MASTER-001,Synthetic Master LLC,accounts@example.test,+971501234567,100000000000003,100000000000004,quarterly,2026-09-01,2026-11-30,2025-01-01,2025-12-31,LIC-1234,DED,2027-12-31,P1234567,2030-01-01,784-1990-1234567-1,2029-01-01',
+        ]));
+
+        Livewire::actingAs($administrator)
+            ->test(Index::class)
+            ->set('clientImportFile', $file)
+            ->call('previewClientImport')
+            ->assertSet('clientImportAccepted', 1)
+            ->call('commitClientImport')
+            ->assertHasNoErrors();
+
+        $client = Client::query()->where('internal_code', 'MASTER-001')->firstOrFail();
+        self::assertSame('P1234567', $client->passport_number);
+        self::assertSame('784-1990-1234567-1', $client->emirates_id_number);
+        self::assertSame('LIC-1234', $client->trade_license_number);
+        self::assertSame('100000000000003', $client->vat_trn);
+        self::assertSame('100000000000004', $client->corporate_tax_trn);
+        self::assertSame(8, TaxPeriod::query()->whereHas('registration', fn ($query) => $query->where('client_id', $client->id))->count());
+        self::assertSame(8, Obligation::query()->where('client_id', $client->id)->count());
+        $this->assertDatabaseMissing('clients', ['passport_number' => 'P1234567']);
+        $this->assertDatabaseMissing('clients', ['emirates_id_number' => '784-1990-1234567-1']);
+    }
+
+    public function test_administrator_can_download_an_audited_client_master_export(): void
+    {
+        [$administrator, $firm] = $this->administratorContext();
+        $client = Client::factory()->createForFirm($firm, [
+            'internal_code' => 'EXPORT-001',
+            'internal_code_normalized' => 'EXPORT-001',
+            'passport_number' => 'P1234567',
+            'created_by' => $administrator->id,
+        ]);
+
+        $this->activateFirmMembership($this->firmMembershipFor($administrator, $firm));
+        $artifact = app(ExportClientMasterData::class)->handle($administrator);
+
+        $response = $this->actingAs($administrator)->get(route('exports.download', ['exportAuditLog' => $artifact->auditLogId]));
+
+        $response->assertOk();
+        $response->assertHeader('content-type', 'text/csv; charset=UTF-8');
+        $this->assertStringContainsString('P1234567', (string) $response->streamedContent());
+    }
+
     /**
      * @return array{User, Firm}
      */
@@ -123,5 +175,13 @@ final class ClientCsvImportTest extends TestCase
         $this->activateFirmMembership($membership);
 
         return [$administrator, $firm];
+    }
+
+    private function firmMembershipFor(User $user, Firm $firm): FirmMembership
+    {
+        return FirmMembership::query()
+            ->where('user_id', $user->id)
+            ->where('firm_id', $firm->id)
+            ->firstOrFail();
     }
 }

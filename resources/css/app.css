@@ -38,6 +38,11 @@
 
 @layer base {
     html {
+        color-scheme: light;
+        background: var(--color-zinc-50);
+    }
+
+    html.dark {
         color-scheme: dark;
         background: var(--color-zinc-950);
     }
@@ -67,6 +72,48 @@
             animation-duration: 0.01ms !important;
             animation-iteration-count: 1 !important;
         }
+    }
+}
+
+@layer base {
+    html:not(.dark) body {
+        color: var(--color-zinc-900);
+    }
+
+    html:not(.dark) .bg-zinc-950 {
+        background-color: var(--color-zinc-50) !important;
+    }
+
+    html:not(.dark) .bg-zinc-900,
+    html:not(.dark) .bg-zinc-900\/70 {
+        background-color: #ffffff !important;
+    }
+
+    html:not(.dark) .text-white,
+    html:not(.dark) .text-zinc-100,
+    html:not(.dark) .text-zinc-200 {
+        color: var(--color-zinc-900) !important;
+    }
+
+    html:not(.dark) .text-zinc-300,
+    html:not(.dark) .text-zinc-400 {
+        color: var(--color-zinc-600) !important;
+    }
+
+    html:not(.dark) .text-zinc-500 {
+        color: var(--color-zinc-600) !important;
+    }
+
+    html:not(.dark) [class*="border-white"] {
+        border-color: var(--color-zinc-200) !important;
+    }
+
+    html:not(.dark) [class*="divide-white"] > :not([hidden]) ~ :not([hidden]) {
+        border-color: var(--color-zinc-200) !important;
+    }
+
+    html:not(.dark) .ring-white\/8 {
+        --tw-ring-color: var(--color-zinc-200) !important;
     }
 }
 

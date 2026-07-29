@@ -14,12 +14,15 @@ FORM: Continuous identity ledger with a compact creation station.
                     {{ __('Clients') }}
                 </h1>
                 <p class="mt-4 max-w-2xl text-base leading-7 text-zinc-400">
-                    {{ __('Add and manage clients, their services, tax registrations, tax periods and responsible team members.') }}
+                    {{ __("Keep each client's contact details, Tax Registration Numbers, Tax Periods, documents and assigned team in one place.") }}
                 </p>
             </div>
             <div class="flex flex-wrap items-center gap-3">
                 <flux:button variant="ghost" icon="arrow-up-tray" wire:click="openImport">
-                    {{ __('Import CSV') }}
+                    {{ __('Import client master data') }}
+                </flux:button>
+                <flux:button variant="ghost" icon="arrow-down-tray" wire:click="exportMasterData">
+                    {{ __('Download client data') }}
                 </flux:button>
                 <flux:badge color="amber" icon="shield-check">{{ __('Firm administrator controlled') }}</flux:badge>
             </div>
@@ -120,7 +123,7 @@ FORM: Continuous identity ledger with a compact creation station.
                     </span>
                     <h2 id="create-client-heading" class="text-lg font-semibold text-zinc-100">{{ __('Create client identity') }}</h2>
                     <p class="mt-2 text-sm leading-6 text-zinc-500">
-                        {{ __('Only the identity foundation is captured in this packet. Names are stored exactly as entered.') }}
+                        {{ __('For a full setup, import the client master file with tax periods and document expiry dates. You can still add a client here.') }}
                     </p>
                 </div>
 
@@ -173,7 +176,7 @@ FORM: Continuous identity ledger with a compact creation station.
             </div>
 
             <p class="mt-4 px-1 text-xs leading-5 text-zinc-600">
-                {{ __('This step captures identity only. Service and tax profile records are maintained from the client register.') }}
+                {{ __('Imported VAT and Corporate Tax periods create the next filing deadlines automatically.') }}
             </p>
         </aside>
     </div>
@@ -181,22 +184,22 @@ FORM: Continuous identity ledger with a compact creation station.
     <flux:modal wire:model.self="showImportModal" class="md:w-[56rem]">
         <div class="space-y-7">
             <div>
-                <flux:heading size="lg">{{ __('Import client identities') }}</flux:heading>
+                <flux:heading size="lg">{{ __('Import client master data') }}</flux:heading>
                 <flux:text class="mt-2 max-w-2xl">
-                    {{ __('Check the CSV before importing it. Accepted rows are validated again when you confirm, and the uploaded file is not kept.') }}
+                    {{ __('Upload a CSV containing client, tax, contact and document details. Review every row before saving. The uploaded file is not kept.') }}
                 </flux:text>
             </div>
 
             <div class="grid gap-5 border-y border-white/8 py-6 md:grid-cols-[minmax(0,1fr)_auto] md:items-end">
                 <flux:field>
-                    <flux:label>{{ __('CSV file') }}</flux:label>
+                    <flux:label>{{ __('Client master CSV file') }}</flux:label>
                     <input
                         wire:model="clientImportFile"
                         type="file"
-                        accept=".csv,text/csv,text/plain"
+                        accept=".csv,.xlsx,text/csv,text/plain,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
                         class="release-file-input mt-2 block min-h-11 w-full rounded-xl border border-white/10 bg-zinc-950 px-3 py-2 text-sm text-zinc-300 focus:outline-none focus:ring-2 focus:ring-amber-300"
                     />
-                    <flux:description>{{ __('Maximum 500 rows and 2 MB. Required headers: internal_code, legal_name. Optional: trade_name, entity_type.') }}</flux:description>
+                    <flux:description>{{ __('Maximum 500 rows and 2 MB. Required: internal_code, legal_name. Optional: email, mobile, vat_trn, ct_trn, vat_frequency, VAT and Corporate Tax period dates, licence, passport and Emirates ID details. Dates use YYYY-MM-DD.') }}</flux:description>
                     <flux:error name="clientImportFile" />
                 </flux:field>
                 <flux:button

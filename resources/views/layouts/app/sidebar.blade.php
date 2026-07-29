@@ -1,16 +1,16 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="dark">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
     <head>
         @include('partials.head')
     </head>
-    <body class="min-h-screen bg-zinc-950 text-zinc-100 antialiased">
+    <body class="min-h-screen bg-zinc-50 text-zinc-900 antialiased dark:bg-zinc-950 dark:text-zinc-100">
         @php
             $firmContext = app(\App\Tenancy\FirmContext::class);
             $hasFirmContext = $firmContext->hasFirm();
         @endphp
 
-        <flux:sidebar sticky collapsible="mobile" class="border-e border-white/8 bg-zinc-900">
-            <flux:sidebar.header class="border-b border-white/8 pb-4">
+        <flux:sidebar sticky collapsible="mobile" class="border-e border-zinc-200 bg-white dark:border-white/8 dark:bg-zinc-900">
+            <flux:sidebar.header class="border-b border-zinc-200 pb-4 dark:border-white/8">
                 <x-app-logo :sidebar="true" href="{{ route('dashboard') }}" wire:navigate />
                 <flux:sidebar.collapse class="lg:hidden" />
             </flux:sidebar.header>
@@ -60,17 +60,19 @@
                         )
                             @can('viewAny', \App\Models\Obligation::class)
                                 <flux:sidebar.item icon="calendar-days" :href="route('obligations.index')" :current="request()->routeIs('obligations.*')" wire:navigate>
-                                    {{ __('Deadlines') }}
+                                    {{ __('Tax Returns and Deadlines') }}
                                 </flux:sidebar.item>
                                 <flux:sidebar.item icon="calendar" :href="route('schedule.index')" :current="request()->routeIs('schedule.*')" wire:navigate>
                                     {{ __('Calendar') }}
                                 </flux:sidebar.item>
-                                <flux:sidebar.item icon="book-open" :href="route('rules.index')" :current="request()->routeIs('rules.*')" wire:navigate>
-                                    {{ __('Deadline rules') }}
-                                </flux:sidebar.item>
-                                <flux:sidebar.item icon="sparkles" :href="route('generation.index')" :current="request()->routeIs('generation.*')" wire:navigate>
-                                    {{ __('Create deadlines') }}
-                                </flux:sidebar.item>
+                                @if ($firmContext->membership()?->hasPermission(\App\Enums\Permission::ManageFirmSettings))
+                                    <flux:sidebar.item icon="book-open" :href="route('rules.index')" :current="request()->routeIs('rules.*')" wire:navigate>
+                                        {{ __('Admin tools: Deadline sources') }}
+                                    </flux:sidebar.item>
+                                    <flux:sidebar.item icon="sparkles" :href="route('generation.index')" :current="request()->routeIs('generation.*')" wire:navigate>
+                                        {{ __('Admin tools: Review deadlines') }}
+                                    </flux:sidebar.item>
+                                @endif
                             @endcan
 
                             @can('viewAny', \App\Models\WorkItem::class)
@@ -119,7 +121,7 @@
 
             <flux:spacer />
 
-            <flux:sidebar.nav class="border-t border-white/8 pt-4">
+            <flux:sidebar.nav class="border-t border-zinc-200 pt-4 dark:border-white/8">
                 <flux:sidebar.item icon="cog-6-tooth" :href="route('profile.edit')" :current="request()->routeIs('profile.*', 'appearance.*', 'security.*')" wire:navigate>
                     {{ __('Account settings') }}
                 </flux:sidebar.item>
@@ -128,7 +130,7 @@
             <x-desktop-user-menu class="hidden lg:block" :name="auth()->user()->name" />
         </flux:sidebar>
 
-        <flux:header class="border-b border-white/8 bg-zinc-950 lg:hidden">
+        <flux:header class="border-b border-zinc-200 bg-white lg:hidden dark:border-white/8 dark:bg-zinc-950">
             <flux:sidebar.toggle class="lg:hidden" icon="bars-2" inset="left" />
             <span class="ml-3 text-sm font-semibold text-zinc-200">
                 {{ $hasFirmContext ? $firmContext->firm()->name : __('Account settings') }}

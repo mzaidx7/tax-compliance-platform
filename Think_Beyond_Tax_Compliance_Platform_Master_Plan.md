@@ -3599,3 +3599,22 @@ It does not authorise:
 - E-invoice transmission
 
 Each activity becomes authorised only after its stated gate is approved.
+
+---
+
+## 56. Compliance-first simplification revision
+
+Product owner direction confirmed 29 July 2026:
+
+- Release 1 is the internal Tax Compliance MVP. E-invoicing readiness remains a separate future release and stays visible only as Coming soon.
+- Client master data is the primary source for VAT periods, Corporate Tax periods, trade licence dates, passport dates, Emirates ID dates and recurring compliance work.
+- The import experience supports CSV and `.xlsx` first-worksheet files, with explicit validation, preview, accepted and rejected rows, and a confirmation step before commit.
+- VAT imports store the actual period start and end dates plus monthly or quarterly frequency. Future periods are generated from those dates rather than calendar-quarter assumptions.
+- VAT filing dates use 28 days after the Tax Period end, moving to the next weekday for weekend dates. Official FTA extensions remain administrator overrides with retained original dates.
+- Corporate Tax imports store the confirmed Tax Period start and end dates. Filing dates use nine months after the Tax Period end. First-period imports outside the normal 6 to 18 month range are blocked for administrator review.
+- Sensitive passport, Emirates ID and trade licence numbers are encrypted at rest. Full assigned-staff exports require recent password confirmation and create audit evidence.
+- The schedule is calculated ahead for planning but the dashboard only promotes VAT work when the Tax Period is ending or the filing period is active. Documents appear when their configured reminder window begins.
+- Deadline source and generation controls are administrator-only tools. Ordinary accountants work from Tax Returns and Deadlines, Work Tracker, Clients, Documents and Calendar.
+- The application keeps the TBT dark and gold identity and adds Light, Dark and System appearance choices with accessible contrast and reduced-motion support.
+
+This revision supersedes the earlier assumption that all VAT and Corporate Tax dates must be entered manually or maintained through visible rule-governance screens. The source-linked rule and override history remain in the data model for exceptional FTA dates and future review.

@@ -112,8 +112,16 @@ final readonly class AuthorizeExportDownload
 
     private function canDownloadOperationalReport(User $actor, AuditLog $exportAuditLog, string $fileName): bool
     {
+        if (
+            preg_match('/\Aclient-master-[0-9a-z]{26}\.csv\z/', $fileName) === 1
+            && $exportAuditLog->actor_type === $actor->getMorphClass()
+            && (string) $exportAuditLog->actor_id === (string) $actor->id
+        ) {
+            return true;
+        }
+
         $isOperationalReport = preg_match(
-            '/\A(monthly-schedule|tax-periods|expiring-documents|workload-completion)-\d{4}-\d{2}-/',
+            '/\A(monthly-schedule|tax-periods|expiring-documents|workload-completion|client-master)-/',
             $fileName,
         ) === 1;
         $membership = $this->firmContext->membership();

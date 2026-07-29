@@ -1,7 +1,9 @@
 <?php
 
 declare(strict_types=1);
+use App\Calculators\CorporateTaxFilingDeadlineCalculator;
 use App\Calculators\ManualDatePassthroughCalculator;
+use App\Calculators\VatFilingDeadlineCalculator;
 
 $firmIds = static fn (string $value): array => array_values(array_filter(
     array_map('trim', explode(',', $value)),
@@ -61,6 +63,8 @@ return [
     'rules' => [
         'calculators' => [
             ManualDatePassthroughCalculator::class,
+            VatFilingDeadlineCalculator::class,
+            CorporateTaxFilingDeadlineCalculator::class,
         ],
         'official_source_hosts' => [
             'tax.gov.ae',

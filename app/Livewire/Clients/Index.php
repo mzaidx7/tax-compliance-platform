@@ -13,6 +13,7 @@ use App\Actions\Clients\CreateClient;
 use App\Actions\Clients\PreviewClientCsvImport;
 use App\Actions\Clients\TransitionClientServiceEnrollment;
 use App\Actions\Clients\TransitionClientStatus;
+use App\Actions\Exports\ExportClientMasterData;
 use App\Enums\ClientContactPurpose;
 use App\Enums\ClientService;
 use App\Enums\ClientStatus;
@@ -60,7 +61,7 @@ final class Index extends Component
 
     public ?TemporaryUploadedFile $clientImportFile = null;
 
-    /** @var list<array{line: int, internalCode: string, legalName: string, tradeName: string, entityType: string, errors: list<string>, valid: bool}> */
+    /** @var list<array{line: int, internalCode: string, legalName: string, tradeName: string, entityType: string, masterData: array<string, string>, errors: list<string>, valid: bool}> */
     public array $clientImportRows = [];
 
     public int $clientImportAccepted = 0;
@@ -166,10 +167,17 @@ final class Index extends Component
         $this->showImportModal = true;
     }
 
+    public function exportMasterData(ExportClientMasterData $action): mixed
+    {
+        $artifact = $action->handle($this->currentUser());
+
+        return redirect()->route('exports.download', ['exportAuditLog' => $artifact->auditLogId]);
+    }
+
     public function previewClientImport(PreviewClientCsvImport $preview): void
     {
         $this->validate([
-            'clientImportFile' => ['required', 'file', 'mimes:csv,txt', 'max:2048'],
+            'clientImportFile' => ['required', 'file', 'mimes:csv,txt,xlsx', 'max:2048'],
         ]);
 
         $result = $preview->handle($this->currentUser(), $this->clientImportFile);

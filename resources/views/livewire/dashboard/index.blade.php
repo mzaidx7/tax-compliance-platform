@@ -10,10 +10,10 @@
                     {{ app(\App\Tenancy\FirmContext::class)->firm()->name }}
                 </p>
                 <h1 class="max-w-3xl text-balance text-4xl font-semibold tracking-[-0.03em] text-white sm:text-5xl">
-                    {{ __('Compliance overview') }}
+                    {{ __("Today's compliance work") }}
                 </h1>
                 <p class="mt-5 max-w-3xl text-base leading-7 text-zinc-400">
-                    {{ __('See upcoming deadlines, overdue items, work risks and payment follow-ups for your firm. The figures come from information recorded by your team.') }}
+                    {{ __('See what needs attention today, which clients are waiting, and which VAT Returns, Corporate Tax Returns or documents are coming up.') }}
                 </p>
             </div>
 
