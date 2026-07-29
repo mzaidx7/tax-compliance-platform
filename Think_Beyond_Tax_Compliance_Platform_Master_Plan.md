@@ -35,13 +35,12 @@ Release 1 is the immediate build and publishing target. It includes:
 
 Release 1 explicitly excludes:
 
-- Automated VAT or Corporate Tax statutory calculations
 - Claims that a stored or manually entered date is legally correct
 - E-invoicing readiness assessment, scoring, cleanup, merge or export
 - E-invoice transmission, EmaraTax automation, OCR and accounting integrations
 - Billing, public self-service onboarding and dedicated-edition automation
 
-VAT and Corporate Tax dates in Release 1 remain manually supplied or governed through source-linked rules with human verification. Automated regulatory calculators remain blocked until official-source golden cases, formulas, ownership and review are approved.
+Release 1 includes bounded VAT and Corporate Tax schedule calculators based on confirmed imported Tax Periods. They retain official-source snapshots and never replace human review, documented FTA extensions or administrator overrides. The platform does not claim that a stored, imported or calculated date is legally correct for every client circumstance.
 
 ### E-Invoicing Readiness: Separate Future Release
 

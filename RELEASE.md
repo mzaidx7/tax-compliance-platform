@@ -2,9 +2,9 @@
 
 ## Release boundary
 
-Compliance Operations V1 includes the client register, CSV onboarding, obligations, governed manual dates, workflows, checklists, assignments, document metadata, filing, payment and tax records, schedules, notifications, reports, safe exports and audit evidence.
+Compliance Operations V1 includes the client register, CSV and Excel onboarding, calculated VAT and Corporate Tax schedules with source-linked rule snapshots and human overrides, obligations, workflows, checklists, assignments, document metadata, filing, payment and tax records, schedules, notifications, reports, safe exports and audit evidence.
 
-It excludes automated statutory calculators, e-invoicing readiness operations, transmission, OCR, billing and accounting integrations.
+It excludes e-invoicing readiness operations, transmission, OCR, billing and accounting integrations.
 
 ## Required infrastructure
 

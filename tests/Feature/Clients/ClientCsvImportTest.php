@@ -157,11 +157,32 @@ final class ClientCsvImportTest extends TestCase
         $this->activateFirmMembership($this->firmMembershipFor($administrator, $firm));
         $artifact = app(ExportClientMasterData::class)->handle($administrator);
 
-        $response = $this->actingAs($administrator)->get(route('exports.download', ['exportAuditLog' => $artifact->auditLogId]));
+        $response = $this->actingAs($administrator)
+            ->withSession(['auth.password_confirmed_at' => now()->timestamp])
+            ->get(route('exports.download', ['exportAuditLog' => $artifact->auditLogId]));
 
         $response->assertOk();
         $response->assertHeader('content-type', 'text/csv; charset=UTF-8');
         $this->assertStringContainsString('P1234567', (string) $response->streamedContent());
+    }
+
+    public function test_client_master_export_requires_recent_password_confirmation(): void
+    {
+        [$administrator, $firm] = $this->administratorContext();
+        Client::factory()->createForFirm($firm, [
+            'internal_code' => 'EXPORT-CONFIRM-001',
+            'internal_code_normalized' => 'EXPORT-CONFIRM-001',
+            'created_by' => $administrator->id,
+        ]);
+
+        $this->activateFirmMembership($this->firmMembershipFor($administrator, $firm));
+        $artifact = app(ExportClientMasterData::class)->handle($administrator);
+
+        $this->actingAs($administrator)
+            ->get(route('exports.download', ['exportAuditLog' => $artifact->auditLogId]))
+            ->assertRedirect(route('password.confirm'));
+
+        $this->assertDatabaseMissing('audit_logs', ['action' => 'firm.export.downloaded']);
     }
 
     /**
