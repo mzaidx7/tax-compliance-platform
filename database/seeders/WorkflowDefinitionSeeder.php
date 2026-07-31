@@ -31,7 +31,7 @@ final class WorkflowDefinitionSeeder extends Seeder
         app(FirmContext::class)->activateMembership($membership);
         app(PublishCoreWorkflowVersion::class)->handle(
             $administrator,
-            'Synthetic core compliance workflow',
+            'Standard compliance process',
         );
     }
 }

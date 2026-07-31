@@ -16,17 +16,14 @@ final class ReadinessComingSoonTest extends TestCase
     use BuildsFirmTenancy;
     use RefreshDatabase;
 
-    public function test_authenticated_firm_member_sees_the_release_boundary(): void
+    public function test_authenticated_firm_member_cannot_open_readiness_page(): void
     {
         [$user, $firm] = $this->member();
 
         $this->actingAs($user)
             ->withSession(['active_firm_id' => $firm->id])
-            ->get(route('readiness.coming-soon'))
-            ->assertOk()
-            ->assertSee('E-invoicing readiness is coming soon.')
-            ->assertSee('Return to compliance dashboard')
-            ->assertDontSee('Create rule version');
+            ->get('/readiness')
+            ->assertNotFound();
     }
 
     public function test_unreleased_readiness_workspaces_are_not_routable(): void

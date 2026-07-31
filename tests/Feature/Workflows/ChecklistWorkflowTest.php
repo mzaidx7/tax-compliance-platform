@@ -260,12 +260,12 @@ final class ChecklistWorkflowTest extends TestCase
             ->test(Index::class)
             ->call('openTransition', $fixture['workItem']->id)
             ->set('targetWorkItemStatus', WorkItemStatus::UnderReview->value)
-            ->assertSee('0 of 1 required items have retained evidence')
+            ->assertSee('0 of 1 required items are completed')
             ->set('transitionReason', 'Synthetic incomplete Livewire submission.')
             ->call('transitionWork')
             ->assertHasErrors('targetStatus')
             ->assertSet('showTransitionModal', true)
-            ->assertSee('Open Work checklist to add evidence');
+            ->assertSee('open the checklist and complete the remaining items');
     }
 
     /**

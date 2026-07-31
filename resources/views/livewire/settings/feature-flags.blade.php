@@ -9,10 +9,10 @@
     >
         <div class="my-6 w-full space-y-4">
             @foreach ($this->features as $feature)
-                <div class="flex items-start justify-between gap-4 rounded-xl bg-zinc-900/60 p-4 ring-1 ring-white/8">
+                <div class="rounded-xl border border-[var(--tbt-border)] bg-[var(--tbt-panel-soft)] p-4 shadow-sm transition hover:border-amber-400/25 hover:bg-[var(--tbt-row-hover)] sm:flex sm:items-start sm:justify-between sm:gap-4">
                     <div class="min-w-0">
                         <div class="flex flex-wrap items-center gap-2">
-                            <p class="text-sm font-medium text-zinc-100">{{ $feature['label'] }}</p>
+                            <p class="text-sm font-medium text-[var(--tbt-text-strong)]">{{ $feature['label'] }}</p>
                             <flux:badge size="sm" :color="$feature['effective'] ? 'green' : 'zinc'">
                                 {{ $feature['effective'] ? __('Enabled') : __('Disabled') }}
                             </flux:badge>
@@ -22,10 +22,10 @@
                                 <flux:badge size="sm" color="zinc">{{ __('Platform default') }}</flux:badge>
                             @endif
                         </div>
-                        <p class="mt-1 text-xs leading-5 text-zinc-500">{{ $feature['description'] }}</p>
+                        <p class="mt-1 text-xs leading-5 text-[var(--tbt-text-muted)]">{{ $feature['description'] }}</p>
                     </div>
 
-                    <flux:button size="sm" variant="ghost" wire:click="openOverride('{{ $feature['value'] }}')">
+                    <flux:button class="mt-3 sm:mt-0" size="sm" variant="ghost" wire:click="openOverride('{{ $feature['value'] }}')">
                         {{ __('Change') }}
                     </flux:button>
                 </div>

@@ -1,12 +1,12 @@
-<div class="mx-auto w-full max-w-7xl">
-    <header class="border-b border-white/8 pb-7">
+<div class="tbt-page">
+    <header class="tbt-page-header">
         <div class="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
             <div>
-                <p class="mb-2 text-sm font-medium text-amber-300">{{ $this->currentFirmName }}</p>
-                <h1 class="text-3xl font-semibold tracking-[-0.03em] text-zinc-50 sm:text-4xl">
+                <p class="tbt-page-kicker">{{ $this->currentFirmName }}</p>
+                <h1 class="tbt-page-title">
                     {{ __('Team members') }}
                 </h1>
-                <p class="mt-3 max-w-2xl text-sm leading-6 text-zinc-400">
+                <p class="tbt-page-copy">
                     {{ __('Invite team members, assign roles, update access and review invitation status. Every change is recorded in the activity history.') }}
                 </p>
             </div>
@@ -14,7 +14,7 @@
         </div>
     </header>
 
-    <div class="mt-8 grid gap-8 xl:grid-cols-[minmax(0,1fr)_22rem]">
+    <div class="mt-5 grid gap-5 xl:grid-cols-[minmax(0,1fr)_22rem]">
         <section aria-labelledby="member-list-heading">
             <div class="mb-4 flex items-center justify-between gap-4">
                 <div>
@@ -32,8 +32,8 @@
 
             <flux:error name="member" class="mb-4" />
 
-            <div class="overflow-hidden rounded-2xl bg-zinc-900/70 ring-1 ring-white/8">
-                <div class="divide-y divide-white/8">
+            <div class="tbt-panel">
+                <div class="divide-y divide-[var(--tbt-border)]">
                     @forelse ($this->members as $membership)
                         @php
                             $statusColor = match ($membership->status) {
@@ -106,7 +106,7 @@
             @if ($this->invitations->isNotEmpty())
                 <div class="mt-9">
                     <h2 class="text-lg font-semibold text-zinc-100">{{ __('Pending invitations') }}</h2>
-                    <div class="mt-4 divide-y divide-white/8 border-y border-white/8">
+                    <div class="tbt-panel mt-4 divide-y divide-[var(--tbt-border)] px-5">
                         @foreach ($this->invitations as $invitation)
                             <div
                                 wire:key="invitation-{{ $invitation->id }}"
@@ -148,7 +148,7 @@
         </section>
 
         <aside aria-labelledby="invite-heading" class="xl:sticky xl:top-8 xl:self-start">
-            <div class="rounded-2xl bg-zinc-900/70 p-6 ring-1 ring-white/8">
+            <div class="tbt-panel p-6">
                 <div class="mb-6">
                     <span class="mb-4 grid size-10 place-items-center rounded-xl bg-amber-400 text-black">
                         <flux:icon.user-plus class="size-5" />
@@ -223,7 +223,7 @@
                 <flux:textarea
                     wire:model="memberReason"
                     :label="__('Reason for change')"
-                    :description="__('Use a concise operational reason. Maximum 500 characters.')"
+                    :description="__('Briefly explain why the access change is needed. Maximum 500 characters.')"
                     rows="3"
                     maxlength="500"
                     required
@@ -242,7 +242,7 @@
             <div class="border-t border-white/8 pt-5">
                 <p class="text-sm font-medium text-zinc-200">{{ __('Access status') }}</p>
                 <p class="mt-1 text-sm leading-6 text-zinc-500">
-                    {{ __('Suspension is reversible. Revocation closes this membership record and cannot be reversed in this packet.') }}
+                    {{ __('Suspending access is temporary. Revoking access permanently removes this person from the firm workspace.') }}
                 </p>
                 <div class="mt-4 flex flex-wrap gap-3">
                     @if ($selectedMemberStatus === \App\Enums\FirmMembershipStatus::Active->value)

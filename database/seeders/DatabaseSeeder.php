@@ -21,12 +21,12 @@ class DatabaseSeeder extends Seeder
         }
 
         $firm = Firm::factory()->create([
-            'name' => 'Synthetic Compliance Practice',
-            'slug' => 'synthetic-compliance-practice',
+            'name' => 'TBT Demo Tax Practice',
+            'slug' => 'tbt-demo-tax-practice',
         ]);
 
         $administrator = User::factory()->create([
-            'name' => 'Synthetic Firm Administrator',
+            'name' => 'Demo Administrator',
             'email' => 'administrator@example.test',
         ]);
 

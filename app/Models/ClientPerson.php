@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 #[Fillable([
     'client_id', 'name', 'role', 'passport_number', 'passport_expires_on', 'emirates_id_number',
@@ -28,6 +29,12 @@ final class ClientPerson extends Model
     public function creator(): BelongsTo
     {
         return $this->belongsTo(User::class, 'created_by');
+    }
+
+    /** @return HasMany<ClientDocument, $this> */
+    public function documents(): HasMany
+    {
+        return $this->hasMany(ClientDocument::class, 'client_person_id');
     }
 
     /** @return array<string, string> */

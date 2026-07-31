@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Jobs;
 
+use App\Actions\Clients\GenerateClientReminderRequests;
 use App\Actions\Documents\GenerateDocumentExpiryReminders;
 use App\Jobs\Middleware\SetFirmContext;
 use App\Tenancy\FirmContext;
@@ -85,9 +86,13 @@ final class RecordFirmScheduledWorkHeartbeat implements FirmAwareJob, ShouldBeEn
         TenantCache $cache,
         FirmContext $firmContext,
         GenerateDocumentExpiryReminders $generateDocumentExpiryReminders,
+        GenerateClientReminderRequests $generateClientReminderRequests,
     ): void {
         $firm = $firmContext->firm();
         $remindersGenerated = $generateDocumentExpiryReminders->handle(
+            $this->scheduledFor->setTimezone($firm->timezone),
+        );
+        $clientRemindersGenerated = $generateClientReminderRequests->handle(
             $this->scheduledFor->setTimezone($firm->timezone),
         );
 
@@ -100,6 +105,7 @@ final class RecordFirmScheduledWorkHeartbeat implements FirmAwareJob, ShouldBeEn
                 'generation_key' => $this->generationKey(),
                 'correlation_id' => $this->correlationId(),
                 'document_expiry_reminders_generated' => $remindersGenerated,
+                'client_reminders_generated' => $clientRemindersGenerated,
             ],
             max(60, (int) config('platform.operations.scheduled_work_heartbeat_ttl_seconds', 86400)),
         );

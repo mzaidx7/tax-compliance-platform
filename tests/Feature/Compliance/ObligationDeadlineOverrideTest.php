@@ -157,7 +157,7 @@ final class ObligationDeadlineOverrideTest extends TestCase
             ->call('overrideDeadline')
             ->assertHasNoErrors()
             ->assertSee('5 Oct 2026')
-            ->assertSee('Statutory 28 Sep 2026');
+            ->assertSee('Original due date: 28 Sep 2026');
     }
 
     /** @return array{User, Obligation, Firm} */

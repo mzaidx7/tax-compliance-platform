@@ -206,7 +206,7 @@ final class WorkItemRiskStatusTest extends TestCase
             ->call('saveRisk')
             ->assertHasNoErrors()
             ->assertSet('showRiskModal', false)
-            ->assertSee('Risk: High');
+            ->assertSee('Attention: Urgent');
     }
 
     public function test_preparer_does_not_see_the_risk_control(): void

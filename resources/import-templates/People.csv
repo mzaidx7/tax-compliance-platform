@@ -1,0 +1,2 @@
+client_internal_code,person_name,role,email,phone,passport_number,passport_expiry_date,emirates_id_number,emirates_id_expiry_date,is_active
+CLIENT-001,Example Authorised Signatory,authorised_signatory,,,EXAMPLE-ONLY,2030-01-01,EXAMPLE-ONLY,2029-01-01,yes

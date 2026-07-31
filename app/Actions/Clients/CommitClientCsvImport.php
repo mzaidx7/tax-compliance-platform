@@ -35,8 +35,12 @@ final readonly class CommitClientCsvImport
      *   line: int, internalCode: string, legalName: string, tradeName: string,
      *   entityType: string, masterData: array<string, string>, errors: list<string>, valid: bool
      * }> $rows
+     * @param list<array{
+     *   line: int, clientInternalCode: string, name: string, role: string,
+     *   data: array<string, string>, errors: list<string>, valid: bool
+     * }> $people
      */
-    public function handle(User $actor, array $rows): int
+    public function handle(User $actor, array $rows, array $people = []): int
     {
         Gate::forUser($actor)->authorize('create', Client::class);
 
@@ -53,8 +57,16 @@ final readonly class CommitClientCsvImport
                 ]);
             }
         }
+        foreach ($people as $person) {
+            if (! $person['valid'] || $person['errors'] !== []) {
+                throw ValidationException::withMessages([
+                    'clientImportFile' => 'Resolve every rejected People row before committing this file.',
+                ]);
+            }
+        }
 
-        return DB::transaction(function () use ($actor, $rows): int {
+        return DB::transaction(function () use ($actor, $people, $rows): int {
+            $clientsByCode = [];
             foreach ($rows as $row) {
                 $client = $this->createClient->handle($actor, [
                     'internalCode' => $row['internalCode'],
@@ -62,8 +74,18 @@ final readonly class CommitClientCsvImport
                     'tradeName' => $row['tradeName'],
                     'entityType' => $row['entityType'],
                 ]);
+                $clientsByCode[$row['internalCode']] = $client;
                 $this->applyMasterData($actor, $client, $row['masterData']);
                 $this->generateClientComplianceSchedule->handle($actor, $client);
+            }
+            foreach ($people as $personRow) {
+                $client = $clientsByCode[$personRow['clientInternalCode']] ?? null;
+                if (! $client instanceof Client) {
+                    throw ValidationException::withMessages([
+                        'clientImportFile' => "People line {$personRow['line']} does not match an imported client.",
+                    ]);
+                }
+                $this->createPerson($actor, $client, $personRow);
             }
 
             $this->recordAudit->handle(
@@ -75,6 +97,60 @@ final readonly class CommitClientCsvImport
 
             return count($rows);
         }, 3);
+    }
+
+    /**
+     * @param array{
+     *   line: int, clientInternalCode: string, name: string, role: string,
+     *   data: array<string, string>, errors: list<string>, valid: bool
+     * } $row
+     */
+    private function createPerson(User $actor, Client $client, array $row): void
+    {
+        $data = $row['data'];
+        $person = ClientPerson::query()->create([
+            'client_id' => $client->id,
+            'name' => trim($row['name']),
+            'role' => trim($row['role']),
+            'passport_number' => $data['passport_number'] ?? null,
+            'passport_expires_on' => $data['passport_expiry_date'] ?? null,
+            'emirates_id_number' => $data['emirates_id_number'] ?? null,
+            'emirates_id_expires_on' => $data['emirates_id_expiry_date'] ?? null,
+            'email' => $data['email'] ?? null,
+            'phone' => $data['phone'] ?? null,
+            'is_active' => ! in_array(strtolower($data['is_active'] ?? 'yes'), ['no', '0', 'false'], true),
+            'created_by' => $actor->id,
+        ]);
+
+        foreach ([
+            ['passport', 'Passport', 'passport_expiry_date', 'passport_number'],
+            ['emirates_id', 'Emirates ID', 'emirates_id_expiry_date', 'emirates_id_number'],
+        ] as [$key, $name, $expiryField, $referenceField]) {
+            if (! isset($data[$expiryField])) {
+                continue;
+            }
+            $type = DocumentTypeVersion::query()->firstOrCreate(
+                ['key' => $key, 'version' => 1],
+                [
+                    'name' => $name,
+                    'expiry_required' => true,
+                    'reminder_days' => [60, 30, 14, 7],
+                    'overdue_repeat_days' => 7,
+                    'published_at' => now('UTC'),
+                    'created_by' => $actor->id,
+                ],
+            );
+            $this->recordClientDocumentMetadata->handle(
+                $actor,
+                $client,
+                $type,
+                $data[$referenceField] ?? null,
+                null,
+                $data[$expiryField],
+                null,
+                $person,
+            );
+        }
     }
 
     /** @param array<string, string> $data */

@@ -1,0 +1,2 @@
+internal_code,legal_name,trade_name,entity_type,email,mobile,vat_trn,ct_trn,vat_frequency,vat_period_start,vat_period_end,ct_period_start,ct_period_end,trade_license_number,trade_license_authority,trade_license_issue_date,trade_license_expiry_date
+CLIENT-001,Example Client LLC,,Limited liability company,accounts@example.test,+971501234567,100000000000003,100000000000004,quarterly,2026-07-01,2026-09-30,2026-01-01,2026-12-31,EXAMPLE-ONLY,Dubai Economy and Tourism,2026-01-01,2027-12-31

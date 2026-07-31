@@ -1,13 +1,13 @@
-<div class="mx-auto w-full max-w-7xl">
-    <header class="border-b border-white/8 pb-8">
-        <p class="mb-3 text-sm font-medium text-amber-300">{{ app(\App\Tenancy\FirmContext::class)->firm()->name }}</p>
-    <h1 class="text-balance text-4xl font-semibold tracking-[-0.03em] text-white sm:text-5xl">{{ __('Reports') }}</h1>
-    <p class="mt-4 max-w-3xl text-base leading-7 text-zinc-400">{{ __('Review and download summaries of client deadlines, tax periods, document expiries and team workload. Reports use information recorded by your firm.') }}</p>
+<div class="tbt-page">
+    <header class="tbt-page-header">
+        <p class="tbt-page-kicker">{{ app(\App\Tenancy\FirmContext::class)->firm()->name }}</p>
+    <h1 class="tbt-page-title">{{ __('Reports') }}</h1>
+    <p class="tbt-page-copy">{{ __('Review and download summaries of client deadlines, tax periods, document expiries and team workload. Reports use information recorded by your firm.') }}</p>
     </header>
 
-    <section class="mt-8" aria-labelledby="report-controls-heading">
-        <h2 id="report-controls-heading" class="sr-only">{{ __('Report controls') }}</h2>
-        <div class="grid gap-4 border-y border-white/8 py-5 sm:grid-cols-[minmax(14rem,1fr)_12rem_auto] sm:items-end">
+    <section class="tbt-filter-panel mt-5" aria-labelledby="report-controls-heading">
+        <h2 id="report-controls-heading" class="tbt-panel-title mb-4">{{ __('Report controls') }}</h2>
+        <div class="grid gap-4 sm:grid-cols-[minmax(14rem,1fr)_12rem_auto] sm:items-end">
             <flux:select wire:model.live="reportType" :label="__('Report')">
                 @foreach ($this->reportTypes() as $type)
                     <flux:select.option :value="$type->value">{{ $type->label() }}</flux:select.option>
@@ -27,7 +27,7 @@
             <span class="text-xs text-zinc-500">{{ trans_choice('{0} No preview rows|{1} 1 preview row|[2,*] :count preview rows', count($this->report['rows']), ['count' => count($this->report['rows'])]) }}</span>
         </div>
 
-        <div class="overflow-x-auto border-y border-white/8" tabindex="0" aria-label="{{ __('Scrollable report table') }}">
+        <div class="tbt-table-shell overflow-x-auto" tabindex="0" aria-label="{{ __('Scrollable report table') }}">
             <table class="min-w-full divide-y divide-white/8 text-left text-sm">
                 <thead>
                     <tr>

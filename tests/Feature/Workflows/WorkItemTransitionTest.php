@@ -220,7 +220,7 @@ final class WorkItemTransitionTest extends TestCase
             ->call('transitionWork')
             ->assertHasNoErrors()
             ->assertSet('showTransitionModal', false)
-            ->assertSee('Work: In preparation');
+            ->assertSee('Task: In preparation');
 
         $this->assertDatabaseHas('work_item_transitions', [
             'work_item_id' => $fixture['workItem']->id,

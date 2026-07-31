@@ -83,7 +83,7 @@ Build assets in CI and deploy the resulting exact source state when the host sup
 6. A synthetic client can be created manually and through CSV preview and commit.
 7. A synthetic obligation can move through assignment, checklist, review, filing and payment states.
 8. Schedule, dashboard, notification centre, report preview and export download load without errors.
-9. `/readiness` shows coming soon and old readiness workspace paths return 404.
+9. `/readiness` and old readiness workspace paths return 404, and no e-invoicing navigation or setting is visible.
 10. Application, worker and mail logs contain no unhandled release errors.
 
 Delete the synthetic smoke-test records through an approved data procedure. Do not run destructive database shortcuts in production.

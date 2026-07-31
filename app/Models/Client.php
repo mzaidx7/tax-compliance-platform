@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Enums\ClientReminderMode;
 use App\Enums\ClientStatus;
 use App\Models\Concerns\BelongsToFirm;
 use Database\Factories\ClientFactory;
@@ -26,6 +27,11 @@ use Illuminate\Support\Carbon;
  * @property string|null $entity_type
  * @property string|null $primary_email
  * @property string|null $primary_phone
+ * @property ClientReminderMode $document_reminder_mode
+ * @property ClientReminderMode $vat_reminder_mode
+ * @property ClientReminderMode $corporate_tax_reminder_mode
+ * @property Carbon|null $automatic_reminders_confirmed_at
+ * @property int|null $automatic_reminders_confirmed_by
  * @property string|null $vat_trn
  * @property string|null $corporate_tax_trn
  * @property string|null $vat_frequency
@@ -57,6 +63,11 @@ use Illuminate\Support\Carbon;
     'entity_type',
     'primary_email',
     'primary_phone',
+    'document_reminder_mode',
+    'vat_reminder_mode',
+    'corporate_tax_reminder_mode',
+    'automatic_reminders_confirmed_at',
+    'automatic_reminders_confirmed_by',
     'vat_trn',
     'corporate_tax_trn',
     'vat_frequency',
@@ -79,6 +90,13 @@ final class Client extends Model
 {
     /** @use HasFactory<ClientFactory> */
     use BelongsToFirm, HasFactory, HasUlids;
+
+    /** @var array<string, mixed> */
+    protected $attributes = [
+        'document_reminder_mode' => 'review',
+        'vat_reminder_mode' => 'review',
+        'corporate_tax_reminder_mode' => 'review',
+    ];
 
     /**
      * @return BelongsTo<User, $this>
@@ -139,6 +157,10 @@ final class Client extends Model
     {
         return [
             'status' => ClientStatus::class,
+            'document_reminder_mode' => ClientReminderMode::class,
+            'vat_reminder_mode' => ClientReminderMode::class,
+            'corporate_tax_reminder_mode' => ClientReminderMode::class,
+            'automatic_reminders_confirmed_at' => 'immutable_datetime',
             'trade_license_number' => 'encrypted',
             'passport_number' => 'encrypted',
             'emirates_id_number' => 'encrypted',

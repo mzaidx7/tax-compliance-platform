@@ -42,14 +42,14 @@ Release 1 explicitly excludes:
 
 Release 1 includes bounded VAT and Corporate Tax schedule calculators based on confirmed imported Tax Periods. They retain official-source snapshots and never replace human review, documented FTA extensions or administrator overrides. The platform does not claim that a stored, imported or calculated date is legally correct for every client circumstance.
 
-### E-Invoicing Readiness: Separate Future Release
+### E-Invoicing Readiness: Dormant and Outside the Current Release
 
 Existing readiness code and data structures remain preserved behind the `e_invoicing_readiness` feature flag. Until its own release gate passes:
 
-- Navigation exposes only a non-operational "Coming soon" page.
+- Navigation, routes and feature administration expose no e-invoicing surface.
 - Readiness work is not included in Release 1 acceptance or deployment claims.
 - Its backlog, decisions, tests and progress remain tracked separately from Compliance Operations.
-- Development may continue incrementally after Release 1 without delaying the compliance launch.
+- Any later development requires a separately approved release plan and must not delay the compliance launch.
 
 ### Release 1 Completion Gate
 
@@ -3605,9 +3605,9 @@ Each activity becomes authorised only after its stated gate is approved.
 
 Product owner direction confirmed 29 July 2026:
 
-- Release 1 is the internal Tax Compliance MVP. E-invoicing readiness remains a separate future release and stays visible only as Coming soon.
+- The current final release is the internal Tax Compliance MVP. E-invoicing is outside this release and has no visible interface surface.
 - Client master data is the primary source for VAT periods, Corporate Tax periods, trade licence dates, passport dates, Emirates ID dates and recurring compliance work.
-- The import experience supports CSV and `.xlsx` first-worksheet files, with explicit validation, preview, accepted and rejected rows, and a confirmation step before commit.
+- The import experience supports the canonical Clients and People workbook plus separate client and optional People CSV files, with explicit validation, preview, accepted and rejected rows, and one atomic confirmation step before commit.
 - VAT imports store the actual period start and end dates plus monthly or quarterly frequency. Future periods are generated from those dates rather than calendar-quarter assumptions.
 - VAT filing dates use 28 days after the Tax Period end, moving to the next weekday for weekend dates. Official FTA extensions remain administrator overrides with retained original dates.
 - Corporate Tax imports store the confirmed Tax Period start and end dates. Filing dates use nine months after the Tax Period end. First-period imports outside the normal 6 to 18 month range are blocked for administrator review.

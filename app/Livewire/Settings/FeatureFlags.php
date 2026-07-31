@@ -56,7 +56,10 @@ final class FeatureFlags extends Component
                 'effective' => $reader->enabled($feature, $firmId),
                 'overridden' => in_array($feature->value, $overriddenFeatures, true),
             ],
-            Feature::cases(),
+            array_values(array_filter(
+                Feature::cases(),
+                static fn (Feature $feature): bool => $feature !== Feature::EInvoicingReadiness,
+            )),
         );
     }
 

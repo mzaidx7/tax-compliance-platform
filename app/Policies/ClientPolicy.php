@@ -21,7 +21,26 @@ final readonly class ClientPolicy
 
     public function view(User $user, Client $client): bool
     {
-        return $this->managesClient($user, $client);
+        $membership = $this->actorMembership($user);
+        if ($membership === null || $client->firm_id !== $membership->firm_id) {
+            return false;
+        }
+
+        if (
+            $membership->hasPermission(Permission::ManageClients)
+            || $membership->hasPermission(Permission::ManageObligations)
+            || $membership->hasPermission(Permission::AssignWork)
+            || $membership->hasPermission(Permission::ViewReports)
+        ) {
+            return true;
+        }
+
+        return $client->obligations()
+            ->whereHas(
+                'workItems.assignmentHistories',
+                static fn ($query) => $query->where('assigned_membership_id', $membership->id),
+            )
+            ->exists();
     }
 
     public function create(User $user): bool

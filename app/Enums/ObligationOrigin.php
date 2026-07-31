@@ -12,8 +12,8 @@ enum ObligationOrigin: string
     public function label(): string
     {
         return match ($this) {
-            self::Manual => 'Manual entry',
-            self::GovernedRule => 'Governed rule',
+            self::Manual => 'Entered by the team',
+            self::GovernedRule => 'Calculated from the saved tax period',
         };
     }
 }

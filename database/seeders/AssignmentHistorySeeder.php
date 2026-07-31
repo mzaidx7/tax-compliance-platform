@@ -33,7 +33,7 @@ final class AssignmentHistorySeeder extends Seeder
                 AssignmentHistory::factory()->createForWorkItem($workItem->firm, $workItem, $membership, [
                     'assignment_role' => $role,
                     'assigned_by' => $administrator->id,
-                    'reason' => 'Synthetic initial assignment fixture.',
+                    'reason' => 'Initial demo assignment.',
                 ]);
             }
         }

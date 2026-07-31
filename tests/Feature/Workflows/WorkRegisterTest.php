@@ -35,8 +35,8 @@ final class WorkRegisterTest extends TestCase
         Livewire::actingAs($fixture['manager'])
             ->test(Index::class)
             ->assertSee('Synthetic VAT review')
-            ->assertSeeInOrder(['Primary work', 'Follow-up 1'])
-            ->assertSee('Original preserved')
+            ->assertSeeInOrder(['Main task', 'Follow-up 1'])
+            ->assertSee('Original task kept in history')
             ->assertSee('1 corrective follow-up');
     }
 
@@ -73,7 +73,7 @@ final class WorkRegisterTest extends TestCase
         Livewire::actingAs($otherManager)
             ->test(Index::class)
             ->assertDontSee('Synthetic VAT review')
-            ->assertSee('No work matches these filters');
+            ->assertSee('No tasks match these filters');
     }
 
     public function test_member_without_work_permission_cannot_open_register(): void
@@ -100,7 +100,7 @@ final class WorkRegisterTest extends TestCase
             ->test(Index::class)
             ->set('status', WorkItemStatus::NotStarted->value)
             ->assertSee('Synthetic VAT review')
-            ->assertSeeInOrder(['Primary work', 'Follow-up 1']);
+            ->assertSeeInOrder(['Main task', 'Follow-up 1']);
     }
 
     /**

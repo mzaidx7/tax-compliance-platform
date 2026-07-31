@@ -1,0 +1,18 @@
+{
+    "compilerOptions": {
+        "allowJs": true,
+        "jsx": "react-jsx",
+        "module": "ESNext",
+        "moduleResolution": "Bundler",
+        "noEmit": true,
+        "resolvePackageJsonImports": true,
+        "skipLibCheck": true,
+        "strict": true,
+        "target": "ES2022"
+    },
+    "include": [
+        "resources/js/**/*.js",
+        "resources/js/**/*.ts",
+        "resources/js/**/*.tsx"
+    ]
+}

@@ -8,6 +8,7 @@ use App\Actions\Audit\RecordAudit;
 use App\Enums\Feature;
 use App\Models\Client;
 use App\Models\ClientDocument;
+use App\Models\ClientPerson;
 use App\Models\DocumentTypeVersion;
 use App\Models\User;
 use App\Support\FeatureFlags;
@@ -34,6 +35,7 @@ final readonly class RecordClientDocumentMetadata
         ?string $issuedOn,
         ?string $expiresOn,
         ?ClientDocument $supersedes = null,
+        ?ClientPerson $person = null,
     ): ClientDocument {
         $firmId = $this->firmContext->firm()->id;
         if (! $this->featureFlags->enabled(Feature::ClientMaster, $firmId)) {
@@ -41,6 +43,9 @@ final readonly class RecordClientDocumentMetadata
         }
         if ($client->firm_id !== $firmId || $documentType->firm_id !== $firmId) {
             throw new AuthorizationException('The client and document type must belong to the active firm.');
+        }
+        if ($person !== null && ($person->firm_id !== $firmId || $person->client_id !== $client->id)) {
+            throw new AuthorizationException('The person must belong to the selected client and active firm.');
         }
         Gate::forUser($actor)->authorize('update', $client);
 
@@ -68,6 +73,7 @@ final readonly class RecordClientDocumentMetadata
             $documentType,
             $validated,
             $supersedes,
+            $person,
         ): ClientDocument {
             $lockedClient = Client::query()->lockForUpdate()->findOrFail($client->id);
             $lockedType = DocumentTypeVersion::query()->findOrFail($documentType->id);
@@ -92,6 +98,7 @@ final readonly class RecordClientDocumentMetadata
 
             $document = ClientDocument::query()->create([
                 'client_id' => $lockedClient->id,
+                'client_person_id' => $person?->id,
                 'document_type_version_id' => $lockedType->id,
                 'supersedes_client_document_id' => $lockedPredecessor?->id,
                 'reference_label' => $this->optional($validated['reference_label']),
@@ -107,6 +114,7 @@ final readonly class RecordClientDocumentMetadata
                 auditable: $lockedClient,
                 after: [
                     'client_document_id' => $document->id,
+                    'client_person_id' => $person?->id,
                     'document_type_key' => $lockedType->key,
                     'document_type_version' => $lockedType->version,
                     'supersedes_client_document_id' => $lockedPredecessor?->id,

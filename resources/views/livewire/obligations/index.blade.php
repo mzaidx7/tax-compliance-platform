@@ -5,114 +5,111 @@ STORY: A team member sees only relevant work, advances an allowed state and leav
 FIRST VIEWPORT: The chronological register owns the wide field while authorised managers retain the manual-entry station.
 FORM: Deadline review rail, grounded structure seven, seed 75cba0e2.
 --}}
-<div class="mx-auto w-full max-w-7xl">
-    <header class="border-b border-white/8 pb-8">
+<div class="tbt-page">
+    <header class="tbt-page-header">
         <div class="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
             <div>
-                <p class="mb-3 text-sm font-medium text-amber-300">{{ $this->currentFirmName }}</p>
-                <h1 class="text-balance text-4xl font-semibold tracking-[-0.03em] text-white sm:text-5xl">
+                <p class="tbt-page-kicker">{{ $this->currentFirmName }}</p>
+                <h1 class="tbt-page-title">
                     {{ __('Tax and compliance deadlines') }}
                 </h1>
-                <p class="mt-4 max-w-2xl text-base leading-7 text-zinc-400">
-                    {{ __('Record and review each client deadline, the responsible team and the progress of related work.') }}
+                <p class="tbt-page-copy">
+                    {{ __('See each client filing or renewal date, who is responsible and what still needs to be done.') }}
                 </p>
             </div>
             <div class="flex flex-wrap items-center gap-2">
-                <flux:badge color="amber" icon="pencil-square">{{ __('Manually entered') }}</flux:badge>
-                <flux:badge color="zinc" icon="shield-check">{{ __('Access controlled') }}</flux:badge>
+                <flux:badge color="amber" icon="pencil-square">{{ __('Dates checked by your team') }}</flux:badge>
             </div>
         </div>
     </header>
 
     <div @class([
-        'mt-9 grid gap-10',
-        '2xl:grid-cols-[minmax(0,1fr)_23rem]' => Gate::allows('create', \App\Models\Obligation::class),
+        'mt-5 grid gap-5',
+        'min-[1900px]:grid-cols-[minmax(0,1fr)_23rem]' => Gate::allows('create', \App\Models\Obligation::class),
     ])>
         <section aria-labelledby="obligation-register-heading">
-            <div class="mb-5 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+            <div class="tbt-section-heading">
                 <div>
-                    <h2 id="obligation-register-heading" class="text-lg font-semibold text-zinc-100">{{ __('Deadline list') }}</h2>
-                    <p class="mt-1 text-sm text-zinc-500">{{ __('Each deadline keeps its work, filing and payment progress separate.') }}</p>
+                    <h2 id="obligation-register-heading">{{ __('Deadline list') }}</h2>
+                    <p>{{ __('Open a client card to update the due date, task progress, filing, payment or tax details.') }}</p>
                 </div>
                 <div class="w-full sm:max-w-xs">
                     <flux:input
                         wire:model.live.debounce.300ms="search"
                         type="search"
-                        :label="__('Search obligations')"
+                        :label="__('Search deadlines')"
                         placeholder="Client, type or period"
                         icon="magnifying-glass"
                     />
                 </div>
             </div>
 
-            <div class="overflow-hidden border-y border-white/8">
-                <div class="hidden grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)_7.5rem_7.5rem_14rem] gap-4 border-b border-white/8 px-4 py-3 text-xs font-medium text-zinc-500 lg:grid">
-                    <span>{{ __('Client and obligation') }}</span>
-                    <span>{{ __('Period and origin') }}</span>
-                    <span>{{ __('Internal target') }}</span>
-                    <span>{{ __('Effective due') }}</span>
-                    <span class="text-right">{{ __('Work ownership') }}</span>
-                </div>
-
-                <div class="divide-y divide-white/8">
+            <div class="space-y-4">
+                <div class="space-y-4">
                     @forelse ($this->obligations as $obligation)
                         <article
                             wire:key="obligation-{{ $obligation->id }}"
-                            class="grid gap-4 px-4 py-5 transition-colors duration-150 hover:bg-white/[0.025] lg:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)_7.5rem_7.5rem_14rem] lg:items-start"
+                            class="tbt-panel overflow-hidden p-5 transition duration-150 hover:border-amber-400/20 sm:p-6"
                         >
-                            <div class="min-w-0">
-                                <span class="mb-1 block text-xs text-zinc-500 lg:hidden">{{ __('Client and obligation') }}</span>
-                                <p class="truncate text-sm font-medium text-zinc-100">{{ $obligation->client->legal_name }}</p>
-                                <p class="mt-1 truncate text-sm text-zinc-400">
-                                    {{ $obligation->client->internal_code }} · {{ $obligation->obligation_type }}
-                                </p>
+                            <div class="flex flex-col gap-4 border-b border-[var(--tbt-border)] pb-5 sm:flex-row sm:items-start sm:justify-between">
+                                <div class="min-w-0">
+                                    <p class="tbt-page-kicker mb-2">{{ $obligation->client->internal_code }}</p>
+                                    <h3 class="truncate text-lg font-semibold text-[var(--tbt-text-strong)]">{{ $obligation->client->legal_name }}</h3>
+                                    <p class="mt-1 truncate text-sm text-[var(--tbt-text-muted)]">
+                                    {{ $obligation->obligation_type }}
+                                    </p>
+                                </div>
+                                <flux:badge class="shrink-0" :color="$obligation->status->badgeColor()">
+                                    {{ __('Due date: :state', ['state' => $obligation->status->label()]) }}
+                                </flux:badge>
                             </div>
-                            <div>
-                                <span class="mb-1 block text-xs text-zinc-500 lg:hidden">{{ __('Period and origin') }}</span>
-                                <p class="text-sm text-zinc-300">{{ $obligation->period_label ?: __('No period label') }}</p>
+
+                            <div class="mt-5 grid gap-3 md:grid-cols-3">
+                            <div class="rounded-xl border border-[var(--tbt-border)] bg-[var(--tbt-panel-soft)] p-4">
+                                <p class="text-xs font-semibold uppercase tracking-[0.08em] text-[var(--tbt-muted-strong)]">{{ __('Tax period') }}</p>
+                                <p class="mt-2 text-sm font-medium text-[var(--tbt-text-strong)]">{{ $obligation->period_label ?: __('Tax period not recorded') }}</p>
                                 <p class="mt-1 text-xs text-amber-300">
-                                    {{ $obligation->origin->label() }} · {{ __('Verified :date', ['date' => $obligation->last_verified_on->format('j M Y')]) }}
+                                    {{ __('Date checked on :date', ['date' => $obligation->last_verified_on->format('j M Y')]) }}
                                 </p>
                             </div>
-                            <div>
-                                <span class="mb-1 block text-xs text-zinc-500 lg:hidden">{{ __('Internal target') }}</span>
-                                <time class="text-sm text-zinc-400" datetime="{{ $obligation->internal_target_date?->toDateString() }}">
+                            <div class="rounded-xl border border-[var(--tbt-border)] bg-[var(--tbt-panel-soft)] p-4">
+                                <p class="text-xs font-semibold uppercase tracking-[0.08em] text-[var(--tbt-muted-strong)]">{{ __('Team target date') }}</p>
+                                <time class="mt-2 block text-sm font-medium text-[var(--tbt-text)]" datetime="{{ $obligation->internal_target_date?->toDateString() }}">
                                     {{ $obligation->internal_target_date?->format('j M Y') ?? __('Not set') }}
                                 </time>
                             </div>
-                            <div>
-                                <span class="mb-1 block text-xs text-zinc-500 lg:hidden">{{ __('Effective due') }}</span>
-                                <time class="text-sm font-medium text-zinc-100" datetime="{{ $obligation->effectiveDueDate()->toDateString() }}">
+                            <div class="rounded-xl border border-amber-400/20 bg-amber-400/[0.06] p-4">
+                                <p class="text-xs font-semibold uppercase tracking-[0.08em] text-amber-300">{{ __('Filing due date') }}</p>
+                                <time class="mt-2 block text-base font-semibold text-[var(--tbt-text-strong)]" datetime="{{ $obligation->effectiveDueDate()->toDateString() }}">
                                     {{ $obligation->effectiveDueDate()->format('j M Y') }}
                                 </time>
                                 @if (! $obligation->effectiveDueDate()->isSameDay($obligation->statutory_due_date))
                                     <p class="mt-1 text-xs text-amber-300">
-                                        {{ __('Statutory :date', ['date' => $obligation->statutory_due_date->format('j M Y')]) }}
+                                        {{ __('Original due date: :date', ['date' => $obligation->statutory_due_date->format('j M Y')]) }}
                                     </p>
                                 @endif
                             </div>
-                            <div class="lg:text-right">
-                                <span class="mb-1 block text-xs text-zinc-500 lg:hidden">{{ __('Work ownership') }}</span>
-                                <div class="mb-2 flex flex-wrap gap-1.5 lg:justify-end">
-                                    <flux:badge :color="$obligation->status->badgeColor()">
-                                        {{ __('Deadline: :state', ['state' => $obligation->status->label()]) }}
-                                    </flux:badge>
-                                </div>
+                            </div>
+
+                            <div class="mt-4 min-w-0 rounded-xl border border-[var(--tbt-border)] bg-[var(--tbt-panel-soft)] p-4">
+                                <p class="mb-3 text-xs font-semibold uppercase tracking-[0.08em] text-[var(--tbt-muted-strong)]">
+                                    {{ __('Task progress') }}
+                                </p>
                                 @can('update', $obligation)
-                                    <details class="group mt-2 text-left lg:text-right">
+                                    <details class="group mt-2 text-left">
                                         <summary class="inline-flex min-h-9 cursor-pointer list-none items-center gap-2 rounded-lg px-2.5 py-1.5 text-sm font-medium text-zinc-300 outline-none transition hover:bg-white/[0.06] hover:text-white focus-visible:ring-2 focus-visible:ring-amber-300">
                                             <flux:icon.calendar-days class="size-4" />
-                                            {{ __('Deadline actions') }}
+                                            {{ __('Change due date') }}
                                             <flux:icon.chevron-down class="size-4 transition group-open:rotate-180" />
                                         </summary>
-                                        <div class="mt-2 flex flex-wrap gap-1.5 lg:justify-end">
+                                        <div class="mt-2 flex flex-wrap gap-1.5">
                                     <flux:button
                                         size="sm"
                                         variant="ghost"
                                         icon="calendar-days"
                                         wire:click="openDeadlineOverride('{{ $obligation->id }}')"
                                     >
-                                        {{ __('Change deadline') }}
+                                        {{ __('Edit due date') }}
                                     </flux:button>
                                     @if ($obligation->status === \App\Enums\ObligationStatus::Open)
                                         <flux:button
@@ -121,7 +118,7 @@ FORM: Deadline review rail, grounded structure seven, seed 75cba0e2.
                                             icon="archive-box"
                                             wire:click="openDisposition('{{ $obligation->id }}')"
                                         >
-                                            {{ __('Cancel or replace') }}
+                                            {{ __('Cancel or replace deadline') }}
                                         </flux:button>
                                     @endif
                                         </div>
@@ -138,10 +135,10 @@ FORM: Deadline review rail, grounded structure seven, seed 75cba0e2.
                                         $checklistCompleted = $obligation->workItem->checklist?->completions?->count() ?? 0;
                                     @endphp
                                     <flux:badge :color="$obligation->workItem->status->badgeColor()">
-                                        {{ __('Work: :state', ['state' => $obligation->workItem->status->label()]) }}
+                                        {{ __('Task: :state', ['state' => $obligation->workItem->status->label()]) }}
                                     </flux:badge>
                                     <flux:badge class="ms-1" :color="$obligation->workItem->risk_status->badgeColor()">
-                                        {{ __('Risk: :level', ['level' => $obligation->workItem->risk_status->label()]) }}
+                                        {{ __('Attention: :level', ['level' => $obligation->workItem->risk_status->label()]) }}
                                     </flux:badge>
                                     @if ($obligation->filingRecord)
                                         <flux:badge class="ms-1" :color="$obligation->filingRecord->status->badgeColor()">
@@ -158,23 +155,19 @@ FORM: Deadline review rail, grounded structure seven, seed 75cba0e2.
                                             {{ __('Tax: :type :state', ['type' => $obligation->taxRecord->tax_type->label(), 'state' => $obligation->taxRecord->status->label()]) }}
                                         </flux:badge>
                                     @endif
-                                    <p class="mt-2 truncate text-xs text-zinc-400" title="{{ __('Preparer') }}">
-                                        {{ $preparer?->assignedMembership?->user?->name }}
-                                    </p>
-                                    <p class="mt-1 truncate text-xs text-zinc-500" title="{{ __('Reviewer and responsible manager') }}">
-                                        {{ $reviewer?->assignedMembership?->user?->name }} · {{ $manager?->assignedMembership?->user?->name }}
-                                    </p>
+                                    <dl class="mt-3 grid gap-2 text-xs sm:grid-cols-3">
+                                        <div><dt class="text-zinc-500">{{ __('Prepared by') }}</dt><dd class="mt-1 truncate text-zinc-300">{{ $preparer?->assignedMembership?->user?->name ?? __('Not assigned') }}</dd></div>
+                                        <div><dt class="text-zinc-500">{{ __('Reviewed by') }}</dt><dd class="mt-1 truncate text-zinc-300">{{ $reviewer?->assignedMembership?->user?->name ?? __('Not assigned') }}</dd></div>
+                                        <div><dt class="text-zinc-500">{{ __('Responsible manager') }}</dt><dd class="mt-1 truncate text-zinc-300">{{ $manager?->assignedMembership?->user?->name ?? __('Not assigned') }}</dd></div>
+                                    </dl>
                                     @if ($obligation->workItem->checklist)
                                         <p class="mt-2 text-xs text-zinc-400">
-                                            {{ __('Checklist :completed/:total', [
+                                            {{ __('Checklist: :completed of :total completed', [
                                                 'completed' => $checklistCompleted,
                                                 'total' => $checklistTotal,
                                             ]) }}
                                         </p>
                                     @endif
-                                    <p class="mt-1 text-xs text-zinc-500">
-                                        {{ __('Workflow v:version', ['version' => $obligation->workItem->workflowDefinition->version]) }}
-                                    </p>
                                     @if ($obligation->workItem->followUps->isNotEmpty())
                                         <p class="mt-1 text-xs text-amber-300">
                                             {{ trans_choice(
@@ -187,13 +180,13 @@ FORM: Deadline review rail, grounded structure seven, seed 75cba0e2.
                                             ) }}
                                         </p>
                                     @endif
-                                    <details class="group mt-2 text-left lg:text-right">
+                                    <details class="group mt-2 text-left">
                                         <summary class="inline-flex min-h-9 cursor-pointer list-none items-center gap-2 rounded-lg px-2.5 py-1.5 text-sm font-medium text-zinc-300 outline-none transition hover:bg-white/[0.06] hover:text-white focus-visible:ring-2 focus-visible:ring-amber-300">
                                             <flux:icon.wrench-screwdriver class="size-4" />
-                                            {{ __('Work actions') }}
+                                            {{ __('Update task') }}
                                             <flux:icon.chevron-down class="size-4 transition group-open:rotate-180" />
                                         </summary>
-                                        <div class="mt-2 flex flex-wrap gap-1.5 lg:justify-end">
+                                        <div class="mt-2 flex flex-wrap gap-1.5">
                                     @if ($obligation->workItem->checklist)
                                         <flux:button
                                             size="sm"
@@ -201,7 +194,7 @@ FORM: Deadline review rail, grounded structure seven, seed 75cba0e2.
                                             icon="clipboard-document-check"
                                             wire:click="openChecklist('{{ $obligation->workItem->id }}')"
                                         >
-                                            {{ __('Checklist') }}
+                                            {{ __('Open checklist') }}
                                         </flux:button>
                                     @endif
                                     @if ($obligation->workItem->status === \App\Enums\WorkItemStatus::UnderReview && Gate::allows('review', $obligation->workItem) && $reviewer?->assigned_membership_id === $activeMembershipId)
@@ -221,7 +214,7 @@ FORM: Deadline review rail, grounded structure seven, seed 75cba0e2.
                                             icon="arrow-path"
                                             wire:click="openTransition('{{ $obligation->workItem->id }}')"
                                         >
-                                            {{ __('Update work') }}
+                                            {{ __('Change task status') }}
                                         </flux:button>
                                     @endif
                                     @can('create', \App\Models\WorkItem::class)
@@ -244,7 +237,7 @@ FORM: Deadline review rail, grounded structure seven, seed 75cba0e2.
                                                 icon="users"
                                                 wire:click="openReassignment('{{ $obligation->workItem->id }}')"
                                             >
-                                                {{ __('Manage team') }}
+                                                {{ __('Assign team') }}
                                             </flux:button>
                                             <flux:button
                                                 size="sm"
@@ -252,7 +245,7 @@ FORM: Deadline review rail, grounded structure seven, seed 75cba0e2.
                                                 icon="arrow-up-circle"
                                                 wire:click="openMigration('{{ $obligation->workItem->id }}')"
                                             >
-                                                {{ __('Migrate version') }}
+                                                {{ __('Use latest checklist') }}
                                             </flux:button>
                                             <flux:button
                                                 size="sm"
@@ -260,7 +253,7 @@ FORM: Deadline review rail, grounded structure seven, seed 75cba0e2.
                                                 icon="exclamation-triangle"
                                                 wire:click="openRisk('{{ $obligation->workItem->id }}')"
                                             >
-                                                {{ __('Update risk') }}
+                                                {{ __('Set attention level') }}
                                             </flux:button>
                                         @endif
                                     @endcan
@@ -271,7 +264,7 @@ FORM: Deadline review rail, grounded structure seven, seed 75cba0e2.
                                             icon="document-check"
                                             wire:click="openFiling('{{ $obligation->id }}')"
                                         >
-                                            {{ $obligation->filingRecord ? __('Update filing') : __('Open filing') }}
+                                            {{ $obligation->filingRecord ? __('Update filing status') : __('Record filing status') }}
                                         </flux:button>
                                     @endif
                                     @if ($obligation->paymentRecord ? Gate::allows('transition', $obligation->paymentRecord) : Gate::allows('create', \App\Models\PaymentRecord::class))
@@ -281,7 +274,7 @@ FORM: Deadline review rail, grounded structure seven, seed 75cba0e2.
                                             icon="banknotes"
                                             wire:click="openPayment('{{ $obligation->id }}')"
                                         >
-                                            {{ $obligation->paymentRecord ? __('Update payment') : __('Open payment') }}
+                                            {{ $obligation->paymentRecord ? __('Update payment status') : __('Record payment status') }}
                                         </flux:button>
                                     @endif
                                     @if ($obligation->taxRecord ? Gate::allows('amend', $obligation->taxRecord) : Gate::allows('create', \App\Models\TaxRecord::class))
@@ -291,7 +284,7 @@ FORM: Deadline review rail, grounded structure seven, seed 75cba0e2.
                                             icon="calculator"
                                             wire:click="openTax('{{ $obligation->id }}')"
                                         >
-                                            {{ $obligation->taxRecord ? __('Update tax') : __('Open tax') }}
+                                            {{ $obligation->taxRecord ? __('Update tax details') : __('Record tax details') }}
                                         </flux:button>
                                     @endif
                                         </div>
@@ -313,12 +306,12 @@ FORM: Deadline review rail, grounded structure seven, seed 75cba0e2.
                     @empty
                         <div class="px-6 py-14 text-center">
                             <p class="text-sm font-medium text-zinc-200">
-                                {{ $search === '' ? __('No manual obligations recorded') : __('No obligations match this search') }}
+                                {{ $search === '' ? __('No due dates recorded') : __('No deadlines match this search') }}
                             </p>
                             <p class="mx-auto mt-2 max-w-md text-sm leading-6 text-zinc-500">
                                 {{ $search === ''
-                                    ? __('Select an active client and record the first reviewed manual deadline.')
-                                    : __('Check the client, obligation type or period and try again.') }}
+                                    ? __('Select an active client and add the first filing or renewal due date.')
+                                    : __('Check the client, deadline type or tax period and try again.') }}
                             </p>
                         </div>
                     @endforelse
@@ -333,15 +326,15 @@ FORM: Deadline review rail, grounded structure seven, seed 75cba0e2.
         </section>
 
         @can('create', \App\Models\Obligation::class)
-        <aside aria-labelledby="create-obligation-heading" class="2xl:sticky 2xl:top-8 2xl:self-start">
-            <div class="rounded-2xl bg-zinc-900/70 p-6 ring-1 ring-white/8">
+        <aside aria-labelledby="create-obligation-heading" class="min-[1900px]:sticky min-[1900px]:top-8 min-[1900px]:self-start">
+            <div class="tbt-panel p-6">
                 <div class="mb-6">
                     <span class="mb-4 grid size-10 place-items-center rounded-xl bg-amber-400 text-black">
                         <flux:icon.calendar-days class="size-5" />
                     </span>
-                    <h2 id="create-obligation-heading" class="text-lg font-semibold text-zinc-100">{{ __('Record manual obligation') }}</h2>
+                    <h2 id="create-obligation-heading" class="text-lg font-semibold text-zinc-100">{{ __('Add a due date') }}</h2>
                     <p class="mt-2 text-sm leading-6 text-zinc-500">
-                        {{ __('Enter only a date reviewed by an authorised person. The source note remains part of the record.') }}
+                        {{ __('Enter only a date checked by an authorised person. The note showing where it was checked remains part of the record.') }}
                     </p>
                 </div>
 
@@ -366,7 +359,7 @@ FORM: Deadline review rail, grounded structure seven, seed 75cba0e2.
 
                         <flux:input
                             wire:model="obligationType"
-                            :label="__('Obligation type')"
+                            :label="__('Deadline type')"
                             placeholder="Manual VAT review"
                             maxlength="100"
                             required
@@ -384,29 +377,29 @@ FORM: Deadline review rail, grounded structure seven, seed 75cba0e2.
                             <flux:input
                                 wire:model="statutoryDueDate"
                                 type="date"
-                                :label="__('Statutory due date')"
+                                :label="__('FTA or legal due date')"
                                 required
                             />
 
                             <flux:input
                                 wire:model="internalTargetDate"
                                 type="date"
-                                :label="__('Internal target date')"
-                                :description="__('Optional. Must not be later than the statutory due date.')"
+                                :label="__('Team target date')"
+                                :description="__('Optional. Set an earlier date for your team to finish the work before the legal due date.')"
                             />
                         </div>
 
                         <flux:input
                             wire:model="lastVerifiedOn"
                             type="date"
-                            :label="__('Last verified on')"
+                            :label="__('Date checked')"
                             max="{{ now('Asia/Dubai')->toDateString() }}"
                             required
                         />
 
                         <flux:textarea
                             wire:model="sourceReference"
-                            :label="__('Source or verification note')"
+                            :label="__('Where was this date checked?')"
                             :description="__('Required. Record where the entered date was checked. Do not include credentials or private documents.')"
                             rows="3"
                             maxlength="1000"
@@ -420,15 +413,15 @@ FORM: Deadline review rail, grounded structure seven, seed 75cba0e2.
                             wire:loading.attr="disabled"
                             wire:target="createObligation"
                         >
-                            <span wire:loading.remove wire:target="createObligation">{{ __('Record manual obligation') }}</span>
-                            <span wire:loading wire:target="createObligation">{{ __('Recording obligation...') }}</span>
+                            <span wire:loading.remove wire:target="createObligation">{{ __('Add due date') }}</span>
+                            <span wire:loading wire:target="createObligation">{{ __('Adding due date...') }}</span>
                         </flux:button>
                     </form>
                 @endif
             </div>
 
             <p class="mt-4 px-1 text-xs leading-5 text-zinc-600">
-                {{ __('Recording a deadline creates no work item. Team assignment remains a separate, explicit action.') }}
+                {{ __('Adding a due date does not assign the task. Assign it separately when the team is ready to start.') }}
             </p>
         </aside>
         @endcan
@@ -442,17 +435,17 @@ FORM: Deadline review rail, grounded structure seven, seed 75cba0e2.
     >
         <form wire:submit="disposeObligation" class="space-y-6">
             <div>
-                <flux:heading size="lg">{{ __('Cancel or supersede obligation') }}</flux:heading>
+                <flux:heading size="lg">{{ __('Cancel or replace deadline') }}</flux:heading>
                 <flux:text class="mt-2">{{ $dispositionLabel }}</flux:text>
-                <flux:text class="mt-2 text-zinc-500">{{ __('The obligation and all retained evidence remain unchanged. Supersession requires a separately issued open replacement.') }}</flux:text>
+                <flux:text class="mt-2 text-zinc-500">{{ __('The old deadline remains in the history. Choose a replacement only when another open deadline should take its place.') }}</flux:text>
             </div>
-            <flux:select wire:model.live="dispositionStatus" :label="__('Disposition')" required>
-                <flux:select.option value="">{{ __('Select disposition') }}</flux:select.option>
+            <flux:select wire:model.live="dispositionStatus" :label="__('What should happen to this deadline?')" required>
+                <flux:select.option value="">{{ __('Select what should happen') }}</flux:select.option>
                 <flux:select.option value="cancelled">{{ __('Cancelled') }}</flux:select.option>
-                <flux:select.option value="superseded">{{ __('Superseded') }}</flux:select.option>
+                <flux:select.option value="superseded">{{ __('Replace with another deadline') }}</flux:select.option>
             </flux:select>
             @if ($dispositionStatus === 'superseded')
-                <flux:select wire:model="replacementObligationId" :label="__('Replacement obligation')" required>
+                <flux:select wire:model="replacementObligationId" :label="__('Replacement deadline')" required>
                     <flux:select.option value="">{{ __('Select replacement') }}</flux:select.option>
                     @foreach ($this->replacementObligations as $replacement)
                         <flux:select.option :value="$replacement->id">
@@ -464,7 +457,7 @@ FORM: Deadline review rail, grounded structure seven, seed 75cba0e2.
             <flux:textarea wire:model="dispositionReason" :label="__('Reason')" rows="4" maxlength="500" required />
             <div class="flex justify-end gap-2">
                 <flux:button type="button" variant="ghost" wire:click="closeDispositionModal">{{ __('Cancel') }}</flux:button>
-                <flux:button type="submit" variant="primary">{{ __('Record disposition') }}</flux:button>
+                <flux:button type="submit" variant="primary">{{ __('Save deadline change') }}</flux:button>
             </div>
         </form>
     </flux:modal>
@@ -477,13 +470,13 @@ FORM: Deadline review rail, grounded structure seven, seed 75cba0e2.
     >
         <form wire:submit="overrideDeadline" class="space-y-6">
             <div>
-                <flux:heading size="lg">{{ __('Override effective deadline') }}</flux:heading>
+                <flux:heading size="lg">{{ __('Change due date') }}</flux:heading>
                 <flux:text class="mt-2">{{ $deadlineOverrideLabel }}</flux:text>
                 <flux:text class="mt-2 text-zinc-500">
-                    {{ __('The original statutory date is preserved. This change affects operational urgency and ordering only.') }}
+                    {{ __('The original due date remains in the history. The new date will be used on dashboards, lists and reminders.') }}
                 </flux:text>
             </div>
-            <flux:input wire:model="deadlineOverrideDate" type="date" :label="__('New effective due date')" required />
+            <flux:input wire:model="deadlineOverrideDate" type="date" :label="__('New due date')" required />
             <flux:textarea wire:model="deadlineOverrideReason" :label="__('Reason')" rows="4" maxlength="500" required />
             <div class="flex justify-end gap-2">
                 <flux:button type="button" variant="ghost" wire:click="closeDeadlineOverrideModal">{{ __('Cancel') }}</flux:button>
@@ -502,7 +495,7 @@ FORM: Deadline review rail, grounded structure seven, seed 75cba0e2.
             <div>
                 <flux:heading size="lg">{{ __('Assign primary work') }}</flux:heading>
                 <flux:text class="mt-2">
-                    {{ __('Create one separate work item for :obligation. The three initial assignments are retained as history events.', [
+                    {{ __('Create a client task for :obligation and assign the people who will prepare, review and manage it.', [
                         'obligation' => $selectedObligationLabel,
                     ]) }}
                 </flux:text>
@@ -537,7 +530,7 @@ FORM: Deadline review rail, grounded structure seven, seed 75cba0e2.
             <flux:textarea
                 wire:model="assignmentReason"
                 :label="__('Assignment reason')"
-                :description="__('Required. This reason is retained with each initial assignment event.')"
+                :description="__('Required. This reason is saved with the initial team assignments.')"
                 rows="3"
                 maxlength="500"
                 required
@@ -563,9 +556,9 @@ FORM: Deadline review rail, grounded structure seven, seed 75cba0e2.
     >
         <form wire:submit="transitionWork" class="space-y-6">
             <div>
-                <flux:heading size="lg">{{ __('Update work status') }}</flux:heading>
+                <flux:heading size="lg">{{ __('Change task status') }}</flux:heading>
                 <flux:text class="mt-2">
-                    {{ __('Move :work from :status through an allowed role-controlled transition. The reason and previous state are retained.', [
+                    {{ __('Change :work from :status to the next available task status. The reason and previous status are saved.', [
                         'work' => $selectedWorkItemLabel,
                         'status' => \App\Enums\WorkItemStatus::tryFrom($selectedWorkItemStatus)?->label() ?? __('the current state'),
                     ]) }}
@@ -578,12 +571,12 @@ FORM: Deadline review rail, grounded structure seven, seed 75cba0e2.
                 <flux:callout
                     variant="warning"
                     icon="lock-closed"
-                    :heading="__('No transition is available')"
+                    :heading="__('No status change is available')"
                 >
                     {{ __('The current state is terminal or the next action belongs to another assigned role. Close this window and ask the responsible assignee to continue.') }}
                 </flux:callout>
             @else
-                <flux:select wire:model.live="targetWorkItemStatus" :label="__('Next work status')" required>
+                <flux:select wire:model.live="targetWorkItemStatus" :label="__('Next task status')" required>
                     <flux:select.option value="">{{ __('Select an allowed status') }}</flux:select.option>
                     @foreach ($this->transitionOptions as $status)
                         <flux:select.option :value="$status->value">{{ $status->label() }}</flux:select.option>
@@ -598,7 +591,7 @@ FORM: Deadline review rail, grounded structure seven, seed 75cba0e2.
                             :heading="__('Review evidence ready')"
                         >
                             {{ trans_choice(
-                                '{0} This checklist has no required items.|{1} The required checklist item has retained evidence.|[2,*] All :count required checklist items have retained evidence.',
+                                '{0} This checklist has no required items.|{1} The required checklist item is completed.|[2,*] All :count required checklist items are completed.',
                                 $selectedRequiredChecklistTotal,
                                 ['count' => $selectedRequiredChecklistTotal],
                             ) }}
@@ -609,7 +602,7 @@ FORM: Deadline review rail, grounded structure seven, seed 75cba0e2.
                             icon="clipboard-document-check"
                             :heading="__('Checklist evidence required')"
                         >
-                            {{ __(':completed of :total required items have retained evidence. Close this window, open Work checklist, and complete the remaining items before submitting for review.', [
+                            {{ __(':completed of :total required items are completed. Close this window, open the checklist and complete the remaining items before submitting for review.', [
                                 'completed' => $selectedRequiredChecklistCompleted,
                                 'total' => $selectedRequiredChecklistTotal,
                             ]) }}
@@ -619,8 +612,8 @@ FORM: Deadline review rail, grounded structure seven, seed 75cba0e2.
 
                 <flux:textarea
                     wire:model="transitionReason"
-                    :label="__('Transition reason')"
-                    :description="__('Required. Record the operational reason without including credentials or private documents.')"
+                    :label="__('Reason for status change')"
+                    :description="__('Briefly explain the change. Do not include passwords or private document numbers.')"
                     rows="3"
                     maxlength="500"
                     required
@@ -670,7 +663,7 @@ FORM: Deadline review rail, grounded structure seven, seed 75cba0e2.
             <flux:textarea
                 wire:model="reviewReason"
                 :label="__('Review reason')"
-                :description="__('Required. Record the operational reason without including credentials or private documents.')"
+                :description="__('Required. Briefly explain the change. Do not include passwords or private document numbers.')"
                 rows="3"
                 maxlength="500"
                 required
@@ -698,7 +691,7 @@ FORM: Deadline review rail, grounded structure seven, seed 75cba0e2.
             <div>
                 <flux:heading size="lg">{{ __('Work checklist') }}</flux:heading>
                 <flux:text class="mt-2">
-                    {{ __('Review the checklist version pinned to :work. Completed items retain their original evidence and cannot be reopened in this packet.', [
+                    {{ __('Review the checklist for :work. Completed items keep their notes and cannot be reopened.', [
                         'work' => $checklistWorkItemLabel,
                     ]) }}
                 </flux:text>
@@ -764,9 +757,9 @@ FORM: Deadline review rail, grounded structure seven, seed 75cba0e2.
                 @if ($this->canCompleteChecklist && $incompleteItems->isNotEmpty())
                     <form wire:submit="completeChecklistItem" class="space-y-5 border-t border-white/8 pt-5">
                         <div>
-                            <p class="text-sm font-medium text-zinc-200">{{ __('Retain completion evidence') }}</p>
+                            <p class="text-sm font-medium text-zinc-200">{{ __('Complete a checklist item') }}</p>
                             <p class="mt-1 text-sm leading-6 text-zinc-500">
-                                {{ __('Select one item and record concise evidence. This completion cannot be edited or removed.') }}
+                                {{ __('Select one item and add a short completion note. Completed items cannot be edited or removed.') }}
                             </p>
                         </div>
                         <flux:select wire:model="checklistItemId" :label="__('Checklist item')" required>
@@ -777,7 +770,7 @@ FORM: Deadline review rail, grounded structure seven, seed 75cba0e2.
                         </flux:select>
                         <flux:textarea
                             wire:model="checklistEvidenceNote"
-                            :label="__('Evidence note')"
+                            :label="__('Completion note')"
                             :description="__('Required. Do not include credentials or private documents.')"
                             rows="3"
                             maxlength="500"
@@ -792,7 +785,7 @@ FORM: Deadline review rail, grounded structure seven, seed 75cba0e2.
                     </form>
                 @elseif ($incompleteItems->isEmpty())
                     <flux:callout variant="success" icon="check-circle" :heading="__('Checklist complete')">
-                        {{ __('Every item in this pinned version has retained completion evidence.') }}
+                        {{ __('Every item in this checklist is completed.') }}
                     </flux:callout>
                 @endif
             @endif
@@ -823,7 +816,7 @@ FORM: Deadline review rail, grounded structure seven, seed 75cba0e2.
 
             <flux:error name="reassignment" />
 
-            <div class="divide-y divide-white/8 border-y border-white/8">
+            <div class="tbt-panel divide-y divide-[var(--tbt-border)] px-5">
                 @foreach (\App\Enums\AssignmentRole::cases() as $role)
                     <div class="flex items-center justify-between gap-4 py-3">
                         <span class="text-sm text-zinc-500">{{ $role->label() }}</span>
@@ -939,7 +932,7 @@ FORM: Deadline review rail, grounded structure seven, seed 75cba0e2.
                 <flux:textarea
                     wire:model="filingReason"
                     :label="__('Filing reason')"
-                    :description="__('Required. Record the operational reason without including credentials or private documents.')"
+                    :description="__('Required. Briefly explain the change. Do not include passwords or private document numbers.')"
                     rows="3"
                     maxlength="500"
                     required
@@ -1019,7 +1012,7 @@ FORM: Deadline review rail, grounded structure seven, seed 75cba0e2.
                 <flux:textarea
                     wire:model="paymentReason"
                     :label="__('Payment reason')"
-                    :description="__('Required. Record the operational reason without including credentials or private documents.')"
+                    :description="__('Required. Briefly explain the change. Do not include passwords or private document numbers.')"
                     rows="3"
                     maxlength="500"
                     required
@@ -1087,9 +1080,9 @@ FORM: Deadline review rail, grounded structure seven, seed 75cba0e2.
     >
         <form wire:submit="saveRisk" class="space-y-6">
             <div>
-                <flux:heading size="lg">{{ __('Update risk status') }}</flux:heading>
+                <flux:heading size="lg">{{ __('Set attention level') }}</flux:heading>
                 <flux:text class="mt-2">
-                    {{ __('Record the assessed risk for :work. Risk status is stored independently of work, filing, payment and tax state.', [
+                    {{ __('Set how urgently :work needs attention. This does not change the filing, payment or tax status.', [
                         'work' => $riskWorkItemLabel,
                     ]) }}
                 </flux:text>
@@ -1097,7 +1090,7 @@ FORM: Deadline review rail, grounded structure seven, seed 75cba0e2.
 
             <flux:error name="riskLevel" />
 
-            <flux:select wire:model="riskLevel" :label="__('Risk level')" required>
+            <flux:select wire:model="riskLevel" :label="__('Attention level')" required>
                 @foreach (\App\Enums\RiskLevel::cases() as $level)
                     <flux:select.option :value="$level->value">{{ $level->label() }}</flux:select.option>
                 @endforeach
@@ -1106,7 +1099,7 @@ FORM: Deadline review rail, grounded structure seven, seed 75cba0e2.
             <flux:textarea
                 wire:model="riskReason"
                 :label="__('Reason')"
-                :description="__('Required. Record the operational reason without including credentials or private documents.')"
+                :description="__('Required. Briefly explain the change. Do not include passwords or private document numbers.')"
                 rows="3"
                 maxlength="500"
                 required
@@ -1117,8 +1110,8 @@ FORM: Deadline review rail, grounded structure seven, seed 75cba0e2.
                     {{ __('Cancel') }}
                 </flux:button>
                 <flux:button type="submit" variant="primary" wire:loading.attr="disabled" wire:target="saveRisk">
-                    <span wire:loading.remove wire:target="saveRisk">{{ __('Record risk status') }}</span>
-                    <span wire:loading wire:target="saveRisk">{{ __('Recording risk status...') }}</span>
+                    <span wire:loading.remove wire:target="saveRisk">{{ __('Save attention level') }}</span>
+                    <span wire:loading wire:target="saveRisk">{{ __('Saving attention level...') }}</span>
                 </flux:button>
             </div>
         </form>
@@ -1136,7 +1129,7 @@ FORM: Deadline review rail, grounded structure seven, seed 75cba0e2.
                     {{ $taxRecordId === '' ? __('Open tax record') : __('Amend tax record') }}
                 </flux:heading>
                 <flux:text class="mt-2">
-                    {{ __('Record retained tax figures for :work. These are entered or externally computed values. This platform does not calculate a statutory amount, and tax figures are stored separately from work, filing and payment state.', [
+                    {{ __('Record the tax figures for :work. Enter values prepared outside this platform. The platform does not calculate the tax amount.', [
                         'work' => $taxWorkLabel,
                     ]) }}
                 </flux:text>
@@ -1179,7 +1172,7 @@ FORM: Deadline review rail, grounded structure seven, seed 75cba0e2.
             <flux:textarea
                 wire:model="taxReason"
                 :label="__('Reason')"
-                :description="__('Required. Record the operational reason without including credentials or private documents.')"
+                :description="__('Required. Briefly explain the change. Do not include passwords or private document numbers.')"
                 rows="3"
                 maxlength="500"
                 required
@@ -1205,9 +1198,9 @@ FORM: Deadline review rail, grounded structure seven, seed 75cba0e2.
     >
         <form wire:submit="migrateWorkflowVersion" class="space-y-6">
             <div>
-                <flux:heading size="lg">{{ __('Migrate workflow version') }}</flux:heading>
+                <flux:heading size="lg">{{ __('Use a newer checklist') }}</flux:heading>
                 <flux:text class="mt-2">
-                    {{ __('Move :work from pinned version :version to a later published workflow version. Transition, assignment and checklist history are preserved unchanged.', [
+                    {{ __('Move :work to a newer task checklist. Existing status, assignments and completed checklist notes remain in the history.', [
                         'work' => $migrationWorkItemLabel,
                         'version' => $migrationCurrentVersion,
                     ]) }}
@@ -1222,10 +1215,10 @@ FORM: Deadline review rail, grounded structure seven, seed 75cba0e2.
                     icon="lock-closed"
                     :heading="__('No later version is published')"
                 >
-                    {{ __('This work is already pinned to the latest published workflow version. Close this window; no repin is possible or needed.') }}
+                    {{ __('This task already uses the latest checklist.') }}
                 </flux:callout>
             @else
-                <flux:select wire:model="migrationTargetDefinitionId" :label="__('Target workflow version')" required>
+                <flux:select wire:model="migrationTargetDefinitionId" :label="__('New checklist version')" required>
                     <flux:select.option value="">{{ __('Select a later published version') }}</flux:select.option>
                     @foreach ($this->availableWorkflowVersions as $definition)
                         <flux:select.option :value="$definition->id">
@@ -1236,8 +1229,8 @@ FORM: Deadline review rail, grounded structure seven, seed 75cba0e2.
 
                 <flux:textarea
                     wire:model="migrationReason"
-                    :label="__('Migration reason')"
-                    :description="__('Required. Record the operational reason without including credentials or private documents.')"
+                    :label="__('Reason for changing the checklist')"
+                    :description="__('Required. Briefly explain the change. Do not include passwords or private document numbers.')"
                     rows="3"
                     maxlength="500"
                     required
@@ -1250,8 +1243,8 @@ FORM: Deadline review rail, grounded structure seven, seed 75cba0e2.
                 </flux:button>
                 @if ($this->availableWorkflowVersions->isNotEmpty())
                     <flux:button type="submit" variant="primary" wire:loading.attr="disabled" wire:target="migrateWorkflowVersion">
-                        <span wire:loading.remove wire:target="migrateWorkflowVersion">{{ __('Record migration') }}</span>
-                        <span wire:loading wire:target="migrateWorkflowVersion">{{ __('Recording migration...') }}</span>
+                        <span wire:loading.remove wire:target="migrateWorkflowVersion">{{ __('Use selected checklist') }}</span>
+                        <span wire:loading wire:target="migrateWorkflowVersion">{{ __('Updating checklist...') }}</span>
                     </flux:button>
                 @endif
             </div>

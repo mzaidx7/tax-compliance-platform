@@ -2,7 +2,7 @@
 
 ## Handoff Metadata
 
-- Last updated: 2026-07-28
+- Last updated: 2026-07-30
 - Updated by: Codex GPT-5.6
 - Platform repository status: independent repository on `main`, remote `mzaidx7/tax-compliance-platform`
 - Current milestone: Compliance Operations V1 repository release candidate completed
@@ -10,7 +10,7 @@
 ## Current Objective
 Create a UAE-focused compliance operations and e-invoicing readiness platform under a TBT subdomain while keeping its application, data, deployment and release lifecycle separate from the public TBT website.
 
-The immediate objective is to configure the real production host, pass `platform:release-check`, deploy the verified commit, and complete post-deployment browser and operational smoke checks. E-invoicing remains preserved behind its coming-soon boundary.
+The immediate objective is to complete and verify the multi-client Compliance Operations interface, then configure the real production host, pass `platform:release-check`, deploy the verified commit, and complete post-deployment browser and operational smoke checks. E-invoicing code remains dormant with no visible route, navigation or feature control.
 
 ## Canonical Files
 
@@ -51,7 +51,7 @@ The immediate objective is to configure the real production host, pass `platform
 - Work, filing, payment and risk states remain separate.
 - Compliance calculations use named PHP calculators and immutable rule versions.
 - Imports use staging, preview, approval, idempotency and row reconciliation.
-- Release 1 is the internal Compliance Operations MVP. E-invoicing readiness is a separately tracked future release and must not delay publishing Release 1.
+- The final current release is the internal Compliance Operations MVP. E-invoicing is not part of this release and has no visible interface surface.
 - The calendar is secondary to operational queues.
 - The MVP stores document metadata only.
 - Email is the only required external notification channel for the MVP.
@@ -77,6 +77,7 @@ The immediate objective is to configure the real production host, pass `platform
 - The Laravel application is scaffolded directly in this directory.
 - Runtime baseline: PHP 8.3.32, Laravel 13.22.0, Livewire 4.1, Flux 2.13.1 and Tailwind CSS 4.
 - Development baseline: Composer 2.10.2, PHPUnit 12, Larastan 3, Laravel Pint and Laravel Boost 2.4.13.
+- The COSS shadcn registry is installed locally with its UI primitives, full style package and neutral colour tokens. Generated React and TypeScript components live under `resources/js/components/ui`; they are not wired into the existing Blade and Livewire screens. The registry theme extends `resources/css/app.css`, and the Vite production build passed on 2026-07-30 after removing the invalid generated root `geist` stylesheet import.
 - Local development uses SQLite. `.env.example` targets MySQL for deployed environments.
 - The application timezone defaults to `Asia/Dubai`.
 - Initial framework migrations for users, cache, jobs and two-factor authentication exist and have run locally.

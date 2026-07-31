@@ -1,13 +1,14 @@
 <flux:dropdown position="bottom" align="start">
     <button
         type="button"
-        class="group flex w-full items-center gap-3 rounded-xl bg-zinc-950/80 px-3 py-3 text-left outline-none ring-1 ring-white/8 transition hover:bg-zinc-800 focus-visible:ring-2 focus-visible:ring-amber-400"
+        class="tbt-firm-switcher group flex w-full items-center gap-3 rounded-xl px-3 py-3 text-left outline-none transition focus-visible:ring-2 focus-visible:ring-amber-400 in-data-flux-sidebar-collapsed-desktop:justify-center in-data-flux-sidebar-collapsed-desktop:px-0"
         aria-label="{{ __('Switch firm. Current firm: :firm', ['firm' => $currentMembership->firm->name]) }}"
+        title="{{ __('Switch firm: :firm', ['firm' => $currentMembership->firm->name]) }}"
     >
         <span class="grid size-9 shrink-0 place-items-center rounded-lg bg-amber-400 text-sm font-black text-zinc-950">
             {{ mb_strtoupper(mb_substr($currentMembership->firm->name, 0, 1)) }}
         </span>
-        <span class="min-w-0 flex-1">
+        <span class="min-w-0 flex-1 in-data-flux-sidebar-collapsed-desktop:hidden">
             <span class="block truncate text-sm font-semibold text-zinc-100">
                 {{ $currentMembership->firm->name }}
             </span>
@@ -15,7 +16,7 @@
                 {{ $currentMembership->role->label() }}
             </span>
         </span>
-        <flux:icon.chevrons-up-down class="size-4 text-zinc-500 transition group-hover:text-amber-300" />
+        <flux:icon.chevrons-up-down class="size-4 text-zinc-500 transition group-hover:text-amber-300 in-data-flux-sidebar-collapsed-desktop:hidden" />
     </button>
 
     <flux:menu class="min-w-72">

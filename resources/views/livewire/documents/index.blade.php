@@ -1,31 +1,31 @@
 {{-- Metadata only. This interface never accepts or stores a document file. --}}
-<div class="mx-auto w-full max-w-7xl">
-    <header class="border-b border-white/8 pb-8">
+<div class="tbt-page">
+    <header class="tbt-page-header">
         <div class="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
             <div>
-                <p class="mb-3 text-sm font-medium text-amber-300">{{ __('Client records') }}</p>
-                <h1 class="text-balance text-4xl font-semibold tracking-[-0.03em] text-white sm:text-5xl">
+                <p class="tbt-page-kicker">{{ __('Client records') }}</p>
+                <h1 class="tbt-page-title">
                     {{ __('Document expiry') }}
                 </h1>
-                <p class="mt-4 max-w-3xl text-base leading-7 text-zinc-400">
+                <p class="tbt-page-copy">
                     {{ __('Record document expiry dates and follow up before renewals are due. The platform stores the details entered by your team and does not confirm whether a document is legally valid.') }}
                 </p>
             </div>
-            <flux:badge color="amber" icon="calendar-days">{{ __('Metadata only') }}</flux:badge>
+            <flux:badge color="amber" icon="calendar-days">{{ __('Dates and details only') }}</flux:badge>
         </div>
     </header>
 
-    <div class="mt-9 grid gap-8 xl:grid-cols-[minmax(0,1fr)_23rem]">
+    <div class="mt-5 grid gap-5 xl:grid-cols-[minmax(0,1fr)_23rem]">
         <section aria-labelledby="expiry-register-heading">
-            <div class="flex items-end justify-between gap-4">
+            <div class="tbt-section-heading">
                 <div>
-                    <h2 id="expiry-register-heading" class="text-lg font-semibold text-zinc-100">{{ __('Current documents') }}</h2>
-                    <p class="mt-1 text-sm text-zinc-500">{{ __('When a document is renewed, the previous record remains in the history.') }}</p>
+                    <h2 id="expiry-register-heading">{{ __('Current documents') }}</h2>
+                    <p>{{ __('When a document is renewed, the previous record remains in the history.') }}</p>
                 </div>
                 <span class="text-xs text-zinc-500">{{ $this->currentDocuments->count() }} {{ __('current records') }}</span>
             </div>
 
-            <div class="mt-5 divide-y divide-white/8 border-y border-white/8">
+            <div class="tbt-panel divide-y divide-[var(--tbt-border)]">
                 @forelse ($this->currentDocuments as $document)
                     @php
                         $days = $document->expires_on ? today()->diffInDays($document->expires_on, false) : null;
@@ -34,7 +34,7 @@
                         <div>
                             <p class="text-sm font-medium text-zinc-100">{{ $document->client->legal_name }}</p>
                             <p class="mt-1 text-xs text-zinc-500">
-                                {{ $document->documentTypeVersion->name }} v{{ $document->documentTypeVersion->version }}
+                                {{ $document->documentTypeVersion->name }}
                                 @if ($document->reference_label)
                                     / {{ $document->reference_label }}
                                 @endif
@@ -66,7 +66,7 @@
                             @elseif ($days <= 90)
                                 <flux:badge color="amber">{{ trans_choice('{1} 1 day left|[2,*] :count days left', (int) $days, ['count' => (int) $days]) }}</flux:badge>
                             @else
-                                <flux:badge color="green">{{ __('Future expiry') }}</flux:badge>
+                                <flux:badge color="green">{{ __('More than 90 days left') }}</flux:badge>
                             @endif
                         </div>
                     </article>
@@ -80,7 +80,7 @@
         </section>
 
         <aside class="space-y-6">
-            <section aria-labelledby="record-document-heading" class="rounded-2xl bg-zinc-900/70 p-6 ring-1 ring-white/8">
+            <section aria-labelledby="record-document-heading" class="tbt-panel p-6">
                 <h2 id="record-document-heading" class="text-lg font-semibold text-zinc-100">{{ __('Add document details') }}</h2>
                 <p class="mt-2 text-sm leading-6 text-zinc-500">{{ __('Dates are stored exactly as supplied. Select a prior record only for a renewal.') }}</p>
                 <form wire:submit="recordDocument" class="mt-5 space-y-4">
@@ -90,14 +90,14 @@
                             <flux:select.option :value="$client->id">{{ $client->internal_code }} / {{ $client->legal_name }}</flux:select.option>
                         @endforeach
                     </flux:select>
-                    <flux:select wire:model="documentTypeVersionId" :label="__('Published document type')" required>
+                    <flux:select wire:model="documentTypeVersionId" :label="__('Document type')" required>
                         <flux:select.option value="">{{ __('Select type') }}</flux:select.option>
                         @foreach ($this->latestDocumentTypes as $type)
-                            <flux:select.option :value="$type->id">{{ $type->name }} v{{ $type->version }}</flux:select.option>
+                            <flux:select.option :value="$type->id">{{ $type->name }}</flux:select.option>
                         @endforeach
                     </flux:select>
-                    <flux:select wire:model="supersedesClientDocumentId" :label="__('Renews current record')">
-                        <flux:select.option value="">{{ __('New record') }}</flux:select.option>
+                    <flux:select wire:model="supersedesClientDocumentId" :label="__('Replaces an older document')">
+                        <flux:select.option value="">{{ __('No, this is a new document') }}</flux:select.option>
                         @foreach ($this->currentDocuments as $document)
                             <flux:select.option :value="$document->id">{{ $document->client->internal_code }} / {{ $document->documentTypeVersion->name }}</flux:select.option>
                         @endforeach
@@ -109,18 +109,20 @@
                 </form>
             </section>
 
-            <section aria-labelledby="publish-type-heading" class="rounded-2xl bg-zinc-900/70 p-6 ring-1 ring-white/8">
-                <h2 id="publish-type-heading" class="text-lg font-semibold text-zinc-100">{{ __('Publish document type') }}</h2>
-                <p class="mt-2 text-sm leading-6 text-zinc-500">{{ __('Changing an existing document type creates a new version and keeps the previous version in the history.') }}</p>
+            <details class="tbt-accordion">
+                <summary id="publish-type-heading">{{ __('Manage document types') }}</summary>
+                <div class="p-5">
+                <p class="text-sm leading-6 text-zinc-500">{{ __('Changing an existing document type creates a new version and keeps the previous version in the history.') }}</p>
                 <form wire:submit="publishType" class="mt-5 space-y-4">
-                    <flux:input wire:model="typeKey" :label="__('Stable key')" placeholder="trade_licence" maxlength="64" required />
-                    <flux:input wire:model="typeName" :label="__('Display name')" placeholder="Trade licence" maxlength="100" required />
+                    <flux:input wire:model="typeKey" :label="__('Internal type code')" :description="__('Used by administrators and imports. Use lowercase words joined by underscores.')" placeholder="trade_licence" maxlength="64" required />
+                    <flux:input wire:model="typeName" :label="__('Name shown to the team')" placeholder="Trade licence" maxlength="100" required />
                     <flux:checkbox wire:model="expiryRequired" :label="__('Expiry date required')" />
                     <flux:input wire:model="reminderDays" :label="__('Reminder days before expiry')" description="Comma-separated, such as 90, 30, 7, 1" />
                     <flux:input type="number" min="1" max="365" wire:model="overdueRepeatDays" :label="__('Repeat overdue every days')" />
-                    <flux:button type="submit" variant="filled" class="w-full">{{ __('Publish version') }}</flux:button>
+                    <flux:button type="submit" variant="filled" class="w-full">{{ __('Save document type') }}</flux:button>
                 </form>
-            </section>
+                </div>
+            </details>
         </aside>
     </div>
 </div>

@@ -8,6 +8,7 @@ use App\Enums\ClientStatus;
 use App\Enums\Feature;
 use App\Enums\ObligationStatus;
 use App\Models\Client;
+use App\Models\ClientDocument;
 use App\Models\Obligation;
 use App\Support\FeatureFlags;
 use App\Tenancy\FirmContext;
@@ -29,7 +30,7 @@ final class Index extends Component
 
     public string $clientId = '';
 
-    public string $status = 'open';
+    public string $status = 'all';
 
     public function mount(FeatureFlags $flags, FirmContext $context): void
     {
@@ -46,7 +47,7 @@ final class Index extends Component
             'week' => $anchor->subWeek()->toDateString(),
             default => $anchor->subDays(30)->toDateString(),
         };
-        unset($this->obligations);
+        unset($this->obligations, $this->calendarEvents);
     }
 
     public function nextPeriod(): void
@@ -57,13 +58,19 @@ final class Index extends Component
             'week' => $anchor->addWeek()->toDateString(),
             default => $anchor->addDays(30)->toDateString(),
         };
-        unset($this->obligations);
+        unset($this->obligations, $this->calendarEvents);
     }
 
     public function goToToday(): void
     {
         $this->anchorDate = today()->toDateString();
-        unset($this->obligations);
+        unset($this->obligations, $this->calendarEvents);
+    }
+
+    public function setMode(string $mode): void
+    {
+        $this->mode = in_array($mode, ['month', 'week', 'list'], true) ? $mode : 'month';
+        unset($this->obligations, $this->calendarEvents);
     }
 
     public function updated(): void
@@ -74,7 +81,7 @@ final class Index extends Component
             'clientId' => ['nullable', 'string', 'max:26'],
             'status' => ['required', Rule::in(['all', ...array_column(ObligationStatus::cases(), 'value')])],
         ]);
-        unset($this->obligations, $this->timelineEvents);
+        unset($this->obligations, $this->calendarEvents, $this->timelineEvents);
     }
 
     /** @return Collection<int, Client> */
@@ -108,6 +115,56 @@ final class Index extends Component
             ->orderBy('id')
             ->limit(500)
             ->get();
+    }
+
+    /**
+     * @return \Illuminate\Support\Collection<int, array{
+     *   date: string, client_code: string, title: string, detail: string, kind: string,
+     *   status_label: string, status_color: string
+     * }>
+     */
+    #[Computed]
+    public function calendarEvents(): \Illuminate\Support\Collection
+    {
+        [$start, $end] = $this->range();
+        $events = $this->obligations()->map(static fn (Obligation $obligation): array => [
+            'date' => $obligation->effectiveDueDate()->toDateString(),
+            'client_code' => $obligation->client->internal_code,
+            'title' => $obligation->obligation_type,
+            'detail' => $obligation->period_label ?: (string) __('No period label'),
+            'kind' => 'obligation',
+            'status_label' => $obligation->status->label(),
+            'status_color' => $obligation->status->badgeColor(),
+        ]);
+
+        $documents = ClientDocument::query()
+            ->with(['client', 'person', 'documentTypeVersion'])
+            ->whereNotNull('expires_on')
+            ->whereDoesntHave('successor')
+            ->when($this->clientId !== '', fn ($query) => $query->where('client_id', $this->clientId))
+            ->whereBetween('expires_on', [$start->toDateString(), $end->toDateString()])
+            ->orderBy('expires_on')
+            ->limit(500)
+            ->get()
+            ->map(static fn (ClientDocument $document): array => [
+                'date' => $document->expires_on->toDateString(),
+                'client_code' => $document->client->internal_code,
+                'title' => $document->documentTypeVersion->name,
+                'detail' => $document->client_person_id === null
+                    ? (string) __('Client document')
+                    : $document->person->name,
+                'kind' => 'document',
+                'status_label' => $document->expires_on->isPast()
+                    ? (string) __('Expired')
+                    : (string) __('Expires'),
+                'status_color' => $document->expires_on->isPast() ? 'red' : 'amber',
+            ]);
+
+        return $events->concat($documents)->sortBy([
+            ['date', 'asc'],
+            ['client_code', 'asc'],
+            ['title', 'asc'],
+        ])->values();
     }
 
     /**

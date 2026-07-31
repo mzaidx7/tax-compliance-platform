@@ -5,36 +5,56 @@ STORY: The administrator scans the current register, searches identity records, 
 FIRST VIEWPORT: The searchable register leads while the creation panel remains visible beside it on wide screens.
 FORM: Continuous identity ledger with a compact creation station.
 --}}
-<div class="mx-auto w-full max-w-7xl">
-    <header class="border-b border-white/8 pb-8">
+<div class="tbt-page">
+    <header class="tbt-page-header">
         <div class="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
             <div>
-                <p class="mb-3 text-sm font-medium text-amber-300">{{ $this->currentFirmName }}</p>
-                <h1 class="text-balance text-4xl font-semibold tracking-[-0.03em] text-white sm:text-5xl">
+                <p class="tbt-page-kicker">{{ $this->currentFirmName }}</p>
+                <h1 class="tbt-page-title">
                     {{ __('Clients') }}
                 </h1>
-                <p class="mt-4 max-w-2xl text-base leading-7 text-zinc-400">
+                <p class="tbt-page-copy">
                     {{ __("Keep each client's contact details, Tax Registration Numbers, Tax Periods, documents and assigned team in one place.") }}
                 </p>
             </div>
             <div class="flex flex-wrap items-center gap-3">
+                <flux:button
+                    variant="primary"
+                    icon="arrow-down-tray"
+                    :href="route('clients.import-template', 'workbook')"
+                >
+                    {{ __('Download Excel template') }}
+                </flux:button>
                 <flux:button variant="ghost" icon="arrow-up-tray" wire:click="openImport">
-                    {{ __('Import client master data') }}
+                    {{ __('Import completed file') }}
                 </flux:button>
                 <flux:button variant="ghost" icon="arrow-down-tray" wire:click="exportMasterData">
                     {{ __('Download client data') }}
                 </flux:button>
-                <flux:badge color="amber" icon="shield-check">{{ __('Firm administrator controlled') }}</flux:badge>
+                <flux:badge color="amber" icon="shield-check">{{ __('Administrator access required') }}</flux:badge>
             </div>
         </div>
     </header>
 
-    <div class="mt-9 grid gap-10 xl:grid-cols-[minmax(0,1fr)_22rem]">
+    <section class="tbt-import-steps mt-5" aria-labelledby="bulk-import-heading">
+        <div class="tbt-import-steps__intro">
+            <p class="tbt-page-kicker">{{ __('Bulk client setup') }}</p>
+            <h2 id="bulk-import-heading">{{ __('Add clients and people in one upload') }}</h2>
+            <p>{{ __('The workbook includes separate Clients and People sheets, examples, date guidance and protected identifier columns.') }}</p>
+        </div>
+        <ol class="tbt-import-steps__list">
+            <li><span>1</span><strong>{{ __('Download') }}</strong><small>{{ __('Use the Excel template') }}</small></li>
+            <li><span>2</span><strong>{{ __('Complete') }}</strong><small>{{ __('Fill Clients and People') }}</small></li>
+            <li><span>3</span><strong>{{ __('Import') }}</strong><small>{{ __('Preview before saving') }}</small></li>
+        </ol>
+    </section>
+
+    <div class="mt-5 grid gap-5 2xl:grid-cols-[minmax(0,1fr)_23rem]">
         <section aria-labelledby="client-register-heading">
-            <div class="mb-5 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+            <div class="tbt-section-heading">
                 <div>
-                    <h2 id="client-register-heading" class="text-lg font-semibold text-zinc-100">{{ __('Client list') }}</h2>
-                    <p class="mt-1 text-sm text-zinc-500">{{ __('Each client code must be unique within your firm.') }}</p>
+                    <h2 id="client-register-heading">{{ __('Client list') }}</h2>
+                    <p>{{ __('Each client code must be unique within your firm.') }}</p>
                 </div>
                 <div class="w-full sm:max-w-xs">
                     <flux:input
@@ -47,50 +67,55 @@ FORM: Continuous identity ledger with a compact creation station.
                 </div>
             </div>
 
-            <div class="overflow-hidden border-y border-white/8">
-                <div class="hidden grid-cols-[8rem_minmax(0,1.4fr)_minmax(0,1fr)_7rem_8rem] gap-4 border-b border-white/8 px-4 py-3 text-xs font-medium text-zinc-500 sm:grid">
+            <div class="tbt-table-shell">
+                <div class="hidden grid-cols-[6rem_minmax(0,1.4fr)_minmax(0,.8fr)_6rem_11rem] gap-4 border-b border-[var(--tbt-border)] bg-[var(--tbt-table-head)] px-4 py-3 text-xs font-semibold text-[var(--tbt-muted-strong)] lg:grid">
                     <span>{{ __('Code') }}</span>
-                    <span>{{ __('Legal identity') }}</span>
+                    <span>{{ __('Client name') }}</span>
                     <span>{{ __('Entity type') }}</span>
                     <span class="text-right">{{ __('Status') }}</span>
-                    <span class="text-right">{{ __('Profile') }}</span>
+                    <span class="text-right">{{ __('Actions') }}</span>
                 </div>
 
-                <div class="divide-y divide-white/8">
+                <div class="divide-y divide-[var(--tbt-border)]">
                     @forelse ($this->clients as $client)
                         <article
                             wire:key="client-{{ $client->id }}"
-                            class="grid gap-4 px-4 py-5 transition-colors duration-150 hover:bg-white/[0.025] sm:grid-cols-[8rem_minmax(0,1.4fr)_minmax(0,1fr)_7rem_8rem] sm:items-center"
+                            class="grid gap-4 px-4 py-5 transition-colors duration-150 hover:bg-[var(--tbt-row-hover)] lg:grid-cols-[6rem_minmax(0,1.4fr)_minmax(0,.8fr)_6rem_11rem] lg:items-center"
                         >
                             <div>
-                                <span class="mb-1 block text-xs text-zinc-500 sm:hidden">{{ __('Code') }}</span>
+                                <span class="mb-1 block text-xs text-zinc-500 lg:hidden">{{ __('Code') }}</span>
                                 <span class="font-medium text-zinc-200">{{ $client->internal_code }}</span>
                             </div>
                             <div class="min-w-0">
-                                <span class="mb-1 block text-xs text-zinc-500 sm:hidden">{{ __('Legal identity') }}</span>
+                                <span class="mb-1 block text-xs text-zinc-500 lg:hidden">{{ __('Client name') }}</span>
                                 <p class="truncate text-sm font-medium text-zinc-100">{{ $client->legal_name }}</p>
                                 @if ($client->trade_name)
                                     <p class="mt-1 truncate text-sm text-zinc-500">{{ $client->trade_name }}</p>
                                 @endif
                             </div>
                             <div>
-                                <span class="mb-1 block text-xs text-zinc-500 sm:hidden">{{ __('Entity type') }}</span>
+                                <span class="mb-1 block text-xs text-zinc-500 lg:hidden">{{ __('Entity type') }}</span>
                                 <span class="text-sm text-zinc-400">{{ $client->entity_type ?: __('Not recorded') }}</span>
                             </div>
-                            <div class="sm:text-right">
+                            <div class="lg:text-right">
                                 <flux:badge :color="$client->status->badgeColor()">
                                     {{ $client->status->label() }}
                                 </flux:badge>
                             </div>
-                            <div class="sm:text-right">
-                                <p class="mb-2 text-xs text-zinc-500">
+                            <div class="lg:text-right">
+                                <p class="mb-2 text-xs leading-5 text-zinc-500">
                                     {{ trans_choice('{0} No services|{1} 1 service|[2,*] :count services', $client->service_enrollments_count, ['count' => $client->service_enrollments_count]) }}
                                     ·
                                     {{ trans_choice('{0} No registrations|{1} 1 registration|[2,*] :count registrations', $client->tax_registrations_count, ['count' => $client->tax_registrations_count]) }}
                                 </p>
-                                <flux:button size="sm" variant="ghost" wire:click="openProfile('{{ $client->id }}')">
-                                    {{ __('Manage') }}
-                                </flux:button>
+                                <div class="flex flex-wrap gap-2 lg:justify-end">
+                                    <flux:button size="sm" variant="ghost" :href="route('clients.show', $client)" wire:navigate>
+                                        {{ __('Open workspace') }}
+                                    </flux:button>
+                                    <flux:button size="sm" variant="ghost" wire:click="openProfile('{{ $client->id }}')">
+                                        {{ __('Manage') }}
+                                    </flux:button>
+                                </div>
                             </div>
                         </article>
                     @empty
@@ -115,13 +140,13 @@ FORM: Continuous identity ledger with a compact creation station.
             @endif
         </section>
 
-        <aside aria-labelledby="create-client-heading" class="xl:sticky xl:top-8 xl:self-start">
-            <div class="rounded-2xl bg-zinc-900/70 p-6 ring-1 ring-white/8">
+        <aside aria-labelledby="create-client-heading" class="2xl:sticky 2xl:top-8 2xl:self-start">
+            <div class="tbt-panel p-6">
                 <div class="mb-6">
                     <span class="mb-4 grid size-10 place-items-center rounded-xl bg-amber-400 text-black">
                         <flux:icon.building-office-2 class="size-5" />
                     </span>
-                    <h2 id="create-client-heading" class="text-lg font-semibold text-zinc-100">{{ __('Create client identity') }}</h2>
+                    <h2 id="create-client-heading" class="text-lg font-semibold text-zinc-100">{{ __('Add a client') }}</h2>
                     <p class="mt-2 text-sm leading-6 text-zinc-500">
                         {{ __('For a full setup, import the client master file with tax periods and document expiry dates. You can still add a client here.') }}
                     </p>
@@ -130,7 +155,7 @@ FORM: Continuous identity ledger with a compact creation station.
                 <form wire:submit="createClient" class="space-y-5">
                     <flux:input
                         wire:model="internalCode"
-                        :label="__('Internal client code')"
+                        :label="__('Client code')"
                         placeholder="CL-0001"
                         maxlength="64"
                         autocomplete="off"
@@ -157,7 +182,7 @@ FORM: Continuous identity ledger with a compact creation station.
                     <flux:input
                         wire:model="entityType"
                         :label="__('Entity type')"
-                        :description="__('Optional until the firm confirms its controlled classification list.')"
+                        :description="__('Optional. Record the legal form, such as LLC, FZ-LLC or branch.')"
                         placeholder="Free zone company"
                         maxlength="100"
                     />
@@ -181,18 +206,28 @@ FORM: Continuous identity ledger with a compact creation station.
         </aside>
     </div>
 
-    <flux:modal wire:model.self="showImportModal" class="md:w-[56rem]">
+    <flux:modal wire:model.self="showImportModal" class="w-[calc(100vw-2rem)]! max-w-5xl!">
         <div class="space-y-7">
             <div>
                 <flux:heading size="lg">{{ __('Import client master data') }}</flux:heading>
                 <flux:text class="mt-2 max-w-2xl">
-                    {{ __('Upload a CSV containing client, tax, contact and document details. Review every row before saving. The uploaded file is not kept.') }}
+                    {{ __('Upload the TBT workbook or a client CSV containing client, tax, contact and document details. Review every row before saving. The uploaded file is not kept.') }}
                 </flux:text>
             </div>
 
-            <div class="grid gap-5 border-y border-white/8 py-6 md:grid-cols-[minmax(0,1fr)_auto] md:items-end">
+            <section class="rounded-2xl bg-amber-300/[0.06] p-5 ring-1 ring-amber-300/20" aria-labelledby="import-template-heading">
+                <h3 id="import-template-heading" class="text-sm font-semibold text-amber-200">{{ __('Start with a clean template') }}</h3>
+                <p class="mt-2 text-sm leading-6 text-zinc-400">{{ __('Use the workbook for Clients and People together, or download separate CSV files. Never add FTA or UAE Pass passwords.') }}</p>
+                <div class="mt-4 flex flex-wrap gap-2">
+                    <flux:button size="sm" variant="filled" icon="arrow-down-tray" :href="route('clients.import-template', 'workbook')">{{ __('TBT Client Master.xlsx') }}</flux:button>
+                    <flux:button size="sm" variant="ghost" :href="route('clients.import-template', 'clients')">{{ __('Clients.csv') }}</flux:button>
+                    <flux:button size="sm" variant="ghost" :href="route('clients.import-template', 'people')">{{ __('People.csv') }}</flux:button>
+                </div>
+            </section>
+
+            <div class="grid gap-5 border-y border-white/8 py-6 md:grid-cols-2 md:items-start">
                 <flux:field>
-                    <flux:label>{{ __('Client master CSV file') }}</flux:label>
+                    <flux:label>{{ __('Client master workbook or CSV') }}</flux:label>
                     <input
                         wire:model="clientImportFile"
                         type="file"
@@ -202,11 +237,23 @@ FORM: Continuous identity ledger with a compact creation station.
                     <flux:description>{{ __('Maximum 500 rows and 2 MB. Required: internal_code, legal_name. Optional: email, mobile, vat_trn, ct_trn, vat_frequency, VAT and Corporate Tax period dates, licence, passport and Emirates ID details. Dates use YYYY-MM-DD.') }}</flux:description>
                     <flux:error name="clientImportFile" />
                 </flux:field>
+                <flux:field>
+                    <flux:label>{{ __('People CSV, optional') }}</flux:label>
+                    <input
+                        wire:model="peopleImportFile"
+                        type="file"
+                        accept=".csv,text/csv,text/plain"
+                        class="release-file-input mt-2 block min-h-11 w-full rounded-xl border border-white/10 bg-zinc-950 px-3 py-2 text-sm text-zinc-300 focus:outline-none focus:ring-2 focus:ring-amber-300"
+                    />
+                    <flux:description>{{ __('Use this with Clients.csv. Each person must match client_internal_code in the client file.') }}</flux:description>
+                    <flux:error name="peopleImportFile" />
+                </flux:field>
                 <flux:button
                     variant="primary"
+                    class="md:col-span-2 md:justify-self-end"
                     wire:click="previewClientImport"
                     wire:loading.attr="disabled"
-                    wire:target="clientImportFile,previewClientImport"
+                    wire:target="clientImportFile,peopleImportFile,previewClientImport"
                 >
                     <span wire:loading.remove wire:target="previewClientImport">{{ __('Validate and preview') }}</span>
                     <span wire:loading wire:target="previewClientImport">{{ __('Validating...') }}</span>
@@ -223,6 +270,10 @@ FORM: Continuous identity ledger with a compact creation station.
                         <div class="flex gap-2">
                             <flux:badge color="green">{{ $clientImportAccepted }} {{ __('accepted') }}</flux:badge>
                             <flux:badge :color="$clientImportRejected > 0 ? 'red' : 'zinc'">{{ $clientImportRejected }} {{ __('rejected') }}</flux:badge>
+                            @if ($clientImportPeople !== [])
+                                <flux:badge color="green">{{ $clientImportPeopleAccepted }} {{ __('people ready') }}</flux:badge>
+                                <flux:badge :color="$clientImportPeopleRejected > 0 ? 'red' : 'zinc'">{{ $clientImportPeopleRejected }} {{ __('people rejected') }}</flux:badge>
+                            @endif
                         </div>
                     </div>
 
@@ -266,7 +317,7 @@ FORM: Continuous identity ledger with a compact creation station.
                 <flux:button
                     variant="primary"
                     wire:click="commitClientImport"
-                    :disabled="$clientImportRows === [] || $clientImportRejected > 0"
+                    :disabled="$clientImportRows === [] || $clientImportRejected > 0 || $clientImportPeopleRejected > 0"
                     wire:loading.attr="disabled"
                     wire:target="commitClientImport"
                 >

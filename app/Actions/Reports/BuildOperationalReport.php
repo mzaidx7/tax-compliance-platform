@@ -91,7 +91,21 @@ final readonly class BuildOperationalReport
         $models = match ($type) {
             OperationalReportType::MonthlySchedule => Obligation::query()
                 ->with('client')
-                ->whereRaw('coalesce(effective_due_date, statutory_due_date) between ? and ?', [$start->toDateString(), $end->toDateString()])
+                ->where(function ($query) use ($start, $end): void {
+                    $query
+                        ->where(function ($query) use ($start, $end): void {
+                            $query
+                                ->whereNotNull('effective_due_date')
+                                ->whereDate('effective_due_date', '>=', $start->toDateString())
+                                ->whereDate('effective_due_date', '<=', $end->toDateString());
+                        })
+                        ->orWhere(function ($query) use ($start, $end): void {
+                            $query
+                                ->whereNull('effective_due_date')
+                                ->whereDate('statutory_due_date', '>=', $start->toDateString())
+                                ->whereDate('statutory_due_date', '<=', $end->toDateString());
+                        });
+                })
                 ->orderByRaw('coalesce(effective_due_date, statutory_due_date)')
                 ->orderBy('id')->lazy(500),
             OperationalReportType::TaxPeriods => TaxPeriod::query()

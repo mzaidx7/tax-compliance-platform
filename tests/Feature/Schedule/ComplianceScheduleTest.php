@@ -36,10 +36,12 @@ final class ComplianceScheduleTest extends TestCase
 
         Livewire::actingAs($fixture['manager'])->test(Index::class)
             ->assertSee('Synthetic schedule obligation')
-            ->set('mode', 'week')
+            ->call('setMode', 'week')
+            ->assertSet('mode', 'week')
             ->set('anchorDate', today()->toDateString())
             ->assertSee('Synthetic schedule obligation')
-            ->set('mode', 'list')
+            ->call('setMode', 'list')
+            ->assertSet('mode', 'list')
             ->assertSee(today()->format('d M Y'))
             ->assertSee('Synthetic schedule obligation');
     }
@@ -86,6 +88,15 @@ final class ComplianceScheduleTest extends TestCase
             ->assertSet('anchorDate', '2026-07-22');
 
         $component->call('goToToday')->assertSet('anchorDate', today()->toDateString());
+    }
+
+    public function test_invalid_calendar_layout_falls_back_to_month(): void
+    {
+        $fixture = $this->fixture();
+
+        Livewire::actingAs($fixture['manager'])->test(Index::class)
+            ->call('setMode', 'unsupported')
+            ->assertSet('mode', 'month');
     }
 
     public function test_schedule_excludes_other_firms_and_rejects_non_operational_roles(): void

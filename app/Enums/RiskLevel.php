@@ -14,10 +14,10 @@ enum RiskLevel: string
     public function label(): string
     {
         return match ($this) {
-            self::Unassessed => 'Unassessed',
-            self::Low => 'Low',
-            self::Medium => 'Medium',
-            self::High => 'High',
+            self::Unassessed => 'Not set',
+            self::Low => 'Routine',
+            self::Medium => 'Needs attention',
+            self::High => 'Urgent',
         };
     }
 

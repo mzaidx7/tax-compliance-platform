@@ -11,6 +11,7 @@ use App\Actions\Clients\AddTaxRegistration;
 use App\Actions\Clients\CommitClientCsvImport;
 use App\Actions\Clients\CreateClient;
 use App\Actions\Clients\PreviewClientCsvImport;
+use App\Actions\Clients\PreviewClientPeopleCsvImport;
 use App\Actions\Clients\TransitionClientServiceEnrollment;
 use App\Actions\Clients\TransitionClientStatus;
 use App\Actions\Exports\ExportClientMasterData;
@@ -61,12 +62,21 @@ final class Index extends Component
 
     public ?TemporaryUploadedFile $clientImportFile = null;
 
+    public ?TemporaryUploadedFile $peopleImportFile = null;
+
     /** @var list<array{line: int, internalCode: string, legalName: string, tradeName: string, entityType: string, masterData: array<string, string>, errors: list<string>, valid: bool}> */
     public array $clientImportRows = [];
 
     public int $clientImportAccepted = 0;
 
     public int $clientImportRejected = 0;
+
+    /** @var list<array{line: int, clientInternalCode: string, name: string, role: string, data: array<string, string>, errors: list<string>, valid: bool}> */
+    public array $clientImportPeople = [];
+
+    public int $clientImportPeopleAccepted = 0;
+
+    public int $clientImportPeopleRejected = 0;
 
     public bool $showImportModal = false;
 
@@ -174,8 +184,10 @@ final class Index extends Component
         return redirect()->route('exports.download', ['exportAuditLog' => $artifact->auditLogId]);
     }
 
-    public function previewClientImport(PreviewClientCsvImport $preview): void
-    {
+    public function previewClientImport(
+        PreviewClientCsvImport $preview,
+        PreviewClientPeopleCsvImport $peoplePreview,
+    ): void {
         $this->validate([
             'clientImportFile' => ['required', 'file', 'mimes:csv,txt,xlsx', 'max:2048'],
         ]);
@@ -184,11 +196,23 @@ final class Index extends Component
         $this->clientImportRows = $result['rows'];
         $this->clientImportAccepted = $result['accepted'];
         $this->clientImportRejected = $result['rejected'];
+        $this->clientImportPeople = $result['people'];
+        $this->clientImportPeopleAccepted = $result['peopleAccepted'];
+        $this->clientImportPeopleRejected = $result['peopleRejected'];
+        if ($this->peopleImportFile !== null) {
+            $this->validate([
+                'peopleImportFile' => ['file', 'mimes:csv,txt', 'max:2048'],
+            ]);
+            $people = $peoplePreview->handle($this->currentUser(), $this->peopleImportFile, $this->clientImportRows);
+            $this->clientImportPeople = $people['rows'];
+            $this->clientImportPeopleAccepted = $people['accepted'];
+            $this->clientImportPeopleRejected = $people['rejected'];
+        }
     }
 
     public function commitClientImport(CommitClientCsvImport $commit): void
     {
-        $count = $commit->handle($this->currentUser(), $this->clientImportRows);
+        $count = $commit->handle($this->currentUser(), $this->clientImportRows, $this->clientImportPeople);
         $this->showImportModal = false;
         $this->resetClientImport();
         $this->resetPage();
@@ -199,7 +223,16 @@ final class Index extends Component
 
     public function resetClientImport(): void
     {
-        $this->reset('clientImportFile', 'clientImportRows', 'clientImportAccepted', 'clientImportRejected');
+        $this->reset(
+            'clientImportFile',
+            'peopleImportFile',
+            'clientImportRows',
+            'clientImportAccepted',
+            'clientImportRejected',
+            'clientImportPeople',
+            'clientImportPeopleAccepted',
+            'clientImportPeopleRejected',
+        );
         $this->resetValidation('clientImportFile');
     }
 

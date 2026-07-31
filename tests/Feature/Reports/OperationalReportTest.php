@@ -76,6 +76,20 @@ final class OperationalReportTest extends TestCase
         $this->assertDatabaseHas('audit_logs', ['action' => 'firm.export.downloaded']);
     }
 
+    public function test_monthly_schedule_includes_an_obligation_due_on_the_last_day_of_the_month(): void
+    {
+        $fixture = $this->fixture();
+
+        $preview = app(BuildOperationalReport::class)->preview(
+            $fixture['manager'],
+            OperationalReportType::MonthlySchedule,
+            today()->format('Y-m'),
+        );
+
+        $this->assertNotEmpty($preview['rows']);
+        $this->assertSame('Synthetic report obligation', $preview['rows'][0][2]);
+    }
+
     public function test_livewire_preview_and_export_reject_member_without_report_permission(): void
     {
         $fixture = $this->fixture();

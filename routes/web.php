@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ClientImportTemplateController;
 use App\Http\Controllers\DocumentEvidenceDownloadController;
 use App\Http\Controllers\ExportDownloadController;
 use App\Http\Controllers\FirmSelectionController;
@@ -7,17 +8,18 @@ use App\Http\Controllers\FirmSwitchController;
 use App\Http\Controllers\InvitationAcceptanceController;
 use App\Livewire\Audit\Index as AuditIndex;
 use App\Livewire\Clients\Index as ClientsIndex;
+use App\Livewire\Clients\Show as ClientShow;
 use App\Livewire\Dashboard\Index as DashboardIndex;
 use App\Livewire\Documents\Index as DocumentsIndex;
 use App\Livewire\Generation\Index as GenerationIndex;
 use App\Livewire\Members\Index as MembersIndex;
 use App\Livewire\Notifications\Index as NotificationsIndex;
 use App\Livewire\Obligations\Index as ObligationsIndex;
-use App\Livewire\Readiness\ComingSoon as ReadinessComingSoon;
 use App\Livewire\Reports\Index as ReportsIndex;
 use App\Livewire\Rules\Index as RulesIndex;
 use App\Livewire\Schedule\Index as ScheduleIndex;
 use App\Livewire\Settings\FeatureFlags as SettingsFeatureFlags;
+use App\Livewire\Tutorial\Index as TutorialIndex;
 use App\Livewire\WorkItems\Index as WorkItemsIndex;
 use Illuminate\Support\Facades\Route;
 
@@ -37,7 +39,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
 Route::middleware(['auth', 'verified', 'firm.context'])->group(function () {
     Route::livewire('dashboard', DashboardIndex::class)->name('dashboard');
+    Route::livewire('tutorial', TutorialIndex::class)->name('tutorial.index');
     Route::livewire('clients', ClientsIndex::class)->name('clients.index');
+    Route::get('clients/import-template/{template}', ClientImportTemplateController::class)
+        ->whereIn('template', ['workbook', 'clients', 'people'])
+        ->name('clients.import-template');
+    Route::livewire('clients/{client}', ClientShow::class)->name('clients.show');
     Route::livewire('document-expiry', DocumentsIndex::class)->name('documents.index');
     Route::livewire('members', MembersIndex::class)->name('members.index');
     Route::livewire('notifications', NotificationsIndex::class)->name('notifications.index');
@@ -45,7 +52,6 @@ Route::middleware(['auth', 'verified', 'firm.context'])->group(function () {
     Route::livewire('rules', RulesIndex::class)->name('rules.index');
     Route::livewire('generation', GenerationIndex::class)->name('generation.index');
     Route::livewire('schedule', ScheduleIndex::class)->name('schedule.index');
-    Route::livewire('readiness', ReadinessComingSoon::class)->name('readiness.coming-soon');
     Route::livewire('reports', ReportsIndex::class)->name('reports.index');
     Route::livewire('work', WorkItemsIndex::class)->name('work-items.index');
     Route::livewire('audit', AuditIndex::class)->name('audit.index');

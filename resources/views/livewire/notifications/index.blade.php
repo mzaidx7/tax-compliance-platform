@@ -1,16 +1,16 @@
-<div class="mx-auto w-full max-w-6xl">
-    <header class="border-b border-white/8 pb-8">
-        <p class="mb-3 text-sm font-medium text-amber-300">{{ app(\App\Tenancy\FirmContext::class)->firm()->name }}</p>
-        <h1 class="text-balance text-4xl font-semibold tracking-[-0.03em] text-white sm:text-5xl">{{ __('Notifications') }}</h1>
-        <p class="mt-4 max-w-3xl text-base leading-7 text-zinc-400">{{ __('Review reminders and updates about your firm’s compliance work. Delivery status is shown without exposing private message content.') }}</p>
+<div class="tbt-page max-w-6xl">
+    <header class="tbt-page-header">
+        <p class="tbt-page-kicker">{{ app(\App\Tenancy\FirmContext::class)->firm()->name }}</p>
+        <h1 class="tbt-page-title">{{ __('Notifications') }}</h1>
+        <p class="tbt-page-copy">{{ __('Review reminders and updates about your firm’s compliance work. Delivery status is shown without exposing private message content.') }}</p>
     </header>
 
     @if ($this->canGenerateSummary())
-        <section class="mt-8 border-y border-white/8 py-5" aria-labelledby="manager-summary-heading">
+        <section class="tbt-panel mt-5 p-5" aria-labelledby="manager-summary-heading">
             <div class="grid gap-4 sm:grid-cols-[minmax(14rem,1fr)_auto] sm:items-end">
                 <div>
                     <h2 id="manager-summary-heading" class="text-lg font-semibold text-zinc-100">{{ __('Send a manager summary') }}</h2>
-                    <p class="mt-1 text-sm text-zinc-500">{{ __('Send a daily summary of upcoming deadlines, overdue work, recorded risks and payment follow-ups to an active manager.') }}</p>
+                    <p class="mt-1 text-sm text-zinc-500">{{ __('Send a summary of upcoming deadlines, overdue tasks, urgent items and payment follow-ups to a manager.') }}</p>
                     <div class="mt-4 max-w-xl">
                         <flux:select wire:model="managerMembershipId" :label="__('Recipient manager')" required>
                             <flux:select.option value="">{{ __('Select active manager') }}</flux:select.option>
@@ -34,7 +34,7 @@
             <span class="text-xs text-zinc-500">{{ trans_choice('{0} No notices|{1} 1 notice|[2,*] :count notices', $this->requests->total(), ['count' => $this->requests->total()]) }}</span>
         </div>
 
-        <div class="divide-y divide-white/8 border-y border-white/8">
+        <div class="tbt-panel divide-y divide-[var(--tbt-border)] px-5">
             @forelse ($this->requests as $request)
                 @php($latestAttempt = $request->attempts->first())
                 <article class="grid gap-4 py-5 md:grid-cols-[minmax(0,1fr)_12rem_auto] md:items-center">
@@ -62,7 +62,7 @@
                     </div>
                 </article>
             @empty
-                <div class="py-14 text-center"><p class="text-sm font-medium text-zinc-200">{{ __('No notification evidence yet') }}</p><p class="mt-2 text-sm text-zinc-500">{{ __('Operational notices addressed to you will appear here.') }}</p></div>
+                <div class="py-14 text-center"><p class="text-sm font-medium text-zinc-200">{{ __('No notifications yet') }}</p><p class="mt-2 text-sm text-zinc-500">{{ __('Reminders and updates sent to you will appear here.') }}</p></div>
             @endforelse
         </div>
         @if ($this->requests->hasPages())<div class="mt-6">{{ $this->requests->links() }}</div>@endif

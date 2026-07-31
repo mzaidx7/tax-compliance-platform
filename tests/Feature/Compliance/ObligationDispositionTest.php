@@ -135,7 +135,7 @@ final class ObligationDispositionTest extends TestCase
             ->set('dispositionReason', 'Synthetic UI approval.')
             ->call('disposeObligation')
             ->assertHasNoErrors()
-            ->assertSee('Deadline: Superseded');
+            ->assertSee('Due date: Superseded');
     }
 
     /** @return array{User, Obligation, Firm, Client} */

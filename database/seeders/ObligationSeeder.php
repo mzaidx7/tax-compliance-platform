@@ -30,12 +30,12 @@ final class ObligationSeeder extends Seeder
         foreach ($clients as $index => $client) {
             Obligation::factory()->createForFirm($client->firm, $client, [
                 'obligation_type' => $index === 0
-                    ? 'Synthetic manual VAT review'
-                    : 'Synthetic manual licence review',
-                'period_label' => $index === 0 ? 'Synthetic Q2 2026' : null,
+                    ? 'VAT return'
+                    : 'Trade licence renewal',
+                'period_label' => $index === 0 ? 'Apr to Jun 2026' : null,
                 'statutory_due_date' => $index === 0 ? '2026-09-28' : '2026-10-15',
                 'internal_target_date' => $index === 0 ? '2026-09-21' : '2026-10-08',
-                'source_reference' => 'Synthetic manual fixture, not regulatory guidance.',
+                'source_reference' => 'Demo record for local testing only.',
                 'last_verified_on' => '2026-07-27',
                 'verified_by' => $administrator->id,
                 'created_by' => $administrator->id,

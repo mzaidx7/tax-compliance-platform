@@ -85,10 +85,10 @@ final class Index extends Component
     {
         return match ($key) {
             'firm_access_summary' => __('Firm access summary'),
-            'work_item_high_risk' => __('Work recorded high risk'),
+            'work_item_high_risk' => __('Task marked for urgent attention'),
             'payment_overdue' => __('Payment recorded overdue'),
-            'manager_operational_summary' => __('Manager operational summary'),
-            default => __('Operational notice'),
+            'manager_operational_summary' => __('Manager deadline summary'),
+            default => __('Compliance update'),
         };
     }
 

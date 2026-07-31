@@ -18,6 +18,7 @@ use LogicException;
  * @property string $id
  * @property string $firm_id
  * @property string $client_id
+ * @property string|null $client_person_id
  * @property string $document_type_version_id
  * @property string|null $supersedes_client_document_id
  * @property string|null $reference_label
@@ -31,6 +32,7 @@ use LogicException;
  */
 #[Fillable([
     'client_id',
+    'client_person_id',
     'document_type_version_id',
     'supersedes_client_document_id',
     'reference_label',
@@ -55,6 +57,12 @@ final class ClientDocument extends Model
     public function client(): BelongsTo
     {
         return $this->belongsTo(Client::class);
+    }
+
+    /** @return BelongsTo<ClientPerson, $this> */
+    public function person(): BelongsTo
+    {
+        return $this->belongsTo(ClientPerson::class, 'client_person_id');
     }
 
     /** @return BelongsTo<DocumentTypeVersion, $this> */

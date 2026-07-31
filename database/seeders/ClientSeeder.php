@@ -19,7 +19,7 @@ final class ClientSeeder extends Seeder
         }
 
         $firm = Firm::query()
-            ->where('slug', 'synthetic-compliance-practice')
+            ->where('slug', 'tbt-demo-tax-practice')
             ->firstOrFail();
         $administrator = User::query()
             ->where('email', 'administrator@example.test')
@@ -28,8 +28,8 @@ final class ClientSeeder extends Seeder
         Client::factory()->createForFirm($firm, [
             'internal_code' => 'CL-0001',
             'internal_code_normalized' => 'CL-0001',
-            'legal_name' => 'Synthetic Horizon Trading LLC',
-            'trade_name' => 'Synthetic Horizon',
+            'legal_name' => 'Horizon Trading LLC',
+            'trade_name' => 'Horizon Trading',
             'entity_type' => 'Limited liability company',
             'created_by' => $administrator->id,
         ]);
@@ -37,7 +37,7 @@ final class ClientSeeder extends Seeder
         Client::factory()->createForFirm($firm, [
             'internal_code' => 'CL-0002',
             'internal_code_normalized' => 'CL-0002',
-            'legal_name' => 'Synthetic Dune Advisory FZ-LLC',
+            'legal_name' => 'Dune Advisory FZ-LLC',
             'trade_name' => null,
             'entity_type' => 'Free zone company',
             'created_by' => $administrator->id,

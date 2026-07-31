@@ -49,7 +49,7 @@ final class NotificationCentreTest extends TestCase
         $this->activateFirmMembership($fixture['managerMembership']);
 
         $component = Livewire::actingAs($fixture['manager'])->test(Index::class)
-            ->assertSee('Manager operational summary')
+            ->assertSee('Manager deadline summary')
             ->assertSee('Unread')
             ->call('markRead', $request->id)
             ->assertDontSee('Unread');
@@ -68,7 +68,7 @@ final class NotificationCentreTest extends TestCase
         $otherMembership = $this->createFirmMembership($fixture['firm'], $other, FirmRole::Manager);
         $this->activateFirmMembership($otherMembership);
 
-        Livewire::actingAs($other)->test(Index::class)->assertDontSee('Manager operational summary');
+        Livewire::actingAs($other)->test(Index::class)->assertDontSee('Manager deadline summary');
         $this->expectException(AuthorizationException::class);
         app(MarkNotificationRead::class)->handle($other, $request);
     }

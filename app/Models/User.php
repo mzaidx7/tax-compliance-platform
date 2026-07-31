@@ -25,6 +25,8 @@ use Laravel\Fortify\TwoFactorAuthenticatable;
  * @property string|null $two_factor_recovery_codes
  * @property Carbon|null $two_factor_confirmed_at
  * @property string|null $remember_token
+ * @property Carbon|null $tutorial_prompt_dismissed_at
+ * @property Carbon|null $tutorial_completed_at
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  */
@@ -64,6 +66,8 @@ class User extends Authenticatable
     {
         return [
             'email_verified_at' => 'datetime',
+            'tutorial_prompt_dismissed_at' => 'datetime',
+            'tutorial_completed_at' => 'datetime',
             'password' => 'hashed',
         ];
     }

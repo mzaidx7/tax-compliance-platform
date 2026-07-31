@@ -26,7 +26,7 @@ final class WorkItemTransitionSeeder extends Seeder
         foreach ($workItems as $workItem) {
             WorkItemTransition::factory()->createForWorkItem($workItem->firm, $workItem, [
                 'transitioned_by' => $administrator->id,
-                'reason' => 'Synthetic initial work transition.',
+                'reason' => 'Initial demo task status.',
             ]);
             app(FirmContext::class)->runForFirm(
                 $workItem->firm,

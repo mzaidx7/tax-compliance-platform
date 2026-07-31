@@ -15,9 +15,9 @@ enum OperationalReportType: string
     {
         return match ($this) {
             self::MonthlySchedule => 'Monthly schedule',
-            self::TaxPeriods => 'Tax-period list',
+            self::TaxPeriods => 'Client tax periods',
             self::ExpiringDocuments => 'Expiring documents',
-            self::WorkloadCompletion => 'Workload and completion',
+            self::WorkloadCompletion => 'Team tasks and completion',
         };
     }
 

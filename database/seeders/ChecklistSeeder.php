@@ -33,11 +33,11 @@ final class ChecklistSeeder extends Seeder
         app(PublishChecklistVersion::class)->handle(
             $administrator,
             ChecklistTemplate::CORE_KEY,
-            'Synthetic core compliance checklist',
+            'Standard compliance checklist',
             [
-                ['key' => 'review-source-records', 'label' => 'Review the synthetic source records'],
-                ['key' => 'record-preparation-note', 'label' => 'Record a synthetic preparation note'],
-                ['key' => 'confirm-review-package', 'label' => 'Confirm the synthetic review package'],
+                ['key' => 'review-source-records', 'label' => 'Review the client records'],
+                ['key' => 'record-preparation-note', 'label' => 'Record the preparation note'],
+                ['key' => 'confirm-review-package', 'label' => 'Confirm the filing documents are ready'],
             ],
         );
     }

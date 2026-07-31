@@ -3,24 +3,27 @@
     <head>
         @include('partials.head')
     </head>
-    <body class="min-h-screen bg-zinc-50 text-zinc-900 antialiased dark:bg-zinc-950 dark:text-zinc-100">
+    <body class="tbt-app-shell min-h-screen bg-zinc-50 text-zinc-900 antialiased dark:bg-zinc-950 dark:text-zinc-100">
+        <a href="#main-content" class="fixed left-4 top-3 z-[100] -translate-y-20 rounded-lg bg-amber-300 px-4 py-2 text-sm font-semibold text-black shadow-lg transition-transform focus:translate-y-0">
+            {{ __('Skip to main content') }}
+        </a>
         @php
             $firmContext = app(\App\Tenancy\FirmContext::class);
             $hasFirmContext = $firmContext->hasFirm();
         @endphp
 
-        <flux:sidebar sticky collapsible="mobile" class="border-e border-zinc-200 bg-white dark:border-white/8 dark:bg-zinc-900">
-            <flux:sidebar.header class="border-b border-zinc-200 pb-4 dark:border-white/8">
+        <flux:sidebar sticky collapsible class="tbt-sidebar border-e border-[var(--tbt-border)]">
+            <flux:sidebar.header class="border-b border-[var(--tbt-border)] pb-4">
                 <x-app-logo :sidebar="true" href="{{ route('dashboard') }}" wire:navigate />
-                <flux:sidebar.collapse class="lg:hidden" />
+                <flux:sidebar.collapse />
             </flux:sidebar.header>
 
             @if ($hasFirmContext)
-                <div class="px-2 py-4">
+                <div class="px-2 py-4 in-data-flux-sidebar-collapsed-desktop:px-0">
                     <x-firm-switcher />
                 </div>
             @else
-                <div class="px-3 py-5">
+                <div class="px-3 py-5 in-data-flux-sidebar-collapsed-desktop:hidden">
                     <p class="text-xs font-medium text-zinc-500">{{ __('Personal account') }}</p>
                     <p class="mt-1 text-sm text-zinc-300">{{ __('Account settings') }}</p>
                 </div>
@@ -80,7 +83,7 @@
 
                             @can('viewAny', \App\Models\WorkItem::class)
                                 <flux:sidebar.item icon="queue-list" :href="route('work-items.index')" :current="request()->routeIs('work-items.*')" wire:navigate>
-                                    {{ __('Work tracker') }}
+                            {{ __('Client tasks') }}
                                 </flux:sidebar.item>
                             @endcan
                             @if ($firmContext->membership()?->hasPermission(\App\Enums\Permission::ViewReports))
@@ -110,21 +113,16 @@
                         @endcan
                     @endif
                 </flux:sidebar.group>
-                @if ($hasFirmContext)
-                    <flux:sidebar.group :heading="__('Future release')" class="grid">
-                        <flux:sidebar.item icon="sparkles" :href="route('readiness.coming-soon')" :current="request()->routeIs('readiness.*')" wire:navigate>
-                            <span class="flex min-w-0 flex-1 items-center justify-between gap-3">
-                                <span>{{ __('E-invoicing readiness') }}</span>
-                                <span class="rounded-full bg-amber-300/10 px-2 py-0.5 text-[0.65rem] font-semibold text-amber-300">{{ __('Soon') }}</span>
-                            </span>
-                        </flux:sidebar.item>
-                    </flux:sidebar.group>
-                @endif
             </flux:sidebar.nav>
 
             <flux:spacer />
 
-            <flux:sidebar.nav class="border-t border-zinc-200 pt-4 dark:border-white/8">
+            <flux:sidebar.nav class="border-t border-[var(--tbt-border)] pt-4">
+                @if ($hasFirmContext)
+                    <flux:sidebar.item icon="question-mark-circle" :href="route('tutorial.index')" :current="request()->routeIs('tutorial.*')" wire:navigate>
+                        {{ __('Help & tutorial') }}
+                    </flux:sidebar.item>
+                @endif
                 <flux:sidebar.item icon="cog-6-tooth" :href="route('profile.edit')" :current="request()->routeIs('profile.*', 'appearance.*', 'security.*')" wire:navigate>
                     {{ __('Account settings') }}
                 </flux:sidebar.item>
@@ -133,9 +131,9 @@
             <x-desktop-user-menu class="hidden lg:block" :name="auth()->user()->name" />
         </flux:sidebar>
 
-        <flux:header class="border-b border-zinc-200 bg-white lg:hidden dark:border-white/8 dark:bg-zinc-950">
+        <flux:header class="tbt-mobile-header border-b border-[var(--tbt-border)] lg:hidden">
             <flux:sidebar.toggle class="lg:hidden" icon="bars-2" inset="left" />
-            <span class="ml-3 text-sm font-semibold text-zinc-200">
+            <span class="ml-3 text-sm font-semibold text-[var(--tbt-text)]">
                 {{ $hasFirmContext ? $firmContext->firm()->name : __('Account settings') }}
             </span>
             <flux:spacer />
@@ -153,6 +151,7 @@
             </flux:toast.group>
         @endpersist
 
+        @livewireScriptConfig
         @fluxScripts
     </body>
 </html>

@@ -31,6 +31,16 @@ final class ManualObligationTest extends TestCase
     use BuildsFirmTenancy;
     use RefreshDatabase;
 
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        config([
+            'platform.features.compliance_operations.enabled' => false,
+            'platform.features.compliance_operations.firm_ids' => [],
+        ]);
+    }
+
     public function test_obligation_register_is_not_available_while_feature_is_disabled(): void
     {
         [$manager] = $this->managerContext();

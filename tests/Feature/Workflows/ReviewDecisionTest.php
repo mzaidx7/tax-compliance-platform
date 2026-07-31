@@ -192,7 +192,7 @@ final class ReviewDecisionTest extends TestCase
             ->call('decideReview')
             ->assertHasNoErrors()
             ->assertSet('showReviewModal', false)
-            ->assertSee('Work: Returned for changes');
+            ->assertSee('Task: Returned for changes');
 
         $this->assertDatabaseHas('work_item_transitions', [
             'work_item_id' => $fixture['workItem']->id,

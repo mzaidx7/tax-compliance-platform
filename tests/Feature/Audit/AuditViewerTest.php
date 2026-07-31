@@ -30,7 +30,7 @@ final class AuditViewerTest extends TestCase
         Livewire::actingAs($fixture['admin'])
             ->test(Index::class)
             ->assertOk()
-            ->assertSee('client.created')
+            ->assertSee('Client created')
             ->assertSee('Synthetic client creation reason.')
             ->assertSee('Synthetic Administrator');
     }
@@ -66,7 +66,7 @@ final class AuditViewerTest extends TestCase
             ->test(Index::class)
             ->set('fromDate', $tomorrow)
             ->assertDontSee('Synthetic distinctive marker.')
-            ->assertSee('No retained records match');
+            ->assertSee('No recorded changes match');
     }
 
     public function test_clearing_filters_restores_the_full_register(): void

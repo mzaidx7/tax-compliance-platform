@@ -2,9 +2,9 @@
 
 Release 1 is an invitation-only, firm-scoped compliance operations platform built with Laravel, Livewire, Flux and MySQL.
 
-It covers client records, manually verified obligations, work assignments, checklists, review decisions, filing, payment and tax records, document expiry, schedules, notifications, operational reports and append-only audit evidence.
+It covers client records, calculated VAT and Corporate Tax schedules, work assignments, checklists, review decisions, filing, payment and tax records, document expiry, client reminders, schedules, operational reports and append-only audit evidence.
 
-E-invoicing readiness is intentionally separated as a future release. The Release 1 interface exposes a coming-soon page and no operational readiness routes.
+E-invoicing readiness is intentionally separated from this final Compliance Operations release. Its dormant code and data structures are retained for possible later work, but the interface exposes no e-invoicing navigation, page or feature control.
 
 ## Local setup
 
@@ -15,9 +15,12 @@ Copy-Item .env.example .env
 & '.\.tools\php-8.3.32\php.exe' artisan key:generate
 & '.\.tools\php-8.3.32\php.exe' artisan migrate --seed
 npm.cmd run build
+& '.\.tools\php-8.3.32\php.exe' artisan serve --host=127.0.0.1 --port=8000
 ```
 
 Only synthetic data may be used in development.
+
+Use `artisan serve` for local testing. A plain `php -S` command pointed at `public` does not route Livewire and Flux asset requests through Laravel, so menus, modals, filters and calendar controls will render without working.
 
 ## Verification
 

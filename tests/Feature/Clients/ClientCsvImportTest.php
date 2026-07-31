@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Clients;
 
+use App\Actions\Clients\CommitClientCsvImport;
 use App\Actions\Clients\PreviewClientCsvImport;
+use App\Actions\Clients\PreviewClientPeopleCsvImport;
 use App\Actions\Exports\ExportClientMasterData;
 use App\Enums\FirmRole;
 use App\Livewire\Clients\Index;
@@ -142,6 +144,98 @@ final class ClientCsvImportTest extends TestCase
         self::assertSame(8, Obligation::query()->where('client_id', $client->id)->count());
         $this->assertDatabaseMissing('clients', ['passport_number' => 'P1234567']);
         $this->assertDatabaseMissing('clients', ['emirates_id_number' => '784-1990-1234567-1']);
+    }
+
+    public function test_canonical_workbook_imports_clients_people_and_person_documents_atomically(): void
+    {
+        [$administrator] = $this->administratorContext();
+        $path = resource_path('import-templates/TBT Client Master.xlsx');
+        $file = new UploadedFile(
+            $path,
+            'TBT Client Master.xlsx',
+            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            null,
+            true,
+        );
+
+        $preview = app(PreviewClientCsvImport::class)->handle($administrator, $file);
+
+        self::assertSame(1, $preview['accepted']);
+        self::assertSame(1, $preview['peopleAccepted']);
+        self::assertSame(0, $preview['peopleRejected']);
+
+        app(CommitClientCsvImport::class)->handle(
+            $administrator,
+            $preview['rows'],
+            $preview['people'],
+        );
+
+        $client = Client::query()->where('internal_code', 'CLIENT-001')->sole();
+        $person = $client->people()->sole();
+        self::assertSame('Example Authorised Signatory', $person->name);
+        self::assertSame('EXAMPLE-ONLY', $person->passport_number);
+        self::assertSame(2, $person->documents()->count());
+        self::assertSame(2, $client->documents()->where('client_person_id', $person->id)->count());
+    }
+
+    public function test_separate_clients_and_people_csv_files_preview_together(): void
+    {
+        [$administrator] = $this->administratorContext();
+        $clientsFile = new UploadedFile(
+            resource_path('import-templates/Clients.csv'),
+            'Clients.csv',
+            'text/csv',
+            null,
+            true,
+        );
+        $peopleFile = new UploadedFile(
+            resource_path('import-templates/People.csv'),
+            'People.csv',
+            'text/csv',
+            null,
+            true,
+        );
+
+        $clients = app(PreviewClientCsvImport::class)->handle($administrator, $clientsFile);
+        $people = app(PreviewClientPeopleCsvImport::class)->handle($administrator, $peopleFile, $clients['rows']);
+
+        self::assertSame(1, $clients['accepted']);
+        self::assertSame(1, $people['accepted']);
+        self::assertSame(0, $people['rejected']);
+    }
+
+    public function test_client_import_templates_are_visible_and_downloadable(): void
+    {
+        [$administrator] = $this->administratorContext();
+
+        $this->actingAs($administrator)
+            ->get(route('clients.index'))
+            ->assertOk()
+            ->assertSee('Download Excel template')
+            ->assertSee(route('clients.import-template', 'workbook'), false);
+
+        foreach ([
+            'workbook' => 'TBT Client Master.xlsx',
+            'clients' => 'Clients.csv',
+            'people' => 'People.csv',
+        ] as $template => $filename) {
+            $this->actingAs($administrator)
+                ->get(route('clients.import-template', $template))
+                ->assertOk()
+                ->assertDownload($filename);
+        }
+    }
+
+    public function test_import_template_download_requires_client_management_permission(): void
+    {
+        $user = User::factory()->create();
+        $firm = Firm::factory()->create();
+        $membership = $this->createFirmMembership($firm, $user, FirmRole::ReadOnly);
+        $this->activateFirmMembership($membership);
+
+        $this->actingAs($user)
+            ->get(route('clients.import-template', 'workbook'))
+            ->assertForbidden();
     }
 
     public function test_administrator_can_download_an_audited_client_master_export(): void

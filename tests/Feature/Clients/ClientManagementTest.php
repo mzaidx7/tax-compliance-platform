@@ -27,6 +27,16 @@ final class ClientManagementTest extends TestCase
     use BuildsFirmTenancy;
     use RefreshDatabase;
 
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        config([
+            'platform.features.client_master.enabled' => false,
+            'platform.features.client_master.firm_ids' => [],
+        ]);
+    }
+
     public function test_client_register_is_not_available_while_feature_is_disabled(): void
     {
         [$administrator] = $this->administratorContext();
